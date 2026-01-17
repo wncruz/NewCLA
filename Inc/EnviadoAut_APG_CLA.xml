@@ -1,0 +1,33 @@
+<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+	<soap:Body>
+		<!-- Define a operacao sendo realizada (executar classe) -->
+		<executeClass>
+			<!-- Ambiente do Apia a ser chamado -->
+			<envName>APG</envName>
+			<!-- Nome da classe de negocio, tal como configurada no Apia -->
+			<className>INTERFDESINSTALARRETURN</className>
+			<!-- Parametros configurados na classe -->
+			<parameters>
+				<parameter name="processo">DES</parameter>
+				<parameter name="acao">DES</parameter>
+				<parameter name="idLogico">6787366430</parameter>
+				<!-- Adicionado devido ao APG -->
+				<parameter name="idTarefaApg">32260</parameter>
+				<parameter name="numeroSolicitacao"></parameter>
+				<parameter name="dataEntregaAcesso"></parameter>
+				<parameter name="dataRecebimentoRecursoAcesso"></parameter>
+				<parameter name="dataAceiteAcesso"></parameter>
+				<parameter name="numeroAcessoProvedor"></parameter>
+				<parameter name="dataDesinstalacao">01/12/2011</parameter>
+				<parameter name="retorno">OK</parameter>
+			</parameters>
+			<!-- Dados do usuario -->
+			<userData>
+				<!-- Usuario Apia executante -->
+				<usrLogin>sisecla</usrLogin>
+				<!-- senha criptografada (solicitar da BULL a senha ja encriptada) -->
+				<password>36-74142-12611467-95-2011442125126-58-15117</password>
+			</userData>
+		</executeClass>
+	</soap:Body>
+</soap:Envelope>
