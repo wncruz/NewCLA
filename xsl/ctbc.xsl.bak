@@ -1,0 +1,552 @@
+<?xml version = "1.0" encoding ="ISO-8859-1" ?>
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+	<xsl:output method="html" encoding ="ISO-8859-1"/>
+	<xsl:template match="/">
+		<html>
+			<head>
+			<title>Pedido: <xsl:value-of select="//numero"/></title>
+			<style>
+				TD
+				{
+				    FONT-SIZE: 7pt;
+				    FONT-FAMILY: Tahoma;
+				}
+				.TD_RESPOSTA
+				{
+				    FONT-SIZE: 7pt;
+				    FONT-FAMILY: Tahoma;
+				    border-top: 1px solid ;
+				    border-right: 1px solid ;
+				    border-bottom: 1px solid ;
+				    border-left: 1px solid;
+				}
+				INPUT
+				{
+				    FONT-SIZE: 7pt;
+				    FONT-FAMILY: Tahoma;
+				}
+				.TD_CAMPO
+				{
+				    FONT-WEIGHT: bold;
+				    FONT-SIZE: 7pt;
+				    FONT-FAMILY: Tahoma;
+				    BACKGROUND-COLOR: #c2c3d2
+				}
+				.td_btn
+				{
+				    FONT-WEIGHT: bold;
+				    FONT-SIZE: 7pt;
+				    CURSOR: hand;
+				    COLOR: white;
+				    BORDER-LEFT: thin groove;
+				    BORDER-BOTTOM: thin groove;
+				    BORDER-RIGHT: thin groove;
+				    BORDER-TOP: thin groove;
+				    FONT-FAMILY: Tahoma;
+				    BACKGROUND-COLOR: steelblue;
+				    TEXT-ALIGN: center
+				}
+				.TD_NEGRITO
+				{
+				    FONT-WEIGHT: bold;
+				    FONT-FAMILY: Arial
+				}
+				.TD_CAMPO_CLARO
+				{
+				    FONT-WEIGHT: bold;
+				    FONT-SIZE: 7pt;
+				    FONT-FAMILY: Tahoma;
+				    BACKGROUND-COLOR: #edebeb
+				}
+				.TD_SUBTIT
+				{
+				    FONT-WEIGHT: bold;
+				    FONT-SIZE: 7pt;
+				    FONT-FAMILY: Tahoma;
+				    BACKGROUND-COLOR: #b2e6f7;
+				    TEXT-DECORATION: underline
+				}
+				.TD_EMBRATEL
+				{
+				    FONT-WEIGHT: normal;
+				    COLOR: darkblue;
+				    FONT-STYLE: oblique;
+				    FONT-FAMILY: 'Arial Black';
+				    BACKGROUND-COLOR: #eeeeea;
+				    border-top: 1px solid ;
+				    border-right: 1px solid ;
+				    border-bottom: 1px solid ;
+				    border-left: 1px solid;
+				}
+				INPUT.button
+				{
+					font-family: Verdana, Arial, Helvetica, sans-serif;
+					font-size: 9px;
+					font-weight: normal;
+					TEXT-ALIGN: center
+					color: #000000;
+					text-decoration: none;
+					background-color: #f1f1f1;
+					border-top: 1px solid #0F1F5F;
+					border-right: 1px solid #0F1F5F;
+					border-bottom: 1px solid #0F1F5F;
+					border-left: 1px solid #0F1F5F;
+					width:100px
+				}
+				.table_interno
+				{
+				    border-top: 1px solid ;
+				    border-right: 1px solid ;
+				    border-bottom: 1px solid ;
+				    border-left: 1px solid;
+				}
+			</style>
+			<script>
+				function Imprimir()
+				{
+					window.print();
+					//alert("teste");
+				}
+				function SendMail()
+				{
+
+					var xmlDoc = new ActiveXObject("Microsoft.XMLDOM");
+					var xmlhttp = new ActiveXObject("Msxml2.XMLHTTP");
+					var strXML
+
+					xmlDoc.loadXML(Envio.hdnstrXML.value);
+					xmlhttp.Open("POST", "EnviaEmail.asp", false);
+					xmlhttp.Send(xmlDoc.xml);
+
+					strXML = xmlhttp.responseText;
+					objWindow = window.open("About:blank", null, "status=no,toolbar=no,menubar=no,location=no,resizable=Yes,scrollbars = Yes");
+					objWindow.document.write(strXML);		
+					objWindow.document.close();
+					document.close();
+								
+				}
+			</script>
+			</head>
+			
+			<BODY leftMargin="0" topMargin="0" marginheight="0" marginwidth="0"  align = "center">
+
+
+			<TABLE BORDER="0" cellSpacing="0" cellPadding="1" width="100%" >
+  
+				<TR>
+					<TD>
+						<FONT face="Arial" SIZE="2">À</FONT>
+					</TD>
+				</TR>
+
+				<TR>
+					<TD>
+						<FONT face="Arial" SIZE="2">CTBC TELECOM-URA</FONT>
+					</TD>
+				</TR>
+			</TABLE>
+
+
+			<BR></BR>
+			<BR></BR>
+
+			<TABLE BORDER="1" CELLSPACING="0" BORDERCOLOR="#000000" CELLPADDING="2" WIDTH="100%">
+			<TR>
+				<TD VALIGN="TOP" ALIGN="CENTER" COLSPAN="14" BGCOLOR="#ffffff" HEIGHT="13">
+					<FONT FACE="Arial" SIZE="3"> <B>FORMULÁRIO DE SOLICITAÇÃO DE SERVIÇO - EILD (FSS - EILD)</B> </FONT><BR> </BR>
+
+					<FONT FACE="Arial" SIZE="2"> <B><xsl:value-of select="//numero"/>   DATA PEDIDO: <xsl:value-of select="//data"/> DATA EXECUÇÃO: ____/____/____</B></FONT>
+				</TD>
+			</TR>
+			</TABLE>
+
+			<BR></BR>
+			
+			<TABLE BORDER="0" CELLSPACING="0" BORDERCOLOR="#000000" CELLPADDING="2" WIDTH="100%">
+			<TR>
+				<TD VALIGN="TOP" COLSPAN="14" BGCOLOR="#ffffff" HEIGHT="12">
+					<B><FONT FACE="Arial" SIZE="2">EMPRESA CONTRATANTE: </FONT></B>
+				</TD>
+			</TR>
+			</TABLE>
+
+
+			<TABLE BORDER="1" CELLSPACING="0" BORDERCOLOR="#000000" CELLPADDING="2" WIDTH="100%">
+			<TR>
+				<TD VALIGN="TOP" COLSPAN="14" BGCOLOR="#ffffff" HEIGHT="12">
+					<FONT FACE="Arial" SIZE="1">EMPRESA/RAZÃO SOCIAL:</FONT><BR></BR>
+					<FONT FACE="Arial" SIZE="2"><xsl:value-of select="//nomecontratante"/></FONT>
+				</TD>
+			</TR>
+
+			<TR>
+				<TD WIDTH="63%" VALIGN="TOP" COLSPAN="8" BGCOLOR="#ffffff" HEIGHT="12">
+					<FONT FACE="Arial" SIZE="1">ENDEREÇO (RUA, AVENIDA, No, BAIRRO): </FONT><BR></BR>
+					<FONT FACE="Arial" SIZE="2"><xsl:value-of select="//endercontratante"/> </FONT>
+				</TD>
+
+				<TD WIDTH="37%" VALIGN="TOP" COLSPAN="6" BGCOLOR="#ffffff" HEIGHT="12">
+					<FONT FACE="Arial" SIZE="1">.</FONT>
+					<FONT FACE="Arial" SIZE="2"></FONT>
+				</TD>
+			</TR>
+
+
+			<TR>
+				<TD WIDTH="27%" VALIGN="TOP" BGCOLOR="#ffffff" HEIGHT="12">
+					<FONT FACE="Arial" SIZE="1"> CGC: </FONT> <BR></BR> 
+					<FONT FACE="Arial" SIZE="2"> <xsl:value-of select="//cgccnpjcontratante"/> </FONT>
+				</TD>
+
+				<TD WIDTH="27%" VALIGN="TOP" COLSPAN="5" BGCOLOR="#ffffff" HEIGHT="12">
+					<FONT FACE="Arial" SIZE="1">	CIDADE </FONT><BR></BR>
+					<FONT FACE="Arial" SIZE="2">  <xsl:value-of select="//cidadecontratante"/> </FONT>
+				</TD>
+	
+				<TD WIDTH="20%" VALIGN="TOP" COLSPAN="6" BGCOLOR="#ffffff" HEIGHT="12">
+					<FONT FACE="Arial" SIZE="1"> UF: </FONT> <BR></BR> 
+					<FONT FACE="Arial" SIZE="2"> <xsl:value-of select="//ufcontratante"/> </FONT>
+				</TD>
+	
+				<TD WIDTH="27%" VALIGN="TOP" COLSPAN="2" BGCOLOR="#ffffff" HEIGHT="12">
+					<FONT FACE="Arial" SIZE="1"> CEP: </FONT> <BR></BR> 
+					<FONT FACE="Arial" SIZE="2"> <xsl:value-of select="//cepcontratante"/> </FONT>
+				</TD>
+			</TR>
+
+			<TR>
+				<TD WIDTH="53%" VALIGN="TOP" COLSPAN="6" BGCOLOR="#ffffff" HEIGHT="12">
+					<FONT FACE="Arial" SIZE="1"> CONTATO: <BR></BR></FONT>
+					<FONT FACE="Arial" SIZE="2"> <xsl:value-of select="//contatoebt"/> </FONT>
+				</TD>
+	
+				<TD WIDTH="20%" VALIGN="TOP" COLSPAN="6" BGCOLOR="#ffffff" HEIGHT="12">
+					<FONT FACE="Arial" SIZE="1"> TELEFONE: <BR></BR> </FONT>
+					<FONT FACE="Arial" SIZE="2"> <xsl:value-of select="//telefonecontratante"/> </FONT>
+				</TD>
+	
+				<TD WIDTH="27%" VALIGN="TOP" COLSPAN="2" BGCOLOR="#ffffff" HEIGHT="12">
+					<FONT FACE="Arial" SIZE="1"> FAX/TELEX: <BR></BR> </FONT>
+					<FONT FACE="Arial" SIZE="2"> <xsl:value-of select="//faxcontratante"/></FONT>
+				</TD>
+			</TR>
+			</TABLE>
+
+
+			<BR></BR>
+
+			<TABLE BORDER="0" CELLSPACING="0" BORDERCOLOR="#000000" CELLPADDING="2" WIDTH="100%">
+			<TR>
+				<TD VALIGN="TOP" COLSPAN="14" BGCOLOR="#ffffff" HEIGHT="12">
+					<FONT FACE="Arial" SIZE="2"><B>DADOS DO PEDIDO</B></FONT>
+				</TD>
+			</TR>
+			</TABLE>
+
+			<TABLE BORDER="1" CELLSPACING="0" BORDERCOLOR="#000000" CELLPADDING="2" WIDTH="100%">
+			<TR>
+				<TD VALIGN="TOP" COLSPAN="14" BGCOLOR="#ffffff" HEIGHT="12">
+					<FONT FACE="Arial" SIZE="1">CLIENTE / USUÁRIO: </FONT><BR></BR>
+					<FONT FACE="Arial" SIZE="2" COLOR="#ff0000"><B> <xsl:value-of select="//clientenome"/> </B></FONT>
+				</TD>
+			</TR>
+
+			<TR>
+				<TD WIDTH="34%" VALIGN="TOP" COLSPAN="4" BGCOLOR="#ffffff" HEIGHT="33">
+					<FONT FACE="Arial" SIZE="2"> 
+					<B>( <xsl:if test="//codacao = 1">
+							<span style = "font-family:'verdana'"> x </span>
+						 </xsl:if>
+						)
+					</B> </FONT>
+					<FONT FACE="Arial" SIZE="2" COLOR="#ff0000"> <B> INSTALAÇÃO </B></FONT> <BR></BR><BR></BR>
+			
+					<FONT FACE="Arial" SIZE="1">( )ALT. DE  CARACTERISTICA TÉCNICA </FONT> <BR></BR><BR></BR>
+					<FONT FACE="Arial" SIZE="1">( )ALT. DE MEIO</FONT><BR></BR><BR></BR>
+					<FONT FACE="Arial" SIZE="1">( )ALT.  DE RAZÃO SOCIAL</FONT>
+				</TD>
+
+				<TD WIDTH="35%" VALIGN="TOP" COLSPAN="7" BGCOLOR="#ffffff" HEIGHT="33">
+					<FONT FACE="Arial" SIZE="1">( )AUMENTO VELOCIDADE</FONT><BR></BR>
+					<FONT FACE="Arial" SIZE="1">DE: ______ </FONT> 
+					<FONT FACE="Arial" SIZE="1">PARA: _____</FONT> <BR></BR><BR></BR>
+					<FONT FACE="Arial" SIZE="1">( )REDUÇÃO VELOCIDADE</FONT><BR></BR>
+					<FONT FACE="Arial" SIZE="1">DE: ______ </FONT>
+					<FONT FACE="Arial" SIZE="1">PARA: _____</FONT> <BR></BR><BR></BR>
+					<FONT FACE="Arial" SIZE="1">MUD. END. PONTA:  A( )    B( )  </FONT> <BR></BR><BR></BR>
+					<FONT FACE="Arial" SIZE="1">( )MUDANÇA DE LOCALIDADE</FONT> <BR></BR>
+				</TD>
+		
+				<TD WIDTH="31%" VALIGN="TOP" COLSPAN="3" BGCOLOR="#ffffff" HEIGHT="33">
+					<FONT FACE="Arial" SIZE="1"> 
+					<B>( 
+						<xsl:if test="//codacao = 4">
+								<span style = "font-family:'verdana'">x</span>
+						</xsl:if>
+					)</B> CANCELAMENTO</FONT> <BR></BR> 
+					
+					<FONT FACE="Arial" SIZE="1"> 
+					<B>(
+						<xsl:if test="//codacao = 2">
+								<span style = "font-family:'verdana'">x</span>
+						</xsl:if>
+					)</B> RETIRADA DE ACESSO </FONT><BR></BR>
+					
+					<FONT FACE="Arial" SIZE="1">( ) OUTROS <BR></BR><BR></BR>
+					DATA DESIG. FACILIDADES:  </FONT> <BR></BR><BR></BR>
+					<FONT FACE="Arial" SIZE="1">DATA PREVISÃO DE ATENDIMENTO:  </FONT>
+				</TD>
+			</TR>
+	
+			<TR>
+				<TD WIDTH="65%" VALIGN="TOP" COLSPAN="10" BGCOLOR="#ffffff" HEIGHT="12">
+					<FONT FACE="Arial" SIZE="1">ENDEREÇO  PONTA A (RUA, AVENIDA, No, BAIRRO):</FONT> <BR></BR>
+					<FONT FACE="Arial" SIZE="2" COLOR="#ff0000"> <B> <xsl:value-of select="//clienteend"/> </B></FONT> 
+				</TD>
+				<TD WIDTH="35%" VALIGN="TOP" COLSPAN="4" BGCOLOR="#ffffff" HEIGHT="12">
+					<FONT FACE="Arial" SIZE="1">CGC: </FONT> <BR></BR>
+					<FONT FACE="Arial" SIZE="2" COLOR="#ff0000"><B> <xsl:value-of select="//clientecnpj"/> </B></FONT>
+				</TD>
+			</TR>
+	
+			<TR>
+				<TD WIDTH="53%" VALIGN="TOP" COLSPAN="6" BGCOLOR="#ffffff" HEIGHT="12">
+					<FONT FACE="Arial" SIZE="1">CIDADE:</FONT><BR></BR>
+					<FONT FACE="Arial" SIZE="2" COLOR="#ff0000"><B> <xsl:value-of select="//clientecidade"/> </B></FONT>
+				</TD>
+
+				<TD WIDTH="20%" VALIGN="TOP" COLSPAN="6" BGCOLOR="#ffffff" HEIGHT="12">
+					<FONT FACE="Arial" SIZE="1">UF:</FONT><BR></BR>
+					<FONT FACE="Arial" SIZE="2" COLOR="#ff0000"><B><xsl:value-of select="//clienteuf"/></B></FONT>
+				</TD>
+		
+				<TD WIDTH="27%" VALIGN="TOP" COLSPAN="2" BGCOLOR="#ffffff" HEIGHT="12">
+					<FONT FACE="Arial" SIZE="1">CEP:</FONT><BR></BR>
+					<FONT FACE="Arial" SIZE="2" COLOR="#ff0000"><B><xsl:value-of select="//clientecep"/></B></FONT>
+				</TD>
+			</TR>
+
+			<TR>
+				<TD WIDTH="32%" VALIGN="TOP" COLSPAN="2" BGCOLOR="#ffffff" HEIGHT="12">
+					<FONT FACE="Arial" SIZE="1">TELEFONE:</FONT><BR></BR>
+					<FONT FACE="Arial" SIZE="2" COLOR="#ff0000"><B><xsl:value-of select="//clientetelefone"/></B></FONT>
+				</TD>
+		
+				<TD WIDTH="32%" VALIGN="TOP" COLSPAN="7" BGCOLOR="#ffffff" HEIGHT="12">
+					<FONT FACE="Arial" SIZE="1">PESSOA P/ CONTACTO:</FONT><BR></BR>
+					<FONT FACE="Arial" SIZE="2" COLOR="#ff0000"><B><xsl:value-of select="//clientecontato"/></B></FONT>
+				</TD>
+		
+				<TD WIDTH="36%" VALIGN="TOP" COLSPAN="5" BGCOLOR="#ffffff" HEIGHT="12">
+					<FONT FACE="Arial" SIZE="1">ROTA:</FONT><BR></BR>
+					<FONT FACE="Arial" SIZE="2"><b> . </b></FONT>
+				</TD>
+			</TR>
+	
+			<TR>
+				<TD VALIGN="TOP" COLSPAN="14" BGCOLOR="#ffffff" HEIGHT="12">
+					<FONT FACE="Arial" SIZE="1">ENDEREÇO  PONTA B (RUA, AVENIDA, No, BAIRRO):</FONT><BR></BR>
+					<FONT FACE="Arial" SIZE="2"> <xsl:value-of select="//pontabend"/> </FONT>
+				</TD>
+			</TR>
+	
+			<TR>
+				<TD WIDTH="53%" VALIGN="TOP" COLSPAN="6" BGCOLOR="#ffffff" HEIGHT="12">
+					<FONT FACE="Arial" SIZE="1">CIDADE:</FONT><BR></BR>
+					<FONT FACE="Arial" SIZE="2"><xsl:value-of select="//pontabcidade"/></FONT>
+				</TD>
+		
+				<TD WIDTH="20%" VALIGN="TOP" COLSPAN="6" BGCOLOR="#ffffff" HEIGHT="12">
+					<FONT FACE="Arial" SIZE="1">UF:</FONT><BR></BR>
+					<FONT FACE="Arial" SIZE="2"><xsl:value-of select="//pontabuf"/></FONT>
+				</TD>
+		
+				<TD WIDTH="27%" VALIGN="TOP" COLSPAN="2" BGCOLOR="#ffffff" HEIGHT="12">
+					<FONT FACE="Arial" SIZE="1">CEP:</FONT><BR></BR>
+					<FONT FACE="Arial" SIZE="2"><xsl:value-of select="//pontabcep"/></FONT>
+				</TD>
+			</TR>
+	
+			<TR>
+				<TD WIDTH="32%" VALIGN="TOP" COLSPAN="2" BGCOLOR="#ffffff" HEIGHT="12">
+					<FONT FACE="Arial" SIZE="1">TELEFONE:</FONT><BR></BR>
+					<FONT FACE="Arial" SIZE="2"><xsl:value-of select="//pontabtel"/> </FONT>
+				</TD>
+		
+				<TD WIDTH="32%" VALIGN="TOP" COLSPAN="7" BGCOLOR="#ffffff" HEIGHT="12">
+					<FONT FACE="Arial" SIZE="1">PESSOA P/ CONTACTO:</FONT><BR></BR>
+					<FONT FACE="Arial" SIZE="2"> <xsl:value-of select="//pontabcontato"/> </FONT>
+				</TD>
+		
+				<TD WIDTH="36%" VALIGN="TOP" COLSPAN="5" BGCOLOR="#ffffff" HEIGHT="12">
+					<FONT FACE="Arial" SIZE="1">ESTAÇÃO SMC: </FONT>
+					<FONT FACE="Arial" SIZE="2"></FONT>
+				</TD>
+			</TR>
+
+			</TABLE>
+
+			<BR></BR>
+
+
+			<TABLE BORDER="0" CELLSPACING="0" BORDERCOLOR="#000000" CELLPADDING="2" WIDTH="100%">
+			<TR>
+				<TD VALIGN="TOP" COLSPAN="14" BGCOLOR="#ffffff" HEIGHT="12">
+					<FONT FACE="Arial" SIZE="2"> <B> MODALIDADE/CARACTERÍSTICAS DA LINHA DEDICADA: </B></FONT>
+				</TD>
+			</TR>
+			</TABLE>
+		
+			<TABLE BORDER="1" CELLSPACING="0" BORDERCOLOR="#000000" CELLPADDING="2" WIDTH="100%">
+			<TR>
+				<TD WIDTH="50%" VALIGN="TOP" COLSPAN="5" BGCOLOR="#ffffff" HEIGHT="12">
+					<FONT FACE="Arial" SIZE="2" COLOR="#ff0000"> <B>VELOCIDADE ( <xsl:value-of select="//clientevelocidade"/>  ) </B> </FONT> <BR></BR><BR></BR>
+					<FONT FACE="Arial" SIZE="1">QUANTIDADE DE LINHA:  </FONT>
+					<FONT FACE="Arial" SIZE="1"> DEDICADA(  )  </FONT>
+					<FONT FACE="Arial" SIZE="2" COLOR="#ffffff"> .... </FONT>
+					<FONT FACE="Arial" SIZE="1"> CANAL   (  ) </FONT><BR></BR><BR></BR>
+				
+					<FONT FACE="Arial" SIZE="1">TIPO DE INTERLIGAÇÃO (  )</FONT><BR></BR><BR></BR>
+				
+					<FONT FACE="Arial" SIZE="2"><B>CLASSE/OPERAÇÃO:</B></FONT><BR></BR>
+				
+					<FONT FACE="Arial" SIZE="1"> (  )SÍNCRONO </FONT>
+					<FONT FACE="Arial" SIZE="2" COLOR="#ffffff"> .... </FONT>
+					<FONT FACE="Arial" SIZE="1"> (  )ASSÍNCRONO</FONT> <BR></BR><BR></BR>
+				
+					<FONT FACE="Arial" SIZE="2"><B>INTERFACE:</B></FONT> <BR></BR>
+				
+					<FONT FACE="Arial" SIZE="2" COLOR="#000000"> 
+					( 
+					
+						<xsl:if test="//clienteinterface = 'V24'">
+								<span style = "font-family:'verdana'">x</span>
+						</xsl:if>
+										
+					 )V24 </FONT> 
+					 
+					<FONT FACE="Arial" SIZE="2" COLOR="#ffffff"> .... </FONT>
+					<FONT FACE="Arial" SIZE="2" COLOR="#000000" > 
+					(  
+						<xsl:if test="//clienteinterface = 'V35'">
+								<span style = "font-family:'verdana'">x</span>
+						</xsl:if>
+					
+					)V35 </FONT> 
+					
+					<FONT FACE="Arial" SIZE="2" COLOR="#ffffff"> .... </FONT>
+					
+					<FONT FACE="Arial" SIZE="2" COLOR="#000000" > 
+					(  
+						<xsl:if test="//clienteinterface = 'V36'">
+								<span style = "font-family:'verdana'">x</span>
+						</xsl:if>
+					)V36 </FONT> 
+					
+					<FONT FACE="Arial" SIZE="2" COLOR="#ffffff"> .... </FONT>
+					
+					<FONT FACE="Arial" SIZE="2" COLOR="#000000"> 
+					(
+						<xsl:if test="//clienteinterface = 'G703'">
+								<span style = "font-family:'verdana'">x</span>
+						</xsl:if>
+						
+					)G703 </FONT>
+
+				</TD>
+				
+				<TD WIDTH="50%" VALIGN="TOP" COLSPAN="9" BGCOLOR="#ffffff" HEIGHT="12">
+					<FONT FACE="Arial" SIZE="1">QUANTIDADE MODEM's	(  )</FONT><BR></BR><BR></BR>
+					<FONT FACE="Arial" SIZE="1">ACESSO LOCAL (  ) </FONT><BR></BR><BR></BR>
+					<FONT FACE="Arial" SIZE="1">DEGRAU TARIFÁRIO (  )</FONT><BR></BR><BR></BR>
+				
+					<FONT FACE="Arial" SIZE="2">DESIGNAÇÃO<B> CTBC: 
+					
+					<xsl:if test="//codacao != 1">
+					
+						<xsl:value-of select="//pontaebt"/> 
+					
+					</xsl:if>
+					
+					</B> </FONT><BR></BR>
+					
+					<FONT FACE="Arial" SIZE="1">ROTA (  ) </FONT>
+					<FONT FACE="Arial" SIZE="2" COLOR="#ffffff"> .... </FONT>
+					<FONT FACE="Arial" SIZE="1">NÚMERO (  )</FONT>
+					<FONT FACE="Arial" SIZE="2" COLOR="#ffffff"> .... </FONT>
+					<FONT FACE="Arial" SIZE="1">CANAL (  )   </FONT><BR></BR><BR></BR>
+				
+					<FONT FACE="Arial" SIZE="2">DESIGNAÇÃO <B>OUTRA EMPRESA: </B></FONT><BR></BR>
+					<FONT FACE="Arial" SIZE="1">ROTA (  )</FONT>
+					<FONT FACE="Arial" SIZE="2" COLOR="#ffffff"> .... </FONT>
+					<FONT FACE="Arial" SIZE="1">NÚMERO(  ) </FONT>
+				</TD>
+			</TR>
+
+
+
+			<TR>
+				<TD VALIGN="TOP" COLSPAN="14" BGCOLOR="#ffffff" HEIGHT="11">
+					<FONT FACE="Arial" SIZE="1"> INFORMAÇÕES COMPLEMENTARES: </FONT>
+					<FONT FACE="Arial" SIZE="2"> <xsl:value-of select="//observaçãos"/><BR/><xsl:value-of select="//observaçãop"/></FONT>
+					<BR></BR><BR></BR><BR></BR>
+				
+					<FONT FACE="Arial" SIZE="1">OCORRÊNCIAS IMPEDITIVAS:</FONT><BR></BR><BR></BR>
+				</TD>
+			</TR>
+
+			<TR>
+				<TD >
+				</TD>
+			</TR>
+
+
+			<TR>
+				<TD VALIGN="TOP" COLSPAN="14" BGCOLOR="#ffffff" HEIGHT="12">
+					<FONT FACE="Arial" SIZE="1">ENDEREÇO:</FONT><BR></BR>
+					<FONT FACE="Arial" SIZE="2"><xsl:value-of select="//endercontratante"/></FONT>
+				</TD>
+			</TR>
+
+			<TR>
+				<TD WIDTH="74%" VALIGN="TOP" COLSPAN="13" BGCOLOR="#ffffff" HEIGHT="12">
+					<FONT FACE="Arial" SIZE="1">CIDADE:</FONT><BR></BR>
+					<FONT FACE="Arial" SIZE="2"><xsl:value-of select="//cidadecontratante"/></FONT>
+				</TD>
+
+				<TD WIDTH="26%" VALIGN="TOP" BGCOLOR="#ffffff" HEIGHT="12">
+					<FONT FACE="Arial" SIZE="1">UF:</FONT><BR></BR>
+					<FONT FACE="Arial" SIZE="2"><xsl:value-of select="//ufcontratante"/></FONT>
+				</TD>
+			</TR>
+	
+			<TR>
+				<TD VALIGN="TOP" COLSPAN="14" BGCOLOR="#ffffff" HEIGHT="13">
+					<FONT FACE="Arial" SIZE="1">CONSULTOR:</FONT><BR></BR>
+					<FONT FACE="Arial" SIZE="2"><xsl:value-of select="//contatoebt"/></FONT>
+				</TD>
+			</TR>
+	
+			<TR>
+				<TD WIDTH="34%" VALIGN="TOP" COLSPAN="3" BGCOLOR="#ffffff" HEIGHT="13">
+					<FONT FACE="Arial" SIZE="1">FONE: </FONT><BR></BR>
+					<FONT FACE="Arial" SIZE="2"><xsl:value-of select="//telefonecontratante"/></FONT>
+				</TD>
+			
+				<TD WIDTH="27%" VALIGN="TOP" COLSPAN="4" BGCOLOR="#ffffff" HEIGHT="13">
+					<FONT FACE="Arial" SIZE="1">FAX:	</FONT><BR></BR>
+					<FONT FACE="Arial" SIZE="2"><xsl:value-of select="//faxcontratante"/></FONT>
+				</TD>
+
+				<TD WIDTH="39%" VALIGN="TOP" COLSPAN="7" BGCOLOR="#ffffff" HEIGHT="13">
+					<FONT FACE="Arial" SIZE="1">E-MAIL:</FONT><BR></BR>
+					<FONT FACE="Arial" SIZE="2"> <xsl:value-of select="//mailfrom"/> </FONT>
+				</TD>
+			</TR>
+
+			</TABLE>
+
+		</BODY>
+	</html>
+  </xsl:template>
+</xsl:stylesheet>

@@ -1,0 +1,596 @@
+<?xml version = "1.0" encoding ="ISO-8859-1" ?>
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+	<xsl:output method="html" encoding ="ISO-8859-1"/>
+	<xsl:template match="/">
+
+<HTML>
+	<HEAD>
+		<TITLE>Carta enviada ao provedor</TITLE>
+
+	<STYLE>
+
+	.TD_RESPOSTA 
+	{
+		FONT-SIZE: 8pt; FONT-FAMILY: Times New Roman
+	}
+
+	.TD_NEGRITO 
+	{
+		FONT-SIZE: 8pt; FONT-FAMILY: Arial
+		border-top: 1px solid ;
+	    border-right: 1px solid ;
+	    border-bottom: 1px solid ;
+	    border-left: 1px solid;
+	}
+
+	.TD_SUBTIT 
+	{
+		border-top: 1px solid ;
+	    border-right: 1px solid ;
+	    border-bottom: 1px solid ;
+	    border-left: 1px solid;
+		FONT-WEIGHT: bold; FONT-SIZE: 16pt; FONT-FAMILY: Times New Roman; TEXT-ALIGN: center
+	}
+
+	TR 
+	{
+		BACKGROUND-COLOR: #ffffff
+	}
+
+	INPUT.button 
+	{
+		BORDER-RIGHT: #0f1f5f 1px solid; BORDER-TOP: #0f1f5f 1px solid; FONT-WEIGHT: normal; FONT-SIZE: 9px; BORDER-LEFT: #0f1f5f 1px solid; WIDTH: 100px; BORDER-BOTTOM: #0f1f5f 1px solid; FONT-FAMILY: Verdana, Arial, Helvetica, sans-serif; BACKGROUND-COLOR: #f1f1f1; TEXT-DECORATION: none
+	}
+
+	.table_interno 
+	{
+		BORDER-RIGHT: 1px solid; BORDER-TOP: 1px solid; BORDER-LEFT: 1px solid; BORDER-BOTTOM: 1px solid
+	}
+	
+	.TD_RESPOSTA
+	{
+	    border-top: 1px solid ;
+	    border-right: 1px solid ;
+	    border-bottom: 1px solid ;
+	    border-left: 1px solid;
+	}
+</STYLE>
+
+<SCRIPT>
+				function Imprimir()
+				{
+					window.print();
+					//alert("teste");
+				}
+				function SendMail()
+				{
+
+					var xmlDoc = new ActiveXObject("Microsoft.XMLDOM");
+					var xmlhttp = new ActiveXObject("Msxml2.XMLHTTP");
+					var strXML
+
+					xmlDoc.loadXML(Envio.hdnstrXML.value);
+					xmlhttp.Open("POST", "EnviaEmail.asp", false);
+					xmlhttp.Send(xmlDoc.xml);
+
+					strXML = xmlhttp.responseText;
+					document.write(strXML);
+								
+				}
+</SCRIPT>
+</HEAD>
+
+<BODY>
+
+
+<TABLE cellSpacing="1" cellPadding="0" width="95%" align="center" bgColor="#111111" border="0">
+  
+  <TR>
+		<TD class="TD_SUBTIT" colSpan="3">GERAÇÃO DE CIRCUITO</TD>
+		<TD class="TD_SUBTIT" vAlign="top" colSpan="1">UF: <FONT size="2"><FONT color="white">.</FONT><B><xsl:value-of select="//ufcontratada"/></B></FONT></TD>
+  </TR>
+
+  <TR>
+		<TD class="TD_NEGRITO" vAlign="top" colSpan="2">CONTRATO:<BR></BR><FONT size="2" align="center"><B> (x)EILD </B> </FONT></TD>
+		<TD class="TD_NEGRITO" vAlign="top" colSpan="2">NÚMERO DO ACESSO: <BR></BR><FONT size="2" align="center"><B> <xsl:value-of select="//pontaebt"/> </B> </FONT></TD>
+  </TR>
+
+  <TR>
+    <TD class="TD_NEGRITO" vAlign="top" colSpan="2">1. Nº DO PEDIDO<BR></BR><FONT color="white">.</FONT>
+		<FONT size="2"><B> <xsl:value-of select="//numero"/> (Acesso Lógico: <xsl:value-of select="//AcessoLogico"/>) </B> </FONT>
+	</TD>
+    <TD class="TD_NEGRITO" vAlign="top" colSpan="2"> 2. DATA DE SOL. DO CLIENTE: <BR></BR><FONT color="white">.</FONT>
+      <FONT size="2"><B> <xsl:value-of select="//data"/> </B> </FONT>
+    </TD>
+  </TR>
+
+
+  <TR>
+    <TD class="TD_NEGRITO" vAlign="top" colSpan="4">SOLICITAÇÃO DE ACESSO:<BR></BR>
+    <FONT color="white">.</FONT>
+		
+			
+			(<FONT color="white">.</FONT>
+			
+				<xsl:if test="//codacao = 1">
+						<span style = "font-family:'verdana'"><B>x</B></span>
+				</xsl:if>
+							
+			) <FONT size="2" align="center"> <B> Ativação  </B> </FONT>
+			<FONT color="white">...</FONT>
+
+			(<FONT color="white">.</FONT>
+			 	<xsl:if test="//codacao = 4">
+						<span style = "font-family:'verdana'"><B>x</B></span>
+				</xsl:if>
+			) <FONT size="2" align="center"> <B> Cancelamento </B> </FONT>
+			
+			<FONT color="white">...</FONT>
+			
+			(<FONT color="white">.</FONT>
+				<xsl:if test="//codacao = 2">
+						<span style = "font-family:'verdana'"><B>x</B></span>
+				</xsl:if>
+			) <FONT size="2" align="center"> <B> Desativação </B> </FONT>
+
+	</TD>
+  </TR>
+
+
+  <TR>
+    <TD class="TD_NEGRITO" vAlign="top" colSpan="2"> ALTERAÇÃO: <BR></BR>
+		 
+		 (<FONT color="white">.</FONT>
+		 	<xsl:if test="//tipoAlteracao = 'V'">
+				<span style = "font-family:'verdana'"><B>x</B></span>
+			</xsl:if>
+		 
+		 	<xsl:if test="//tipoAlteracao = 'E+V'">
+				<span style = "font-family:'verdana'"><B>x</B></span>
+			</xsl:if>
+
+		 ) 
+		 <FONT size="2" align="center"> <B> Velocidade </B> </FONT>
+		 
+		 <FONT color="white">...</FONT>
+
+		 (<FONT color="white">.</FONT>
+		 	<xsl:if test="//tipoAlteracao = 'E'">
+				<span style = "font-family:'verdana'"><B>x</B></span>
+		 </xsl:if>
+
+	 	<xsl:if test="//tipoAlteracao = 'E+V'">
+			<span style = "font-family:'verdana'"><B>x</B></span>
+		</xsl:if>
+
+		 ) 
+		 <FONT size="2" align="center"> <B> Endereço </B> </FONT>
+        
+
+    </TD>
+
+    <TD class="TD_NEGRITO" vAlign="top" colSpan="2"> PROGRAMAÇÃO DA ALTERAÇÃO:	<BR></BR>
+		 
+
+		 (<FONT color="white">.</FONT>
+
+		 	<xsl:if test="//ProgAlteracao = 'P'">
+				<span style = "font-family:'verdana'"><B>x</B></span>
+			</xsl:if>
+		 
+		 )
+		 <FONT size="2" align="center"> <B> Programada </B></FONT>
+		 
+		 <FONT color="white">...</FONT>
+		 (<FONT color="white">.</FONT>
+		 
+ 		 	<xsl:if test="//ProgAlteracao = 'NP'">
+				<span style = "font-family:'verdana'"><B>x</B></span>
+			</xsl:if>
+
+		 ) <FONT size="2" align="center"> <B> Não Programada </B> </FONT>
+
+	</TD>
+  </TR>
+  
+
+  <TR>
+    <TD class="TD_NEGRITO" vAlign="top" colSpan="2">3. NOME OU RAZÃO SOCIAL (FIGU): <BR></BR>
+		<FONT color="white">.</FONT>
+        
+        <FONT size="2" align="center">
+        <B>
+			<xsl:value-of select="//nomecontratante"/> 
+		</B>
+		</FONT>
+    </TD>
+    
+    <TD class="TD_NEGRITO" vAlign="top" colSpan="2"> 4. CNPJ: <BR></BR> 
+		<FONT color="white">.</FONT>
+		
+		<FONT size="2" align="center">
+        <B>
+			<xsl:value-of select="//cnpjcontratante"/>
+		</B>
+		</FONT>
+	</TD>
+  </TR>
+  
+  
+  <TR>
+    <TD class="TD_NEGRITO" vAlign="TOP" colSpan="4">5.USUÁRIO: <BR></BR>
+    <FONT color="white">.</FONT>
+    <FONT size="2" align="center">
+        <B>
+			<xsl:value-of select="//clientenome"/> 
+		</B>
+	</FONT>	
+	</TD>
+  </TR>
+  
+  <TR>
+    <TD class="TD_NEGRITO" vAlign="top" colSpan="2">CONTATO:<BR></BR>
+		<FONT color="white">.</FONT>
+		<FONT size="2" align="center">
+			<B>
+				 <xsl:value-of select="//clientecontato"/> 
+			</B>
+		</FONT>
+    </TD>
+    
+    <TD class="TD_NEGRITO" vAlign="top" colSpan="2">FONE:<BR></BR>
+		<FONT color="white">.</FONT>
+		<FONT size="2" align="center">
+			<B> 
+				<xsl:value-of select="//clientetelefone"/> 
+			</B> 
+		</FONT>
+    </TD>
+  </TR>
+  
+  <TR>
+    <TD class="TD_NEGRITO" vAlign="top" colSpan="3">6.END. PONTA A:<BR></BR>
+		<FONT color="white">.</FONT>
+		<FONT size="2" align="center">
+		<B>
+		 <xsl:value-of select="//pontabend"/> 
+		</B>
+		</FONT>
+    </TD>
+    
+    <TD class="TD_NEGRITO" vAlign="top">Nº: <BR></BR>
+		<FONT color="white">.</FONT>
+		<FONT size="2" align="center">
+		<B>
+			<xsl:value-of select="//clienteendnumero"/>
+		</B>
+		</FONT>
+    </TD>
+  </TR>
+  
+  <TR>
+    <TD class="TD_NEGRITO" vAlign="top" width="25%">COMPL:<BR></BR>
+		<FONT color="white">.</FONT>
+		<FONT size="2" align="center">
+		<B>
+			<xsl:value-of select="//clienteendcomplemento"/>
+		</B>
+		</FONT>
+	</TD>
+
+	<TD class="TD_NEGRITO" vAlign="top" width="15%">LOCALIDADE:<BR></BR>
+		<FONT color="white">.</FONT>
+		<FONT size="2" align="center">
+			<B>
+				<xsl:value-of select="//pontabcidade"/> 
+			</B>
+		</FONT>
+    </TD>
+    
+    <TD class="TD_NEGRITO" vAlign="top"> FC: É NECESSÁRIO PAR DE REDE NA PTA?<BR></BR>
+		<FONT color="white">.</FONT>
+    </TD>
+	
+	<TD class="TD_NEGRITO" vAlign="top"> CFA:<BR></BR>
+		<FONT color="white">.</FONT>
+	</TD>
+  </TR>
+  
+  <TR>
+    <TD class="TD_NEGRITO" vAlign="top" colSpan="2">CONTATO:<BR></BR>
+		<FONT color="white">.</FONT>
+		<FONT size="2" align="center">
+			<B>
+			 <xsl:value-of select="//contatoebt"/>
+			</B> 
+		</FONT>
+	</TD>
+	
+    <TD class="TD_NEGRITO" vAlign="top" colSpan="2"> FONE:<BR></BR>
+		<FONT color="white">.</FONT>
+		<FONT size="2" align="center"> 
+		<B>
+			<xsl:value-of select="//telcontatoebt"/>
+		</B>
+		</FONT>
+	</TD>
+  </TR>
+  
+  <TR>
+    <TD class="TD_NEGRITO" vAlign="top" colSpan="3">7.END. PONTA B:<BR></BR>
+		<FONT color="white">.</FONT>
+		<FONT size="2" align="center">
+		<B>
+			<xsl:value-of select="//clienteend"/>
+		</B>
+		</FONT>
+	</TD>
+	
+    <TD class="TD_NEGRITO" vAlign="top"> Nº:<BR></BR>
+		<FONT color="white">.</FONT>
+		<FONT size="2" align="center">
+		<B>
+			<xsl:value-of select="//pontabendnumero"/> 
+		</B>
+		</FONT>
+	</TD>
+  </TR>
+  
+  <TR>
+    <TD class="TD_NEGRITO" vAlign="top">COMPL:<BR></BR>
+		<FONT color="white">.</FONT>
+		<FONT size="2" align="center">
+		<B>
+			<xsl:value-of select="//pontabendcomplemento"/>
+		</B>
+		</FONT>
+	</TD>
+	
+    <TD class="TD_NEGRITO" vAlign="top">LOCALIDADE:<BR></BR>
+		<FONT color="white">.</FONT>
+		<FONT size="2" align="center">
+		<B>
+			<xsl:value-of select="//clientecidade"/> 
+		</B>
+		</FONT>
+	</TD>
+    
+        
+    <TD class="TD_NEGRITO" vAlign="top"> FC: É NECESSÁRIO PAR DE REDE NA PTB?<BR></BR>
+		<FONT color="white">.</FONT>
+	</TD>
+	
+    <TD class="TD_NEGRITO" vAlign="top"> CFB:<BR></BR>
+		<FONT color="white">.</FONT>
+    </TD>
+  </TR>
+  
+  <TR>
+    <TD class="TD_NEGRITO" vAlign="top" colSpan="2">CONTATO:<BR></BR>
+		<FONT color="white">.</FONT>
+		<FONT size="2" align="center">
+		<B>
+			<xsl:value-of select="//clientecontato"/> 
+		</B>
+		</FONT>
+	</TD>
+	
+    <TD class="TD_NEGRITO" vAlign="top" colSpan="2">FONE:<BR></BR>
+		<FONT color="white">.</FONT>
+		<FONT size="2" align="center">
+		<B>
+		 <xsl:value-of select="//clientetelefone"/> 
+		</B> 
+		</FONT>
+	</TD>
+  </TR>
+  
+  <TR>
+    <TD class="TD_NEGRITO" vAlign="top" colSpan="3"> 8.END. COB/COR:<BR></BR>
+		<FONT color="white">.</FONT>
+		<FONT size="2" align="center"> 
+			<B> <xsl:value-of select="//endercontratante"/> </B>
+		</FONT>
+	</TD>
+    
+    <TD class="TD_NEGRITO" vAlign="top">Nº:<BR></BR>
+		<FONT color="white">.</FONT>
+		<FONT face="Times New Roman">. </FONT>
+    </TD>
+  </TR>
+  <TR>
+    <TD class="TD_NEGRITO" vAlign="top" colSpan="2">
+		COMPL:<BR></BR>
+		<FONT color="white">.</FONT>
+    </TD>
+
+    <TD class="TD_NEGRITO" vAlign="top" colSpan="2">
+		LOCALIDADE:<BR></BR>
+		<FONT color="white">.</FONT>
+		<FONT size="2" align="center"> 
+			<B> <xsl:value-of select="//cidadecontratante"/> </B>
+		</FONT>
+    </TD>
+  </TR>
+  
+  <TR>
+    <TD class="TD_NEGRITO" vAlign="top" colSpan="2" rowSpan="2">
+		9.TIPO DE CIRCUITO:<BR></BR>
+		<FONT color="white">.</FONT>
+		
+		(<xsl:if test="//tipocircuito = 'U'">
+							<B>x</B>
+						</xsl:if>
+		)<FONT size="2" align="center"> <B> URBANO </B> </FONT>
+		<FONT color="white">...</FONT>
+		(	<xsl:if test="//tipocircuito = 'I'">
+				<B>x</B>
+			</xsl:if>
+		) <FONT size="2" align="center"> <B> INTERURBANO </B> </FONT>
+	</TD>
+    
+    <TD class="TD_NEGRITO" vAlign="top" colSpan="2">
+		14.DID:(*)<BR></BR>
+		<FONT color="white">.</FONT>
+    </TD>
+  </TR>
+  
+  <TR>
+    <TD class="TD_NEGRITO" vAlign="top" colSpan="2">
+		P/A:<BR></BR><FONT color="white">.</FONT>
+    </TD>
+  </TR>
+  
+  <TR>
+    <TD class="TD_NEGRITO" vAlign="top" colSpan="2" rowSpan="2">
+		10.TIPO DE TRANSMISSÃO:<BR></BR>
+		<FONT color="white">.</FONT>
+		(<B></B>) <FONT size="2" align="center"> <B> SÍNCRONO </B> </FONT> <FONT color="white">....</FONT>
+		(<FONT color="white">.</FONT>) <FONT size="2" align="center"> <B> ASSÍNCRONO </B> </FONT>
+	</TD>
+    
+    <TD class="TD_NEGRITO" vAlign="top" colSpan="2">
+		P/B:<BR></BR><FONT color="white">.</FONT>
+    </TD>
+  </TR>
+  
+  <TR>
+    <TD class="TD_NEGRITO" vAlign="top" colSpan="2">
+		15.DIP:(*)<BR></BR>
+		<FONT color="white">.</FONT>
+    </TD>
+  </TR>
+  
+  <TR>
+    <TD class="TD_NEGRITO" vAlign="top" colSpan="2" rowSpan="2">
+		11.MODEM:<BR></BR>
+		<FONT color="white">.</FONT>
+		(
+		 <xsl:if test="//existemodem = 'SIM'">
+				<span style = "font-family:'verdana'"><B>x</B></span>
+		 </xsl:if>
+		 ) <FONT size="2" align="center"> <B> C/ MODEM </B> </FONT> <FONT color="white">...</FONT>
+		 
+		<FONT color="white">.</FONT>
+		(
+		 <xsl:if test="//existemodem = 'NAO'">
+				<span style = "font-family:'verdana'"><B>x</B></span>
+		 </xsl:if>
+		) <FONT size="2" align="center"> <B> S/ MODEM </B> </FONT> 
+    </TD>
+
+    <TD class="TD_NEGRITO" vAlign="top" colSpan="2">
+		P/A:<BR></BR>
+		<FONT color="white">.</FONT>
+    </TD>
+  </TR>
+  
+  <TR>
+    <TD class="TD_NEGRITO" vAlign="top" colSpan="2">
+		P/B:<BR></BR>
+		<FONT color="white">.</FONT>
+    </TD>
+  </TR>
+  
+  <TR>
+    <TD class="TD_NEGRITO" vAlign="top" colSpan="2">
+		12.PORTADORA: <BR></BR>
+		<FONT color="white">.</FONT>
+		
+		(
+			<B> <xsl:value-of select="//constante"/> </B>
+		) <FONT size="2" align="center"> <B> CONSTANTE </B></FONT>  
+		  <FONT color="white">...</FONT>
+		
+		<FONT color="white">.</FONT>
+		
+		(
+			<b> <xsl:value-of select="//pseudo"/> </b>
+		) <FONT size="2" align="center"> <B> PSEUDO CONTROLADA </B> </FONT> 
+		  <FONT color="white">...</FONT>
+    </TD>
+
+    <TD class="TD_NEGRITO" vAlign="top" colSpan="2">
+		SÓ PARA EILD:<BR></BR>
+		<FONT  color="white">.</FONT>
+	</TD>
+  </TR>
+  
+  
+  <TR>
+    <TD class="TD_NEGRITO" vAlign="top" colSpan="2">
+		13.VELOCIDADE: <BR></BR>
+		<FONT color="white">.</FONT>
+		<FONT size="2" align="center"> <B> <xsl:value-of select="//clientevelocidade"/> </B> </FONT>
+    </TD>
+    
+    <TD class="TD_NEGRITO" vAlign="top" colSpan="2">
+		16.Nº AGREGADO (INSAGREG): <BR></BR>
+		<FONT color="white">.</FONT> 
+		<FONT size="2" align="center"> <B> <xsl:value-of select="//numeroagregado"/> </B> </FONT>
+	</TD>
+  </TR>
+  <TR>
+    <TD class="TD_NEGRITO" vAlign="top" colSpan="4">
+		17.APRAZAMENTO: <BR></BR>
+		<FONT color="white">.</FONT>
+	</TD>
+  </TR>
+
+
+  <TR>
+    <TD class="TD_NEGRITO" vAlign="top" colSpan="3"> CONSULTOR: <BR></BR>
+		<FONT color="white">.</FONT>
+		<FONT size="2" align="center"><B> <xsl:value-of select="//contatocontratada"/> </B> </FONT>
+    </TD>
+    <TD class="TD_NEGRITO" vAlign="top"> DATA: <BR></BR>
+		<FONT color="white">.</FONT>
+	</TD>
+  </tr>
+<!-- LPEREZ  13/12/2005 -->  
+  <TR>
+    <TD class="TD_NEGRITO" vAlign="top" colSpan="3" rowSpan="2">18.OBSERVAÇÕES<BR></BR>
+		<FONT color="white">.</FONT>
+		<FONT size="2" align="center"> <B><xsl:value-of select="//observaçãos"/><br/><xsl:value-of select="//observaçãop"/></B> </FONT>
+	</TD>
+    
+    <TD class="TD_NEGRITO" vAlign="top"><B>NÚMERO DO CIRCUITO</B><BR></BR>
+		<FONT size="2" align="center"> <B> LOC </B> </FONT>
+	</TD>
+  </TR>
+<!-- LP -->
+  
+  
+  
+  <TR>
+    <TD class="TD_NEGRITO" vAlign="top">
+		<BR></BR> <FONT size="2" align="center"> LOC </FONT>
+    </TD>
+  </TR>
+  
+  <TR>
+    <TD class="TD_NEGRITO" vAlign="top" colSpan="3">
+		POSIÇÕES: <BR></BR>
+
+		<FONT size="2" align="center"> 
+		<B>
+			<xsl:value-of select="//facilidadeProv"/>
+		<BR></BR>
+			<xsl:value-of select="//facilidadeEbt"/>  
+		</B>	
+		</FONT>
+
+    </TD>
+    <TD class="TD_NEGRITO" vAlign="top"><BR></BR>
+		<FONT size="2" align="center"> <B> LOC </B> </FONT>
+		
+	</TD>
+  </TR>
+  
+  </TABLE>
+
+</BODY>
+</HTML>
+
+</xsl:template>
+</xsl:stylesheet>
