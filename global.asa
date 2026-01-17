@@ -1,0 +1,48 @@
+<script language=VBScript Runat=Server>
+sub Application_OnStart
+    'Travando a variável para que mais de um processo não a acesse simultaneamente.
+    'Estes comandos serão executados quando o primeiro usuário acessar o aplicativo.
+	Application.Lock
+
+    'Contador Online.
+    	Application("UsuariosAtuais")=0
+    	Application("TotalUsuarios")=0
+
+
+    'Envio diário de e-mail
+	De = "prssilv@embratel.com.br"
+	Para = "prssilv@embratel.com.br"
+	Assunto = "Teste Global.asa " & date & "NTSPO913 - NEWCLA"
+	Mensagem = "Teste " & date & " - " &  time
+
+	Set mail = Server.CreateObject("CDONTS.NewMail")
+	mail.from = De
+    	mail.to = Para
+    	mail.subject = Assunto
+    	mail.MailFormat = 0
+    	mail.BodyFormat = 0
+    	mail.body = Mensagem
+    
+	mail.send
+    	set mail = nothing
+   
+    ' Destrava as variáveis
+	Application.Unlock
+end sub
+sub Application_OnEnd 
+	
+end sub
+sub Session_OnStart 
+	' Comandos executados quando o usuário entrar no site
+	Application.Lock
+	Application("UsuariosAtuais")=Application("UsuariosAtuais")+1
+	Application("TotalUsuarios")=Application("TotalUsuarios")+1
+	Application.Unlock
+end sub
+sub Session_OnEnd
+	'Comandos executados quando o usuário sair do site
+	Application.Lock
+	Application("UsuariosAtuais")=Application("UsuariosAtuais")-1
+	Application.Unlock	
+end sub
+</script>

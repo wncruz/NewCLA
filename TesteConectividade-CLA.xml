@@ -1,0 +1,66 @@
+<requisicao-cla>
+	<acao>DES</acao>
+	<id-logico></id-logico>
+	<origem>SGAP</origem>
+	<id-tarefa>12925531</id-tarefa>
+	<cliente>
+		<conta>00016531145</conta>
+		<subconta>0001</subconta>
+		<razao-social><![CDATA[ETICA PRESTACAO DE SERVICOS E CONSULTORI]]></razao-social>
+		<nome-fantasia><![CDATA[VLX 16531145]]></nome-fantasia>
+	</cliente>
+	<servico>
+		<order-entry>
+			<ano>2011</ano>
+			<numero>102958</numero>
+			<item>1</item>
+			<servico>IP </servico>
+			<servico-desc>VIP UNICO</servico-desc>
+			<designacao>BHE/IP/03189</designacao>
+			<contrato>VEM-71 1626/2008-1</contrato>
+			<tipo-contrato>2</tipo-contrato>
+			<data-prevista></data-prevista>
+			<contato-tecnico>
+				<cliente>CARLOTA</cliente>
+				<e-mail></e-mail>
+				<telefone>031 - 32963548</telefone>
+			</contato-tecnico>
+			<velocidade>960K</velocidade>
+			<interface-cliente></interface-cliente>
+			<interface-embratel>V35</interface-embratel>
+			<servico-temporario>
+				<data-inicio></data-inicio>
+				<data-fim/>
+			</servico-temporario>
+			<cadastrador>
+				<telefone>5313147</telefone>
+				<username>KENNIA</username>
+			</cadastrador>
+			<endereco-instalacao>
+				<cnpj>01322094000188</cnpj>
+				<inscricao-estadual>ISENTO</inscricao-estadual>
+				<inscricao-municipal>126374001-1</inscricao-municipal>
+				<cnl>BHE</cnl>
+				<proprietario><![CDATA[ETICA PRESTACAO DE SERVICOS E CONSULTORI]]></proprietario>
+				<bairro>SANTO ANTONIO</bairro>
+				<cep>30350080</cep>
+				<cidade>BELO HORIZONTE</cidade>
+				<complemento>
+				</complemento>
+				<logradouro>MARQUES DE PARANAGUA 33</logradouro>
+				<numero>33</numero>
+				<tipo-logradouro>RUA </tipo-logradouro>
+				<uf>MG</uf>
+				<centro-cliente></centro-cliente>
+			</endereco-instalacao>
+			<numero-sev>802986</numero-sev>
+			<codDescargaSAP></codDescargaSAP>
+			<estCliente>BHE 5QB</estCliente>
+		</order-entry>
+	</servico>
+	<acesso>
+		<migracao>N</migracao>
+		<tipo-rede></tipo-rede>
+	</acesso>
+	<senha>A3590023DF66AC92AE35E35E33160</senha>
+</requisicao-cla>
