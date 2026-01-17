@@ -1,0 +1,5 @@
+open IBMFTP
+ftpuser
+darkseed
+get EXT.PSFM.IIFCBGER.RELCLA.P1703001 \\NTSPO913\newcla\FTP_SICI\CC_TELMEX_1703.txt
+quit
