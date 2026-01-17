@@ -1,0 +1,1316 @@
+<html>
+<head>
+	<title>CLA - Controle Local de Acesso</title>
+<link rel=stylesheet type="text/css" href="../css/cla.css">
+<script language='javascript' src="../javascript/cla.js"></script>
+<script language='JavaScript' src='../javascript/formatamenu.js'></SCRIPT>
+<script language='JavaScript' src='../javascript/montamenu.js'></SCRIPT>
+<Script language='javascript'>
+var aMenu1 = new Array('','5','95','','','','','','','Solicitação de Acesso - Ativação','Solicitacao.asp',0,'Solicitação de Acesso - Alteração','AcessoLogico.asp?acao=alt',0,'Solicitação de Acesso - Desativação','AcessoLogico.asp?acao=des',0,'Solicitação de Acesso - Cancelamento','AcessoLogico.asp?acao=can',0);
+var aMenu2 = new Array('','180','95','','','','','','','Pedido','facilidade_main.asp',0,'Execução','execucao_main.asp',0,'Manobra','PendeciaManobra.asp',0,'Aceite','aceitacao_main.asp',0);
+var aMenu3 = new Array('','355','95','','','','','','','Pendência de Cabo Interno','ConsPendCaboInterno.asp',0,'Acessos Aceitos','ConsAcessosAceitos.asp',0,'Geral','consulta_main.asp',0,'Consultar Acessos Físicos','ConsultaAcessoFisico.asp',0,'Acompanhamento','consacompanhamento.asp',0,'Monitoração','Monitoracao.asp',0,'Pedidos por Ação','cons_Aca.asp',0,'Pedidos por Provedor e Ação','cons_ProAca.asp',0,'Pedidos por Provedor e Status','cons_ProStp.asp',0,'Desempenho do GLA - Acessos Aceitos','cons_GLA.asp',0,'Qtde. de Pedidos por Provedor e Ação','cons_ProAcaQtd.asp',0,'Qtde. de Pedidos Aceitos por Provedor','cons_ProQtd.asp',0,'Qtde. de Pedidos Pendentes por Provedor','cons_ProData.asp',0,'Histórico de Facilidades','cons_historicofacilidade.asp',0,'Posições Livres','cons_livres_main.asp',0,'Posições Ocupadas','cons_ocupadas_main.asp',0);
+var aMenu4 = new Array('','545','95','','','','','','','Agente do Pedido','agentepedido_main.asp',0,'Manobra','Manobra.asp',0,'Ação','acao_main.asp',0,'Agente','agente_main.asp',0,'Cidade','cidade_main.asp',0,'Distribuidor','distribuicao_main.asp',0,'Estação','estacao_main.asp',0,'Holding','Holding_main.asp',0,'Localidade Subordinada ao CF','LocalidadeSubCef_main.asp',0,'Associação Usuário com CF','AssocUserCef_main.asp',0,'Promoção','Promocao_main.asp',0,'Centro Funcional','CentroFuncional_main.asp',0,'Associação de Serviço com Velocidade', 'AssocServVel_main.asp',0,'Facilidade','CadastrarFacilidade.asp',0,'Logradouro','logradouro_main.asp',0,'Manutenção de Facilidade','Manut_facilidade.asp',0,'Mais...','',17);
+var aMenu4_17 = new Array('Órgão','orgao_main.asp',0,'Provedor','provedor_main.asp',0,'Recurso','recurso_main.asp',0,'Redirecionar Solicitação','redirsolicitacao_main.asp',0,'Regime de Contrato','regimecontrato_main.asp',0,'Serviço','servico_main.asp',0,'Status','status_main.asp',0,'Tipo de Vigência de Contrato','tipocontrato_main.asp',0,'Usuário','usuario_main.asp',0,'Velocidade','velocidade_main.asp',0);
+
+</Script>
+
+<meta content="text/html; charset=windows-1252" http-equiv=content-type>
+
+</head>
+<script language="JavaScript">
+	function resposta(rep,redireciona){
+		if (rep == 1){
+			alert('REGISTRO GRAVADO COM SUCESSO!');
+			//window.location.replace(redireciona);
+		}
+		if (rep==2) {
+ 			alert('REGISTRO ATUALIZADO COM SUCESSO!');
+            //window.location.replace(redireciona);  
+		}
+		if (rep==3) {
+ 			alert('REGISTRO REMOVIDO COM SUCESSO!');
+            //window.location.replace(redireciona);  
+		}
+		if (rep==4) {
+ 			alert('NÃO FOI POSSÍVEL REMOVER, REGISTRO ESTÁ SENDO USADO EM OUTRA TABELA!');
+		}
+		if (rep==5) {
+ 			alert('PARÂMETROS INVÁLIDOS!');
+		}
+		if (rep==6) {
+ 			if (confirm('PEDIDO ATUALIZADO COM SUCESSO!\n\nDESEJA MANTER OS DADOS NA TELA?') == false) {
+				window.location.replace('pedido.asp');
+			}
+		}
+		
+		if (rep==7) {
+			 if (confirm('PEDIDO GRAVADO COM SUCESSO!\n\nO NÚMERO DO PEDIDO É  \n\nDESEJA MANTER OS DADOS NA TELA?') == false) {
+			window.location.replace('pedido.asp');
+			}
+		}
+		if (rep==8) {
+			 alert('REGISTRO DUPLICADO NÃO PERMITIDO!')
+		}
+		if (rep==10) {
+ 			alert('NÃO FOI POSSÍVEL LOCALIZAR O PRÉDIO!"');
+		}
+		if (rep==11) {
+ 			alert('NÃO FOI POSSÍVEL LOCALIZAR O REGIME DE CONTRATAÇÃO!');
+		}
+		if (rep==12) {
+ 			alert('NÃO FOI POSSÍVEL LOCALIZAR O CLIENTE!');
+ 		}
+		if (rep==13) {
+ 			alert('NÃO FOI POSSÍVEL LOCALIZAR A VELOCIDADE!');
+		}
+		if (rep==14) {
+ 			alert('NÃO FOI POSSÍVEL LOCALIZAR O SERVIÇO!');
+		}
+		if (rep==15) {
+ 			alert('NÃO FOI POSSÍVEL LOCALIZAR A COORDENAÇÃO EXECUTANTE!');
+		}
+		if (rep==16) {
+ 			alert('NÃO FOI POSSÍVEL LOCALIZAR A AÇÃO!');
+		}
+		if (rep==17) {
+ 			alert('NÃO FOI POSSÍVEL LOCALIZAR O USUÁRIO!');
+		}
+		if (rep==18) {
+ 			alert('NÃO FOI POSSÍVEL LOCALIZAR A UF!');
+		}
+		if (rep==19) {
+ 			alert('NÃO FOI POSSÍVEL LOCALIZAR A CIDADE!');
+		}
+		if (rep==20) {
+ 			alert('NÃO FOI POSSÍVEL LOCALIZAR O TIPO DE LOGRADOURO!');
+		}
+		if (rep==21) {
+ 			alert('NÃO FOI POSSÍVEL LOCALIZAR O ÓRGÃO!');
+		}
+		if (rep==22) {
+ 			alert('DADOS INVÁLIDOS AO INCLUIR A AÇÃO!');
+		}
+		if (rep==23) {
+ 			alert('DADOS INVÁLIDOS AO INCLUIR A AÇÃO DO PEDIDO!');
+		}
+		if (rep==24) {
+ 			alert('DADOS INVÁLIDOS AO INCLUIR O AGENTE!');
+		}
+		if (rep==25) {
+ 			alert('DADOS INVÁLIDOS AO INCLUIR O AGENTE DO PEDIDO!');
+		}
+		if (rep==26) {
+ 			alert('DADOS INVÁLIDOS AO INCLUIR A COORDENAÇÃO  EXECUTANTE!');
+		}
+		if (rep==27) {
+ 			alert('DADOS INVÁLIDOS AO INCLUIR A DISTRIBUIÇÃO!');
+		}
+		if (rep==28) {
+ 			alert('DADOS INVÁLIDOS AO INCLUIR O PROVEDOR!');
+		}
+		if (rep==29) {
+ 			alert('PARÂMETRO INVÁLIDO AO INCLUIR O REDIRECIONAMENTO DE SOLICITAÇÃO!');
+		}
+		if (rep==30) {
+ 			alert('DADOS INVÁLIDOS AO INCLUIR O REGIME DE CONTRATO!');
+		}
+		if (rep==31) {
+ 			alert('DADOS INVÁLIDOS AO INCLUIR O SERVIÇO!');
+		}
+		if (rep==32) {
+ 			alert('DADOS INVÁLIDOS AO INCLUIR O SISTEMA X TIPO DE POSIÇÃO!');
+		}
+		if (rep==33) {
+ 			alert('DADOS INVÁLIDOS AO INCLUIR O SISTEMA!');
+		}
+		if (rep==34) {
+ 			alert('DADOS INVÁLIDOS AO INCLUIR O STATUS DO PEDIDO!');
+		}
+		if (rep==35) {
+ 			alert('DADOS INVÁLIDOS AO INCLUIR O TIPO CONTRATO!');
+		}
+		if (rep==36) {
+ 			alert('DADOS INVÁLIDOS AO INCLUIR O TIPO DE DISTRIBUIÇÃO!');
+		}
+		if (rep==37) {
+ 			alert('DADOS INVÁLIDOS AO INCLUIR O TIPO DE POSIÇÃO!');
+		}
+		if (rep==38) {
+ 			alert('DADOS INVÁLIDOS AO INCLUIR O USUÁRIO!');
+		}
+		if (rep==39) {
+	    	alert('DADOS INVÁLIDOS AO INCLUIR O VELOCIDADE!');
+		}
+		if (rep==40) {
+    		alert('PEDIDO NÃO ENCONTRADO!');
+		}
+		if (rep==41) {
+    		alert('NÚMERO DO PEDIDO NÃO ENCONTRADO!');
+		}
+		if (rep==42) {
+	    	alert('USUÁRIO NÃO ENCONTRADO!');
+		}
+		if (rep==43) {
+    		alert('PROVEDOR OU TIPO DE CONTRATO NÃO ENCONTRADO!');
+		}
+		if (rep==44) {
+    		alert('AGENTE NÃO ENCONTRADO!');
+		}
+		if (rep==45) {
+	    	alert('DADOS INVÁLIDOS AO ALTERAR O CLIENTE!');
+		}
+		if (rep==46) {
+    		alert('DADOS INVÁLIDOS AO INCLUIR O CLIENTE!');
+		}
+		if (rep==47) {
+    		alert('DADOS INVÁLIDOS AO ALTERAR O PEDIDO!');
+		}
+	 	if (rep==48) {
+	    	alert('DADOS INVÁLIDOS AO INCLUIR O PEDIDO!');
+		}
+		if (rep==49) {
+    		alert('NENHUM CLIENTE FOI SELECIONADO');
+		}
+		if (rep==50) {
+    		alert('PARÂMETRO INVÁLIDO AO INCLUIR A DISTRIBUIÇÃO X ESTAÇÃO');
+		}
+		if (rep==51) {
+	    	alert('PARÂMETRO INVÁLIDO AO INCLUIR O RECURSO');
+		}
+		if (rep==52) {
+    		alert('PARÂMETRO INVÁLIDO AO INCLUIR O HISTÓRICO');
+		}
+		if (rep==53) {
+    		alert('PARÂMETRO INVÁLIDO AO INCLUIR A DISTRIBUIÇÃO X TIPO DE DISTRIBUIÇÃO');
+		}
+		if (rep==54) {
+	    	alert('PARÂMETRO INVÁLIDO AO INCLUIR O ÓRGÃO');
+		}
+		if (rep==55) {
+    		alert('RECURSO NÃO ENCONTRADO');
+		}
+		if (rep==56) {
+	    	alert('CLIENTE NÃO ENCONTRADO');
+		}
+		if (rep==57) {
+	    	alert('REGIME DE CONTRATO NÃO ENCONTRADO');
+		}
+		if (rep==58) {
+	    	alert('PROVEDOR NÃO ENCONTRADO');
+		}
+		if (rep==59) {
+	    	alert('PARÂMETRO INVÁLIDO AO INCLUIR A ESTAÇÃO');
+		}
+		if (rep==60) {
+	    	alert('FACILIDADE NÃO ENCONTRADA');
+		}
+		if (rep==61) {
+	    	alert('ESTA PEDIDO JÁ TEM FACILIDADES E NÃO PODE SER ALTERADO');
+			window.location.replace('pedido_main.asp');
+		} 
+		if (rep==62) {
+	    	alert('PEDIDO DE ACESSO INEXISTENTE');
+		}
+		if (rep==63) {
+	    	alert('FACILIDADE NÃO ENCONTRADA');
+		} 
+		if (rep==64) {
+	    	alert('NÃO HÁ REGISTROS PARA ACEITAÇÃO');
+		} 
+		if (rep==65) {
+	    	alert('FACILIDADE NÃO ENCONTRADA');
+		}
+		if (rep==66) {
+	    	alert('A ª FACILIDADE JÁ ESTÁ SENDO UTILIZADA NO NÚMERO DE ACESSO ');
+		}
+		if (rep==67) {
+	    	alert('NÃO HÁ ACESSOS ACEITOS NESTE PERÍODO');
+		}
+		if (rep==68) {
+	    	alert('EXECUÇÃO CONCLUÍDA COM SUCESSO');
+			window.location.replace('execucao_main.asp');
+		}
+		if (rep==69) {
+	    	alert('EXECUÇÃO GRAVADA COM SUCESSO');
+			window.location.replace('execucao_main.asp');
+		}
+		if (rep==70) {
+	    	alert('DATA DE INÍCIO INVÁLIDA');
+		}
+		if (rep==71) {
+	    	alert('DATA DE TÉRMINO INVÁLIDA');
+		}
+		if (rep==72) {
+	    	alert('A SEV DEVE SER NUMÉRICA');
+		}
+		if (rep==73) {
+	    	alert('NÃO HÁ PEDIDO DE ACESSO DISPONÍVEL PARA ACEITAÇÃO COM ESTE NÚMERO DE ACESSO');
+		}
+		if (rep==74) {
+	    	alert('NÃO HÁ PEDIDOS PARA ESTE CLIENTE');
+		}
+		if (rep==75) {
+	    	alert('NÃO HÁ ACEITAÇÕES PARA ESTE PEDIDO');
+		}
+		if (rep==76) {
+	    	alert('NÃO HÁ PEDIDO DE ACESSO COM ESTE NÚMERO DE ACESSO');
+		}
+		if (rep==77) {
+	    	alert('COORDENADA NÃO ENCONTRADA');
+		}
+		if (rep==78) {
+	    	alert('COORDENADA OCUPADA');
+		}
+		if (rep==79) {
+	    	alert('FACILIDADE JÁ EXISTENTE');
+		}
+		if (rep==80) {
+	    	alert('A PONTA DE ORIGEM JÁ ESTÁ SENDO UTILIZADA');
+		}
+		if (rep==81) {
+	    	alert('A PONTA DE DESTINO JÁ ESTÁ SENDO UTILIZADA');
+		}
+		if (rep==82) {
+	    	alert('PARÂMETRO INVÁLIDO AO INCLUIR DATA DE AÇÃO');
+		}
+		if (rep==83) {
+	    	alert('NRO. DE REFERÊNCIA JÁ EXISTE');
+		}
+		if (rep==84) {
+	    	alert('DATA DO PEDIDO INVÁLIDA');
+		}
+		if (rep==85) {
+	    	alert('COORDENADA NÃO OCUPADA OU NÃO CADASTRADA');
+		}
+		if (rep==86) {
+	    	alert('O NÚMERO DE ACESSO  JÁ ESTÁ SENDO UTILIZADO EM OUTRO PEDIDO');
+		}
+		if (rep==87) {
+	    	alert('O NÚMERO DE ACESSO  NÃO ESTÁ SENDO UTILIZADO');
+		}
+		if (rep==88) {
+	    	alert('O NÚMERO DE ACESSO  NÃO ESTÁ SENDO UTILIZADO COM A FACILIDADE INFORMADA');
+		}
+		if (rep==89) {
+	    	alert('A FACILIDADE JÁ ESTÁ SENDO UTILIZADA NO NÚMERO DE ACESSO ');
+		}
+		if (rep==90) {
+	    	alert('NÃO PODE SER CRIADA AÇÃO PARA ESTE PEDIDO, POIS EXISTE UMA PENDÊNCIA');
+		}
+		if (rep==91) {
+	    	alert('A ª FACILIDADE JÁ ESTÁ EXECUTADA, E NÃO PODE EXCLUÍDA OU MODIFICADA');
+		}
+		if (rep==92) {
+	    	alert('A ª FACILIDADE NÃO PODE SER RETIRADA OU MANTIDA, POIS AINDA NÃO FOI INSTALADA');
+		}
+		if (rep==93) {
+	    	alert('A ª FACILIDADE É UMA INSTALAÇÃO E DEVE TER TODOS OS CAMPOS PREENCHIDOS');
+		}
+		if (rep==94) {
+	    	alert('A ª FACILIDADE É UMA RETIRADA E DEVE TER TODOS OS CAMPOS APAGADOS');
+		}
+		if (rep==95) {
+	    	alert('A ª FACILIDADE DEVE SER MANTIDA, E TODOS OS SEUS CAMPOS DEVEM ESTAR PREENCHIDOS');
+		}
+		if (rep==96) {
+	    	alert('A COORDENADA "DE" NÃO EXISTE');
+		}
+		if (rep==97) {
+	    	alert('A COORDENADA "PARA" NÃO EXISTE');
+		}
+		if (rep==98) {
+	    	alert('A COORDENADA "PARA" JÁ ESTÁ SENDO UTILIZADA');
+		}
+		if (rep==99) {
+	    	alert('A COORDENADA "DE" NÃO ESTÁ SENDO UTILIZADA COM O NRO DE ACESSO INFORMADO');
+		}
+		if (rep==100) {
+	    	alert('A PONTA DE ORIGEM JÁ ESTÁ SENDO UTILIZADA EM UM PEDIDO DE REDE INTERNA');
+		}
+		if (rep==101) {
+	    	alert('ESTE PEDIDO NÃO PODE SER CANCELADO, POIS NÃO ESTÁ PENDENTE');
+		}
+		if (rep==102) {
+	    	alert('RECURSO INTERNO DESALOCADO. JÁ É POSSÍVEL ENTRAR COM NOVA SOLICITAÇÃO');
+		}
+		if (rep==103) {
+			alert('PEDIDO GRAVADO COM SUCESSO!');
+			window.location.replace('redeinterna.asp?estacao=&distribuicao=&provedor=&sistema=');
+		}
+		if (rep==104) {
+	    	alert('A MESMA COORDENADA NÃO PODE SER UTILIZADA EM PARES DIFERENTES');
+		}
+		if (rep==105) {
+	    	alert('A QUANTIDADE MÁXIMA É DE 100 PARES');
+		}
+		if (rep==106) {
+	    	alert('PROBLEMA NA TRANSAÇÃO. VERIFIQUE SE O REGISTRO JÁ EXISTE!');
+		}
+		if (rep==107) {
+	    	alert('USUÁRIO NÃO ESTA ASSOCIADO A UM CENTRO FUNCIONAL. VERIFIQUE O CADASTRO DE USUÁRIO COM CENTRO FUNCIONAL!');
+		}
+		if (rep==108) {
+ 			alert('DADOS INVÁLIDOS AO INCLUIR O CENTRO FUNCIONAL!');
+		}
+		if (rep==109) {
+ 			alert('DADOS INVÁLIDOS AO INCLUIR ASSOCIAÇÃO DO SERVIÇO COM VELOCIDADE!');
+		}
+		if (rep==110) {
+ 			alert('REGISTRO JÁ EXISTE!');
+		}
+	 	if (rep==111) {
+	    	alert('DADOS INVÁLIDOS AO INCLUIR ENDEREÇO DE INSTALAÇÃO!');
+		}
+	 	if (rep==112) {
+	    	alert('DADOS INVÁLIDOS AO INCLUIR COMPLEMENTO DO ENDEREÇO DE INSTALAÇÃO!');
+		}
+	 	if (rep==113) {
+	    	alert('PROBLEMA NA TRANSAÇÃO. VERIFIQUE SE O REGISTRO ESTA ASSOCIADO A ALGUM USUARIO!');
+		}
+	 	if (rep==114) {
+	    	alert('COMPLEMENTO EXCLUIDO, MAS CENTRO FUNCIONAL MANTIDO POIS ESTA ASSOCIADO A OUTROS COMPLEMENTOS!');
+		}
+		if (rep==115) {
+	    	alert('DADOS INVÁLIDOS AO INCLUIR A TIPO DE LOGRADOURO!');
+		}
+	 	if (rep==116) {
+	    	alert('DADOS INVÁLIDOS AO INCLUIR ENDEREÇO DO PONTO INTERMEDIARIO');
+		}
+	 	if (rep==117) {
+	    	alert('DADOS INVÁLIDOS AO INCLUIR COMPLEMENTO DO ENDEREÇO DO PONTO INTERMEDIARIO!');
+		}
+	 	if (rep==118) {
+	    	alert('ID DO ACESSO FÍSICO NÃO EXISTE!');
+		}
+	 	if (rep==119) {
+	    	alert('ID DO ACESSO FÍSICO NÃO PERTENCE AO PROPRIETÁRIO INFORMADO!');
+		}
+	 	if (rep==120) {
+	    	alert('PROBLEMA NA TRANSAÇÃO. SE PERSISTIR COMUNIQUE O SUPORTE TECNICO!');
+		}
+		if (rep==121) {
+	    	alert('USUÁRIO NÃO TEM O PERFIL SOLICITADO!');
+		}
+		if (rep==122) {
+	    	alert('INFRA APROVADA COM SUCESSO!');
+		}
+		if (rep==123) {
+	    	alert('PROBLEMA NA TRANSAÇÃO DE APROVAÇÃO DE INFRA!');
+		}
+		if (rep==124) {
+	    	alert('PROCESSO ATUALIZADO COM SUCESSO!');
+		}
+		if (rep==125) {
+	    	alert('PROBLEMA NA TRANSAÇÃO DE ATUALIZAÇÃO DE PROCESSO!');
+		}
+		if (rep==126) {
+	    	alert('DISTRIBUIDOR NÃO ENCONTRADO');
+		}
+		if (rep==127) {
+	    	alert('ESTAÇÃO NÃO ENCONTRADA');
+		}
+		if (rep==128) {
+	    	alert('CENTRO FUNCIONAL NÃO ENCONTRADO');
+		}
+		if (rep==129) {
+	    	alert('ERRO DURANTE ATUALIZAÇÃO DE FACILIDADE');
+		}
+		if (rep==130) {
+	    	alert('PROBLEMA NA TRANSAÇÃO GERANDO ACESSO LOGICO x FISICO!');
+		}
+		if (rep==131) {
+	    	alert('CEP NÃO CADASTRADO, FAVOR VERIFICAR!');
+		}
+		if (rep==132) {
+	    	alert('PROBLEMA NA TRANSAÇÃO DO CRMS , CONTACTE O SUPORTE!');
+		}
+		if (rep==133) {
+	    	alert('SEV EM ABERTO. NÃO DISPONÍVEL!');
+		}
+		if (rep==134) {
+	    	alert('SEV NÃO ENCONTRADA!');
+		}
+		if (rep==135) {
+	    	alert('CEP DO LOCAL DE INSTALAÇÃO NÃO CADASTRADO, FAVOR VERIFICAR!');
+		}
+		if (rep==136) {
+	    	alert('CEP DO PONTO INTERMEDIARIO NÃO CADASTRADO, FAVOR VERIFICAR!');
+		}
+		if (rep==137) {
+	    	alert('ID DO ACESSO FÍSICO ESTA EM FASE DE CONSTRUÇÃO!');
+		}
+		if (rep==138) {
+	    	alert('AUTORIZA COMPARTILHAMENTO DO ID FÍSICO PARA O ENDEREÇO DE INSTALAÇÃO?');
+		}
+		if (rep==139) {
+	    	alert('AUTORIZA COMPARTILHAMENTO DO ID FÍSICO PARA O ENDEREÇO DO PONTO INTERMEDIARIO?');
+		}
+		if (rep==140) {
+	    	alert('ID DO ACESSO FÍSICO NÃO PERTENCE AO ENDERECO DE INSTALAÇÃO!');
+		}
+		if (rep==141) {
+	    	alert('ID DO ACESSO FÍSICO NÃO PERTENCE AO ENDERECO DO PONTO INTERMEDIARIO!');
+		}
+		if (rep==142) {
+	    	alert('ATENÇÃO EXISTE PENDENCIA DE CRIAÇÃO DE CABO INTERNO!');
+		}
+		if (rep==574) {
+	    	alert('ESTE REGISTRO ESTÁ SENDO UTILIZADO E NÃO PODE SER EXCLUÍDO');
+		}
+	  }
+</script>
+<input type=hidden name=hdnPaginaAtual value="/newCla/Asp/facilidade.asp">
+
+<body leftmargin="0" topmargin="0" onLoad="resposta(86,'main.asp');">
+<table width="780" border="0" cellspacing="0" cellpadding="0" background="../imagens/embratel_r1_c2.jpg">
+<tr> 
+<td><a href="http://ntspo912/cla/main.asp"><img name="embratel" src="../imagens/topo_embratel.jpg" width="748" height="79" border="0"></a></td>
+</tr>
+</table>
+<table width="780" border="0" cellspacing="0" cellpadding="0" background="../imagens/embratel_r2_c2.jpg"><tr><td height=18px></td></tr></table>
+<div id=divMenu style="position:absolute;top:81;left:5">
+<table width="760" border="0" cellspacing="0" cellpadding="0" >
+	<tr>
+		
+		<td nowrap width=190px >
+			<a href='' onMouseOut="popDown('eMenu1')" onMouseOver="popUp('eMenu1',event)" ><font class=clsMenu >Acesso Lógico</font></a>
+		</td>
+		
+		<td nowrap width=190px >
+			<a href='?' onMouseOut="popDown('eMenu2')" onMouseOver="popUp('eMenu2',event)" ><font class=clsMenu >Acesso Físico</font></a>
+		</td>
+		
+		<td nowrap width=190px >
+			<a href='' onMouseOut="popDown('eMenu3')" onMouseOver="popUp('eMenu3',event)" ><font class=clsMenu >Consultas</font></a>
+		</td>
+		<td nowrap width=190px >
+			<a href='' onMouseOut="popDown('eMenu4')" onMouseOver="popUp('eMenu4',event)" ><font class=clsMenu >Tabelas</font></a>
+		</td>
+	</tr>
+</table>
+</div>
+<table valign="top" width="780">
+<tr><td align=center class=titulo>Facilidade<br></td></tr>
+<SCRIPT LANGUAGE=javascript>
+<!--
+function ResgatarPromocaoRegime(obj)
+{
+	with (document.forms[0])
+	{
+		hdnAcao.value = "ResgatarPromocaoRegime"
+		hdnProvedor.value = obj.value
+		target = "IFrmProcesso"
+		action = "ProcessoCla.asp"
+		submit()
+	}
+}
+
+function ResgatarDistribuicao(obj,intDistrib)
+{
+	with (document.forms[0])
+	{
+		hdnAcao.value = "ResgatarDistribuicao"
+		hdnEstacaoAtual.value = obj.value
+
+		if (intDistrib == "1")
+		{
+			hdnNomeLocal.value = "DistLocalInstala"
+		}
+		else
+		{
+			hdnNomeLocal.value = "DistLocalConfig"
+		}
+		target = "IFrmProcesso"
+		action = "ProcessoCla.asp"
+		submit()
+	}
+}
+
+
+function GravarFacilidade()
+{
+	with (document.forms[0])
+	{
+
+		if (!ValidarCampos(cboLocalInstala,"Local de Entrega")) return false
+		if (!ValidarCampos(cboLocalConfig,"Local de Configuração")) return false
+		if (!ValidarCampos(cboDistLocalConfig,"Distribuidor")) return false
+		if (!ValidarCampos(cboRede,"Rede")) return false
+		if (!ValidarCampos(cboProvedor,"Provedor")) return false
+		if (!ValidarCampos(cboRegimeCntr,"Prazos de Contratação de Acesso")) return false
+
+				
+		if (cboRede.value != "")
+		{
+
+			switch (cboRede.value) 
+			{
+				case "1": //Det
+					for(var intIndex=1;intIndex<5;intIndex++)
+					{
+						if  (eval("document.forms[0].numeroacesso"+intIndex+".value != ''") || eval("document.forms[0].bastidor"+intIndex+".value != ''") || eval("document.forms[0].regua"+intIndex+".value != ''") || eval("document.forms[0].porta"+intIndex+".value != ''") ||	eval("document.forms[0].timeslot"+intIndex+".value != ''") ||	eval("document.forms[0].posicaoobservacao"+intIndex+".value != ''") || eval("document.forms[0].situacao"+intIndex+".value != ''"))
+						{
+							if (!parent.IFrmProcesso1.ValidarPadrao(eval("document.forms[0].numeroacesso"+intIndex))) return false
+							if (!ValidarCampos(eval("document.forms[0].numeroacesso"+intIndex),"Nº de Acesso"+intIndex)) return false
+							if (!ValidarCampos(eval("document.forms[0].bastidor"+intIndex),"Bastidor"+intIndex)) return false
+							if (!ValidarCampos(eval("document.forms[0].regua"+intIndex),"Régua"+intIndex)) return false
+							if (!ValidarCampos(eval("document.forms[0].porta"+intIndex),"Porta"+intIndex)) return false
+							if (!ValidarCampos(eval("document.forms[0].timeslot"+intIndex),"Timeslot"+intIndex)) return false
+							if (!ValidarCampos(eval("document.forms[0].situacao"+intIndex),"Ação"+intIndex)) return false
+						}	
+					}
+					break
+
+				case "2": //NDet
+					for(var intIndex=1;intIndex<5;intIndex++)
+					{
+						if  (eval("document.forms[0].numeroacesso"+intIndex+".value != ''") || eval("document.forms[0].tronco"+intIndex+".value != ''") || eval("document.forms[0].par"+intIndex+".value != ''") || eval("document.forms[0].posicaoobservacao"+intIndex+".value != ''") || eval("document.forms[0].situacao"+intIndex+".value != ''"))
+						{
+							if (!parent.IFrmProcesso1.ValidarPadrao(eval("document.forms[0].numeroacesso"+intIndex))) return false
+							if (!ValidarCampos(eval("document.forms[0].numeroacesso"+intIndex),"Nº de Acesso"+intIndex)) return false
+							if (!ValidarCampos(eval("document.forms[0].tronco"+intIndex),"Tronco"+intIndex)) return false
+							if (!ValidarCampos(eval("document.forms[0].par"+intIndex),"Par"+intIndex)) return false
+							if (!ValidarCampos(eval("document.forms[0].situacao"+intIndex),"Ação"+intIndex)) return false
+						}	
+					}
+					break
+
+				case "3": //ADE
+					for(var intIndex=1;intIndex<5;intIndex++)
+					{
+						if  (eval("document.forms[0].txtNroAcesso"+intIndex+".value != ''") || eval("document.forms[0].txtCabo"+intIndex+".value != ''") || eval("document.forms[0].txtLateral"+intIndex+".value != ''") || eval("document.forms[0].cboTipoCabo"+intIndex+".value != ''") || eval("document.forms[0].txtCaixaEmenda"+intIndex+".value != ''") || eval("document.forms[0].txtPar"+intIndex+".value != ''") || eval("document.forms[0].cboAcao"+intIndex+".value != ''"))
+						{
+							if (!parent.IFrmProcesso1.ValidarPadrao(eval("document.forms[0].txtNroAcesso"+intIndex))) return false
+							if (!ValidarCampos(eval("document.forms[0].txtNroAcesso"+intIndex),"Nº de Acesso"+intIndex)) return false
+							if (!ValidarCampos(eval("document.forms[0].txtCabo"+intIndex),"Cabo"+intIndex)) return false
+							if (!ValidarCampos(eval("document.forms[0].txtLateral"+intIndex),"Lateral"+intIndex)) return false
+							if (!ValidarCampos(eval("document.forms[0].cboTipoCabo"+intIndex),"Tipo do Cabo"+intIndex)) return false
+							if (!ValidarCampos(eval("document.forms[0].txtCaixaEmenda"+intIndex),"Caixa de Emenda"+intIndex)) return false
+							if (!ValidarCampos(eval("document.forms[0].txtPar"+intIndex),"Número do Cabo de Acesso"+intIndex)) return false
+							if (!ValidarCampos(eval("document.forms[0].cboAcao"+intIndex),"Ação"+intIndex)) return false
+						}	
+					}
+					break
+
+			}	
+		}
+
+		hdnAcao.value = "GravarFacilidade"
+		hdnRede.value = cboRede.value
+		target = self.name 
+		action = "facilidade.asp"
+		submit()
+	}	
+}
+
+function ApagarLinha(intIndex)
+{
+	with (document.forms[0]) 
+	{
+		if (cboRede.value != "")
+		{
+			switch (cboRede.value) 
+			{
+				case "1": //Det
+					eval("document.forms[0].numeroacesso"+intIndex+".value = ''")
+					eval("document.forms[0].bastidor"+intIndex+".value = ''")
+					eval("document.forms[0].regua"+intIndex+".value = ''")
+					eval("document.forms[0].porta"+intIndex+".value = ''")
+					eval("document.forms[0].timeslot"+intIndex+".value = ''")
+					eval("document.forms[0].posicaoobservacao"+intIndex+".value = ''")
+					eval("document.forms[0].situacao"+intIndex+".value = ''")
+					break
+
+				case "2": //NDet
+					eval("document.forms[0].numeroacesso"+intIndex+".value = ''")
+					eval("document.forms[0].tronco"+intIndex+".value = ''")
+					eval("document.forms[0].par"+intIndex+".value = ''")
+					eval("document.forms[0].posicaoobservacao"+intIndex+".value = ''")
+					eval("document.forms[0].situacao"+intIndex+".value = ''")
+					eval("spnStsNDet"+intIndex+".innerHTML = '&nbsp;'")
+					break
+
+				case "3": //ADE
+					eval("document.forms[0].txtNroAcesso"+intIndex+".value = ''")
+					eval("document.forms[0].txtCabo"+intIndex+".value = ''")
+					eval("document.forms[0].txtLateral"+intIndex+".value = ''")
+					eval("document.forms[0].cboTipoCabo"+intIndex+".value = ''")
+					eval("document.forms[0].txtCaixaEmenda"+intIndex+".value = ''")
+					eval("document.forms[0].txtPar"+intIndex+".value = ''")
+					eval("document.forms[0].cboAcao"+intIndex+".value = ''")
+					eval("document.forms[0].txtObs"+intIndex+".value = ''")
+					eval("spnStsAde"+intIndex+".innerHTML = &nbsp;")
+					break
+			}	
+		}
+	}	
+}
+
+function ApagarNroAcesso(intIndex)
+{
+	with (document.forms[0]) 
+	{
+		if (cboRede.value != "")
+		{
+			switch (cboRede.value) 
+			{
+				case "1": //Det
+					eval("document.forms[0].numeroacesso"+intIndex+".value = ''")
+					break
+
+				case "2": //NDet
+					eval("document.forms[0].numeroacesso"+intIndex+".value = ''")
+					break
+
+				case "3": //ADE
+					eval("document.forms[0].txtNroAcesso"+intIndex+".value = ''")
+					break
+			}	
+		}
+	}	
+}
+
+
+function ResgatarPadraoProvedor(obj,intProd)
+{
+	with (document.forms[0])
+	{
+		if (intProd == 0)
+		{
+			for (var intIndex=1;intIndex<5;intIndex++)
+			{
+				ApagarNroAcesso(intIndex)
+			}
+		}	
+		hdnAcao.value = "ResgatarPadraoProvedor"
+		target = "IFrmProcesso1"
+		action = "ProcessoCla.asp"
+		submit()	
+	}
+}	
+
+function ValidarTipoPro(Campo,intTipo)
+{
+	
+	//var checkOK = str;
+	if (Campo == '[object]')
+	{
+		var checkStr = Campo.value;
+	}
+	else
+	{
+		var checkStr = Campo;
+	}	
+	var allValid = true;
+	var decPoints = 0;
+	var allNum = "";
+	switch (intTipo)
+	{
+		case 0:
+			var checkOK = "0123456789" //int,smallint,bit
+			break
+		case 1:
+			var checkOK = "QWERTYUIOPASDFGHJKLÇZXCVBNMqwertyuiopasdfghjklçzxcvbnm " 
+			break
+		case 2:
+			var checkOK = "QWERTYUIOPASDFGHJKLÇZXCVBNMqwertyuiopasdfghjklçzxcvbnm01234546789 "
+			break
+		case 4:
+			var checkOK = "-" //Traço do cep
+			break
+		case 5:
+			var checkOK = " " //Em banco
+			break
+		case 6:
+			var checkOK = "0123456789 " //int,smallint,bit com espaço
+			break
+
+		default:
+			var checkOK = intTipo //Recebe o próprio valor
+			break
+	}
+
+	for (i = 0;  i < checkStr.length;  i++)
+	{
+		ch = checkStr.charAt(i);
+		for (j = 0;  j < checkOK.length;  j++)
+			if (ch == checkOK.charAt(j))
+			break;
+		if (j == checkOK.length)
+		{
+			allValid = false;
+			break;
+		}
+		if (ch != " ")
+		allNum += ch;
+	}
+	if (!allValid)
+	{
+		return (false);
+	}
+	return (true);
+}
+
+function ValidarNTipoPro()
+{
+	//Argumentos
+	//ObjTextbox,Tipo,Tam,ProxTipo,Tam,ProxTipo,Tam,...
+	//var checkOK = str;
+	//var checkStr = Campo.value;
+	var allValid = true;
+	var decPoints = 0;
+	var allNum = "";
+	
+	if (arguments.length > 0 )
+	{
+		var Campo = arguments[0]
+		var strValue = arguments[0].value
+		var intTamIni = 0
+		var intTam = 0
+		var intTipo = 0
+		
+		var intIndex=1
+
+		while (intIndex < arguments.length)
+		{
+			intTipo	= arguments[intIndex]
+			intTamIni = intTamIni + intTam
+			intTam	= arguments[intIndex+1]
+			
+			checkStr = strValue.substring(intTamIni,intTamIni+intTam)
+			
+			if (!ValidarTipoPro(checkStr,intTipo))
+			{
+				intIndex = arguments.length
+				return false;
+			}
+			else
+			{
+				intIndex = intIndex + 2
+			}	
+		}
+	}
+	
+	return true;
+}
+
+function ProcurarIDFis(intID)
+{
+	with (document.forms[0])
+	{
+		switch (intID)
+		{
+			case 1:
+				hdnIdAcessoFisico.value = ""
+				target = "IFrmIDFis1"
+				action = "Estoque.asp?intEnd=1"
+				submit()
+				break
+			case 2:	
+				hdnIdAcessoFisico.value = ""
+				target = "IFrmIDFis1"
+				action = "AcessoCompartilhadoFac.asp?intEnd=1"
+				submit()
+				break
+		}
+	}	
+}
+
+function SelIDFisComp(obj,intEnd)
+{
+	with (document.forms[0])
+	{
+		switch (intEnd)
+		{
+			case 1: //id's Físicos 
+				hdnIdAcessoFisico.value=obj.value
+				hdnPropIdFisico.value = obj.prop
+				hdnAcao.value = "ResgatarIdFisicoComp"
+				target = "IFrmProcesso"
+				action = "ProcessoResgatarFac.asp"
+				submit()
+				break
+			case 2:	//Estoque
+				hdnIdAcessoFisico1.value=obj.value
+				hdnPropIdFisico1.value = obj.prop
+				hdnAcao.value = "ResgatarEstoque"
+				target = "IFrmProcesso"
+				action = "ProcessoResgatarFac.asp"
+				submit()
+				break
+		}
+	}	
+}
+
+function EnviarEmailProvedor(intTipo)
+{
+	with (document.forms[0])
+	{
+		if (cboProvedor.value != "")
+		{
+			switch (parseInt(intTipo))
+			{
+				case 0:
+					target = self.name 
+					action = "emailprovedor.asp"
+					submit()
+					break
+				case 1:
+					target = self.name 
+					action = "emailatt.asp"
+					submit()
+					break
+			}
+		}
+		else
+		{
+			alert("Selecione o Provedor!")
+			cboProvedor.focus()
+			return
+		}
+			
+	}	
+}
+function AbilitarEmail()
+{
+	with (document.forms[0])
+	{
+		if (cboProvedor.value != 2)
+		{
+			btnEmailPro.disabled = false
+			btnEmailAtt.disabled = true
+		}	
+		else
+		{	
+			btnEmailAtt.disabled = false
+			btnEmailPro.disabled = true
+		}
+	}
+}
+
+//-->
+</SCRIPT>
+<Form name="f" method="Post">
+<input type="hidden" name="hdnProvedor" value="1">
+<input type="hidden" name="hdnEstacaoAtual" >
+<input type="hidden" name="hdnNomeLocal" >
+<input type="hidden" name="hdnAcao">
+<input type="hidden" name="hdnRede">
+<input type="hidden" name="hdnPedId" value="171" >
+<input type="hidden" name="hdnSolId" value="481">
+<input type="hidden" name="hdnPaginaOrig" value="/newCla/Asp/facilidade.asp">
+<input type="hidden" name="txtEndCidInstala"	value="SPO">
+<input type="hidden" name="cboUFEndInstala"		value="SP">
+<input type="hidden" name="cboLogrEndInstala"	value="AVENIDA">
+<input type="hidden" name="txtEndInstala"		value="CRUZEIRO DO SUL">
+<input type="hidden" name="txtNroEndInstala"	value="252">
+<input type="hidden" name="txtCepEndInstala"	value="02030-100">
+
+<input type=hidden name="hdnIdAcessoFisico">
+<input type=hidden name="hdnIdAcessoFisico1">
+<input type=hidden name="hdnPropIdFisico">
+<input type=hidden name="hdnPropIdFisico1">
+<input type=hidden name="hdnCompartilhamento" value="0">
+<input type=hidden name="hdnCompartilhamento1" value="0">
+
+<table rules="groups" bgcolor="#eeeeee" cellspacing="0" cellpadding="5" bordercolorlight="#003388" bordercolordark="#ffffff" width="760"> <tr>
+<tr>
+	<td bgcolor="#003388" colspan=6><font color=white>INFORMAÇÕES GERAIS</font>&nbsp;&nbsp;&nbsp;
+		<input type=button class=button name=btnDetalhe value="Detalhar..." onclick="DetalharFac()" >
+	</td>
+</tr>
+<tr>
+	<td nowrap>Solicitação de Acesso Nº</td>
+	<td class="lightblue" >
+		<table rules="groups" bgcolor="#eeeeee" cellspacing="0" cellpadding="2" bordercolorlight="#003388" bordercolordark="#ffffff" width="80%" >
+			<tr><td class="lightblue">&nbsp;
+				481
+			</td></tr>	
+		</table>	
+	</td>
+	<td align=right >Id Lógico</td>
+	<td class="lightblue">
+		<table rules="groups" bgcolor="#eeeeee" cellspacing="0" cellpadding="2" bordercolorlight="#003388" bordercolordark="#ffffff" width="100%" >
+			<tr><td class="lightblue">&nbsp;
+				6787000237
+			</td></tr>	
+		</table>	
+	</td>
+	<td align=right >Data</td>
+	<td class="lightblue" >
+		<table rules="groups" bgcolor="#eeeeee" cellspacing="0" cellpadding="2" bordercolorlight="#003388" bordercolordark="#ffffff" width="100%" >
+			<tr><td class="lightblue" >&nbsp;
+				03/10/2003
+			</td></tr>	
+		</table>	
+	</td>
+</tr>
+<tr>
+	<td >Pedido de acesso</td>
+	<td class="lightblue">
+		<table rules="groups" bgcolor="#eeeeee" cellspacing="0" cellpadding="2" bordercolorlight="#003388" bordercolordark="#ffffff" width="100%" >
+			<tr><td class="lightblue">&nbsp;
+				DM-00020/2003
+			</td></tr>	
+		</table>	
+	</td>
+	<td align=right>Data</td>
+	<td class="lightblue" colspan=3 nowrap>
+		<table rules="groups" bgcolor="#eeeeee" cellspacing="0" cellpadding="2" bordercolorlight="#003388" bordercolordark="#ffffff" width="150px" >
+			<tr><td class="lightblue">&nbsp;
+				10/03/2003 23:03:52
+			</td></tr>	
+		</table>	
+	</td>
+</tr>
+<tr>
+	<td width="80">Ação</td>
+	<td class="lightblue" colspan=5>
+		<table rules="groups" bgcolor="#eeeeee" cellspacing="0" cellpadding="2" bordercolorlight="#003388" bordercolordark="#ffffff" width="60%" >
+			<tr><td class="lightblue">&nbsp;
+				ATIVAR
+			</td></tr>	
+		</table>	
+	</td>
+</tr>
+<tr>
+	<td >Status</td>
+	<td class="lightblue" colspan=5>
+		<table rules="groups" bgcolor="#eeeeee" cellspacing="0" cellpadding="2" bordercolorlight="#003388" bordercolordark="#ffffff" width="60%" >
+			<tr><td class="lightblue">&nbsp;
+				PENDENTE DE CONSTRUÇÃO DE ACESSO FÍSICO
+			</td></tr>	
+		</table>	
+	</td>
+</tr>
+
+<tr>
+<td>Cliente</td>
+	<td class="lightblue" colspan="5">
+		<table rules="groups" bgcolor="#eeeeee" cellspacing="0" cellpadding="2" bordercolorlight="#003388" bordercolordark="#ffffff" width="80%" >
+			<tr><td class="lightblue">&nbsp;
+				BANCO SANTANDER S.A
+			</td></tr>	
+		</table>	
+	</td>
+</tr>
+
+<tr>
+<td>Endereço</td>
+	<td class="lightblue" colspan="5">
+		<table rules="groups" bgcolor="#eeeeee" cellspacing="0" cellpadding="2" bordercolorlight="#003388" bordercolordark="#ffffff" width="80%" >
+			<tr><td class="lightblue">&nbsp;
+				AVENIDA CRUZEIRO DO SUL, 252  • SANTANA • 02030-100 • SAO PAULO • SP
+			</td></tr>	
+		</table>	
+	</td>
+</tr>
+<tr>
+	<td >Nº Contrato Serviço</td>
+	<td class="lightblue" nowrap>
+		<table rules="groups" bgcolor="#eeeeee" cellspacing="0" cellpadding="2" bordercolorlight="#003388" bordercolordark="#ffffff" width="100%" >
+			<tr><td class="lightblue">&nbsp;
+				VEM-11 xxx20062003
+			</td></tr>	
+		</table>	
+	</td>
+	<td align=right >Designação do Serviço</td>
+	<td class="lightblue" colspan=3>
+		<table rules="groups" bgcolor="#eeeeee" cellspacing="0" cellpadding="2" bordercolorlight="#003388" bordercolordark="#ffffff" width="70%" >
+			<tr><td class="lightblue">&nbsp;
+				
+			</td></tr>	
+		</table>	
+	</td>
+</tr>
+<tr>
+	<td>Serviço</td>
+	<td class="lightblue">
+		<table rules="groups" bgcolor="#eeeeee" cellspacing="0" cellpadding="2" bordercolorlight="#003388" bordercolordark="#ffffff" width="100%" >
+			<tr><td class="lightblue">&nbsp;
+				INTERNET
+			</td></tr>	
+		</table>	
+	</td>
+	<td align=right>Velocidade do Serviço</td>
+	<td class="lightblue" colspan=3>
+		<table rules="groups" bgcolor="#eeeeee" cellspacing="0" cellpadding="2" bordercolorlight="#003388" bordercolordark="#ffffff" width="50%" >
+			<tr><td class="lightblue">&nbsp;
+				64K SINCRONA
+			</td></tr>	
+		</table>	
+	</td>
+</tr>
+<tr>
+	<td></td>
+	<td class="lightblue"></td>
+	<td align=right>Velocidade do Acesso</td>
+	<td class="lightblue" colspan=3>
+		<table rules="groups" bgcolor="#eeeeee" cellspacing="0" cellpadding="2" bordercolorlight="#003388" bordercolordark="#ffffff" width="50%" >
+			<tr><td class="lightblue">&nbsp;
+				64K SINCRONA
+			</td></tr>	
+		</table>	
+	</td>
+</tr>
+</table>
+
+<table rules="groups"  cellspacing="1" cellpadding="0" bordercolorlight="#003388" bordercolordark="#ffffff" width="760">
+	<tr>
+		<td bgcolor="#003388" colspan=2><font color=white>RECURSO</font></td>
+	</tr>
+
+	<tr class=clsSilver >
+		<td width="130"><font class="clsObrig">:: </font>Local de Entrega</td>
+		<td >
+			<select name="cboLocalInstala" >
+				<option value=""></option>
+				<Option value=1 Selected >SPO   IG </Option>
+			</select>
+		</td>
+	</tr>
+
+	<tr class=clsSilver>
+		<td width=150px nowrap><font class="clsObrig">:: </font>Local de Configuração</td>
+		<td  >
+			<select name="cboLocalConfig" onChange="ResgatarDistribuicao(this,2)">
+				<option value=""></option>
+				<Option value=42>ADT   SCC</Option><Option value=48>AIA   TDM</Option><Option value=28>AMR   OS </Option><Option value=49>AMR   TDM</Option><Option value=19>ARC   FP </Option><Option value=51>ARO   TDM</Option><Option value=25>ARQ   FO </Option><Option value=45>ASI   EAC</Option><Option value=38>ASI   RP </Option><Option value=37>BDO   LP </Option><Option value=20>BGU   SC </Option><Option value=9>BRE   AG </Option><Option value=76>BRE   MAR</Option><Option value=14>BRU   AL </Option><Option value=21>BTU   JP </Option><Option value=35>CAO   TEL</Option><Option value=91>CAS   A  </Option><Option value=12>CAS   BC </Option><Option value=40>CAS   OV </Option><Option value=50>CAS   TDM</Option><Option value=47>CMNS  RJO</Option><Option value=53>CMP   TDM</Option><Option value=54>CMX   TDM</Option><Option value=36>CTD   YAG</Option><Option value=30>DRA   AEX</Option><Option value=52>DSH   BGP</Option><Option value=26>FAC   MR </Option><Option value=55>FCR   TDM</Option><Option value=56>HORT  TDM</Option><Option value=57>IDU   TDM</Option><Option value=58>IIA   TDM</Option><Option value=59>ITA   TDM</Option><Option value=60>ITV   TDM</Option><Option value=61>JAI   TDM</Option><Option value=62>LME   TDM</Option><Option value=79>LRA   TDM</Option><Option value=64>MAR   TDM</Option><Option value=65>MGU   TDM</Option><Option value=22>MIA   QA </Option><Option value=66>MMM   TDM</Option><Option value=8>OCO   SA </Option><Option value=31>PAA   RO </Option><Option value=67>PAA   TDM</Option><Option value=68>PAG   TDM</Option><Option value=34>PGE   TEL</Option><Option value=69>PLA   TDM</Option><Option value=15>PPE   CM </Option><Option value=107>PRSE  TST</Option><Option value=70>PTF   TDM</Option><Option value=71>RCO   TDM</Option><Option value=33>RGT      </Option><Option value=108>RJO   TT1</Option><Option value=109>RJO   TT2</Option><Option value=110>RJO   TT3</Option><Option value=23>RPO   TB </Option><Option value=10>SBO   JP </Option><Option value=44>SBO   TEL</Option><Option value=24>SCL   VQ </Option><Option value=27>SCN   PE </Option><Option value=11>SCN   SCO</Option><Option value=18>SJC   EB </Option><Option value=77>SJC   SI </Option><Option value=72>SJR   TDM</Option><Option value=73>SJV   TDM</Option><Option value=7>SNE   JC </Option><Option value=16>SOC   PH </Option><Option value=41>SPO   AK </Option><Option value=29>SPO   ANH</Option><Option value=5>SPO   BG </Option><Option value=43>SPO   CEN</Option><Option value=32>SPO   EXP</Option><Option value=1 Selected >SPO   IG </Option><Option value=2>SPO   LP </Option><Option value=3>SPO   MB </Option><Option value=4>SPO   PH </Option><Option value=46>SPO   SAF</Option><Option value=13>SRR   QN </Option><Option value=6>STS   WL </Option><Option value=39>TBS   AG </Option><Option value=17>TTE   SA </Option><Option value=74>VIN   TDM</Option><Option value=75>VOS   TDM</Option>
+			</select>
+		</td>
+	</tr>
+
+	<tr class=clsSilver>
+		<td><font class="clsObrig">:: </font>Distribuidor</td>
+		<td >
+			<span id="spnDistLocalConfig">
+			<select name="cboDistLocalConfig" onChange="SelecionarRede(this)" >
+				<option value=""></option>
+				<Option value=96>DD                            </Option><Option value=92 Selected >DG                            </Option><Option value=60>GSI                           </Option><Option value=21>LEILA1                        </Option><Option value=59>MUXI</Option><Option value=66>MUXN</Option><Option value=68>PABX</Option><Option value=7>REDE DETERMINÍSTICA</Option><Option value=57>TDA</Option><Option value=58>TLX</Option><Option value=62>VISA</Option>
+			</select>
+			</span>
+		</td>
+	</tr>
+
+	<tr class=clsSilver>
+		<td><font class="clsObrig">:: </font>Rede</td>
+		<td >
+			<select name="cboRede" onChange="AbrirParam(this)" >
+				<option value=""></option>
+				<Option value='3' Selected >ADE</Option><Option value='1'>DETERMINÍSTICO</Option><Option value='2'>NÃO DETERMINÍSTICO</Option>
+			</select>
+		</td>
+	</tr>
+
+	<tr class=clsSilver>
+		<td width=30% ><font class="clsObrig">:: </font>Provedor</td>
+		<td >
+			<select name="cboProvedor" onChange="ResgatarPromocaoRegime(this);ResgatarPadraoProvedor(this,0);AbilitarEmail()">
+				<option value=""></option>
+				<Option value='2'>AT&T LATIN AMERICA            </Option><Option value='7'>CANBRAS</Option><Option value='19'>CRTTEL                        </Option><Option value='13'>CTBC                          </Option><Option value='4'>DIVEO</Option><Option value='5'>ELETROPAULO                   </Option><Option value='11'>EMBRATEL</Option><Option value='12'>IMPSAT COMUNICAÇÕES LTDA</Option><Option value='21'>LEILA M SANTOS                </Option><Option value='3'>METRORED</Option><Option value='6'>PEGASUS                       </Option><Option value='1' Selected >TELEFONICA</Option><Option value='15'>TELEMAR RIO                   </Option><Option value='25'>TESTE PROVEDOR                </Option>
+			</select>
+		</td>
+	</tr>
+	<tr class=clsSilver>
+		<td><font class="clsObrig">:: </font>Prazos de Contratação de Acesso</td>
+		<td >
+			<span id=spnRegimeCntr>
+				<select name="cboRegimeCntr">
+					<option value=""></option>
+					<Option value='1' Selected >TELEFONICA - INDETERMINADO</Option>
+				</select>
+			</span>
+		</td>
+	</tr>
+	<tr class=clsSilver>
+		<td>&nbsp;&nbsp;&nbsp;&nbsp;Promoção</td>
+		<td >
+			<span id=spnPromocao>
+			<select name="cboPromocao">
+				<option value=""></option>
+				
+			</select>
+			</span>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<div id=divIDFis1 style="DISPLAY: 'none'">
+				<table width=100%>
+					<tr>
+						<td >	
+							<iframe	id			= "IFrmIDFis1"
+								    name        = "IFrmIDFis1" 
+								    width       = "100%" 
+								    height      = "75px"
+								    frameborder = "0"
+								    scrolling   = "auto"
+								    align       = "left">
+							</iFrame>
+						</td>
+					</tr>		
+				</table>	
+			</div>	
+		</td>
+	</tr>
+</table>
+
+<span id=spnDet></span>
+<span id=spnNDet></span>
+<span id=spnAde></span>
+
+<table width=100% >
+	<tr>
+		<td >
+			<iframe	id			= "IFrmProcesso1"
+				    name        = "IFrmProcesso1" 
+				    width       = "100%" 
+				    height      = "25px"
+				    frameborder = "0"
+				    scrolling   = "no" 
+				    align       = "left">
+			</iFrame>
+		</td>
+	</tr>
+</table>
+<table width="50%" align=center border=0>
+	<tr>
+		<td colspan=4 >
+		</td>	
+	</tr>	
+
+	<tr>
+		<td ><input type="button" class="button" style="width:150px" name="consultar" value="Posições Disponíveis" onClick="PosicoesLivre('L')"></td>
+		<td ><input type=button name=btnIDFis1 style="width:150px" class=button value="Consultar Estoque" onClick="ProcurarIDFis(1)" ></td>
+		<td ><input type="button" class="button" name="btnEmailPro" style="width:150px" value="Enviar e-mail para provedor"  onclick="EnviarEmailProvedor(0)"></td>
+		<td ><input type="button" class="button" name="btnOK" style="width:150px" value="Gravar" onclick="return GravarFacilidade()" ></td>
+
+	</tr>
+	<tr>
+		<td ><input type="button" class="button" style="width:150px" name="ocupados" value="Posições Ocupadas" onClick="PosicoesLivre('O')"></td>
+		<td ><input type=button name=btnEstoque class=button style="width:150px" value="Consultar ID's Físicos" onClick="ProcurarIDFis(2)"  ></td>
+		<td ><input type="button" class="button" name="btnEmailAtt" style="width:150px" value="Enviar e-mail para AT&T" onclick="EnviarEmailProvedor(1)"  Disabled ></td>
+		<td ><input type="button" class="button" name="btnSair" style="width:150px" value=" Sair " onClick="javascript:window.location.replace('main.asp')"></td>
+	</tr>	
+</table>
+</Form>
+<table width="760">
+	<tr>
+		<td>
+			<font color=red>••</font>&nbsp;&nbsp;Limpa o conteúdo da linha atual
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<font class="clsObrig">:: </font> Campos de preenchimento obrigatório.
+		</td>
+	</tr>
+	<tr>
+		<td>
+			&nbsp;&nbsp;&nbsp;&nbsp;Legenda: A - Alfanumérico;  N - Numérico;  L - Letra
+		</td>
+	</tr>
+
+</table>
+
+<SCRIPT LANGUAGE=javascript>
+<!--
+var strDet = new String('<table rules=groups cellspacing=1 cellpadding=1 bordercolorlight=#003388 bordercolordark=#ffffff width=760><tr><td bgcolor=#003388 colspan=8><font color=white>FACILIDADES DO PEDIDO</font></td></tr><tr class=clsSilver ><td>&nbsp;Nº Acesso</td><td>&nbsp;Bastidor</td><td>&nbsp;Regua</td><td>&nbsp;Porta</td><td>&nbsp;Timeslot</td><td>&nbsp;Observação</td><td colspan=2 width=200>&nbsp;Ação</td>	</tr><tr class=clsSilver>	<td><input type=text class=text name=numeroacesso1  maxlength=25 size=15 onKeyDown="if (ValidaProvedor(this)){parent.IFrmProcesso1.TamanhoMax(this)}"></td>	<td><input type=text class=text name=bastidor1		maxlength=20 size=10></td>	<td><input type=text class=text name=regua1			maxlength=20 size=10></td>	<td><input type=text class=text name=porta1			maxlength=20 size=10></td>	<td><input type=text class=text name=timeslot1		maxlength=9 size=10 onKeyUp="ValidarNTipo(this,0,4,4,1,0,4)" TIPO=N  ></td>	<td><input type=text class=text name=posicaoobservacao1  maxlength=800 size=25 ></td>	<td><select name=situacao1 >		<option value=""></option>		<option value=I >Instalação</option>		<option value=R >Retirada</option>		<option value=M >Manter Facilidade</option>	</select></td>	<td align=center><input type=button class=button style="width:30px" name=apaga1  intIndex=1  value=X onclick=ApagarLinha(this.intIndex) ></td></tr><tr class=clsSilver>	<td><input type=text class=text name=numeroacesso2  maxlength=25 size=15 onKeyDown="if (ValidaProvedor(this)){parent.IFrmProcesso1.TamanhoMax(this)}"></td>	<td><input type=text class=text name=bastidor2		maxlength=20 size=10></td>	<td><input type=text class=text name=regua2			maxlength=20 size=10></td>	<td><input type=text class=text name=porta2			maxlength=20 size=10></td>	<td><input type=text class=text name=timeslot2		maxlength=9 size=10 onKeyUp="ValidarNTipo(this,0,4,4,1,0,4)" TIPO=N  ></td>	<td><input type=text class=text name=posicaoobservacao2  maxlength=800 size=25 ></td>	<td><select name=situacao2 >		<option value=""></option>		<option value=I >Instalação</option>		<option value=R >Retirada</option>		<option value=M >Manter Facilidade</option>	</select></td>	<td align=center><input type=button class=button style="width:30px" name=apaga2  intIndex=2  value=X onclick=ApagarLinha(this.intIndex) ></td></tr><tr class=clsSilver>	<td><input type=text class=text name=numeroacesso3  maxlength=25 size=15 onKeyDown="if (ValidaProvedor(this)){parent.IFrmProcesso1.TamanhoMax(this)}"></td>	<td><input type=text class=text name=bastidor3		maxlength=20 size=10></td>	<td><input type=text class=text name=regua3			maxlength=20 size=10></td>	<td><input type=text class=text name=porta3			maxlength=20 size=10></td>	<td><input type=text class=text name=timeslot3		maxlength=9 size=10 onKeyUp="ValidarNTipo(this,0,4,4,1,0,4)" TIPO=N  ></td>	<td><input type=text class=text name=posicaoobservacao3  maxlength=800 size=25 ></td>	<td><select name=situacao3 >		<option value=""></option>		<option value=I >Instalação</option>		<option value=R >Retirada</option>		<option value=M >Manter Facilidade</option>	</select></td>	<td align=center><input type=button class=button style="width:30px" name=apaga3  intIndex=3  value=X onclick=ApagarLinha(this.intIndex) ></td></tr><tr class=clsSilver>	<td><input type=text class=text name=numeroacesso4  maxlength=25 size=15 onKeyDown="if (ValidaProvedor(this)){parent.IFrmProcesso1.TamanhoMax(this)}"></td>	<td><input type=text class=text name=bastidor4		maxlength=20 size=10></td>	<td><input type=text class=text name=regua4			maxlength=20 size=10></td>	<td><input type=text class=text name=porta4			maxlength=20 size=10></td>	<td><input type=text class=text name=timeslot4		maxlength=9 size=10 onKeyUp="ValidarNTipo(this,0,4,4,1,0,4)" TIPO=N  ></td>	<td><input type=text class=text name=posicaoobservacao4  maxlength=800 size=25 ></td>	<td><select name=situacao4 >		<option value=""></option>		<option value=I >Instalação</option>		<option value=R >Retirada</option>		<option value=M >Manter Facilidade</option>	</select></td>	<td align=center><input type=button class=button style="width:30px" name=apaga4  intIndex=4  value=X onclick=ApagarLinha(this.intIndex) ></td></tr><tr class=clsSilver><td align=center><font color=red>•</font></td><td align=center>A20</td><td align=center>A20</td><td align=center>A20</td><td align=center>N4-N4</td><td align=center>A300</td><td align=center></td><td align=center><font color=red>••</font></td></tr></table>')
+var strNDet = new String('<table rules=groups cellspacing=1 cellpadding=1 bordercolorlight=#003388 bordercolordark=#ffffff width=760>	<tr >		<td bgcolor=#003388 colspan=7><font color=white>FACILIDADES DO PEDIDO</font></td>	</tr>	<tr class=clsSilver>		<td>&nbsp;Nº Acesso</td>		<td>&nbsp;Tronco</td>		<td>&nbsp;Par</td>		<td>&nbsp;Observação</td>		<td>&nbsp;Ação</td>		<td width=150>&nbsp;Status</td>		<td>&nbsp;</td>	</tr><tr class=clsSilver>	<td><input type=text class=text name=numeroacesso1  maxlength=25 size=15 onKeyDown="if (ValidaProvedor(this)){parent.IFrmProcesso1.TamanhoMax(this)}"></td>	<td><input type=text class=text name=tronco1  maxlength=20 size=10></td>	<td><input type=text class=text name=par1  maxlength=9 size=10 onKeyUp="ValidarNTipo(this,0,4,4,1,0,4)" TIPO=N  ></td>	<td><input type=text class=text name=posicaoobservacao1  size=30 maxlength=800></td>	<td><select name=situacao1 >		<option value=></option>		<option value=I >Instalação</option>		<option value=R >Retirada</option>		<option value=M >Manter Facilidade</option>	</select></td>	<td class=lightblue><table rules=groups bgcolor=#eeeeee cellspacing=0 cellpadding=2 bordercolorlight=#003388 bordercolordark=#ffffff width=100% ><tr><td class=lightblue><span id=spnStsNDet1>&nbsp;</span></td></tr></table></td>	<td align=center><input type=button class=button style="width:30px" name=apaga1  value=X intIndex=1  onclick=ApagarLinha(this.intIndex)></td></tr><tr class=clsSilver>	<td><input type=text class=text name=numeroacesso2  maxlength=25 size=15 onKeyDown="if (ValidaProvedor(this)){parent.IFrmProcesso1.TamanhoMax(this)}"></td>	<td><input type=text class=text name=tronco2  maxlength=20 size=10></td>	<td><input type=text class=text name=par2  maxlength=9 size=10 onKeyUp="ValidarNTipo(this,0,4,4,1,0,4)" TIPO=N  ></td>	<td><input type=text class=text name=posicaoobservacao2  size=30 maxlength=800></td>	<td><select name=situacao2 >		<option value=></option>		<option value=I >Instalação</option>		<option value=R >Retirada</option>		<option value=M >Manter Facilidade</option>	</select></td>	<td class=lightblue><table rules=groups bgcolor=#eeeeee cellspacing=0 cellpadding=2 bordercolorlight=#003388 bordercolordark=#ffffff width=100% ><tr><td class=lightblue><span id=spnStsNDet2>&nbsp;</span></td></tr></table></td>	<td align=center><input type=button class=button style="width:30px" name=apaga2  value=X intIndex=2  onclick=ApagarLinha(this.intIndex)></td></tr><tr class=clsSilver>	<td><input type=text class=text name=numeroacesso3  maxlength=25 size=15 onKeyDown="if (ValidaProvedor(this)){parent.IFrmProcesso1.TamanhoMax(this)}"></td>	<td><input type=text class=text name=tronco3  maxlength=20 size=10></td>	<td><input type=text class=text name=par3  maxlength=9 size=10 onKeyUp="ValidarNTipo(this,0,4,4,1,0,4)" TIPO=N  ></td>	<td><input type=text class=text name=posicaoobservacao3  size=30 maxlength=800></td>	<td><select name=situacao3 >		<option value=></option>		<option value=I >Instalação</option>		<option value=R >Retirada</option>		<option value=M >Manter Facilidade</option>	</select></td>	<td class=lightblue><table rules=groups bgcolor=#eeeeee cellspacing=0 cellpadding=2 bordercolorlight=#003388 bordercolordark=#ffffff width=100% ><tr><td class=lightblue><span id=spnStsNDet3>&nbsp;</span></td></tr></table></td>	<td align=center><input type=button class=button style="width:30px" name=apaga3  value=X intIndex=3  onclick=ApagarLinha(this.intIndex)></td></tr><tr class=clsSilver>	<td><input type=text class=text name=numeroacesso4  maxlength=25 size=15 onKeyDown="if (ValidaProvedor(this)){parent.IFrmProcesso1.TamanhoMax(this)}"></td>	<td><input type=text class=text name=tronco4  maxlength=20 size=10></td>	<td><input type=text class=text name=par4  maxlength=9 size=10 onKeyUp="ValidarNTipo(this,0,4,4,1,0,4)" TIPO=N  ></td>	<td><input type=text class=text name=posicaoobservacao4  size=30 maxlength=800></td>	<td><select name=situacao4 >		<option value=></option>		<option value=I >Instalação</option>		<option value=R >Retirada</option>		<option value=M >Manter Facilidade</option>	</select></td>	<td class=lightblue><table rules=groups bgcolor=#eeeeee cellspacing=0 cellpadding=2 bordercolorlight=#003388 bordercolordark=#ffffff width=100% ><tr><td class=lightblue><span id=spnStsNDet4>&nbsp;</span></td></tr></table></td>	<td align=center><input type=button class=button style="width:30px" name=apaga4  value=X intIndex=4  onclick=ApagarLinha(this.intIndex)></td></tr><tr class=clsSilver><td align=center><font color=red>•</font></td><td align=center>A20</td><td align=center>N4-N4</td><td align=center>A300</td><td align=center></td><td align=center></td><td align=center><font color=red>••</font></td></tr></table>')
+var strAde = new String('<table rules=groups  cellspacing=1 cellpadding=1 bordercolorlight=#003388 bordercolordark=#ffffff width=760>	<tr>		<td bgcolor=#003388 colspan=10><font color=white>FACILIDADES DO PEDIDO</font></td>	</tr>	<tr class=clsSilver>		<td>Nº Acesso</td>		<td>Cabo</td>		<td>Par</td>		<td>Lateral</td>		<td nowrap>T. Cabo</td>		<td nowrap>Cx. Emenda</td>		<td nowrap>Obs</td>		<td>Ação</td>		<td width=120px >Status</td>		<td>&nbsp;</td>	</tr><tr class=clsSilver><td><input type=text class=text name=txtNroAcesso1	maxlength=25 size=15 value="11111111" onKeyDown="if (ValidaProvedor(this)){parent.IFrmProcesso1.TamanhoMax(this)}"></td><td><input type=text class=text name=txtCabo1		maxlength=2 size=5 value= "22" onKeyUp="ValidarTipo(this,0)" ></td><td><input type=text class=text name=txtPar1  maxlength=9 size=10 value="0001-0002" onKeyUp="ValidarNTipo(this,0,4,4,1,0,4)" TIPO=N  ></td><td><input type=text class=text name=txtLateral1		maxlength=2 size=5 value="LL"></td><td><select name=cboTipoCabo1 >			<option value=""></option>			<option value="H"  selected >H</option>			<option value="X" >X</option>			<option value="C" >C</option>		</select></td><td><input type=text class=text name=txtCaixaEmenda1  maxlength=3 size=5  value="CXX" ></td><td ALIGN=CENTER><input type=text class=text name=txtObs1  maxlength=300 size=10 value="OBS" ></td><td>	<select name=cboAcao1 >		<option value=""></option>		<option value=I  selected  >Instalação</option>		<option value=R  >Retirada</option>		<option value=M  >Manter Facilidade</option>	</select></td><td class=lightblue align=center>	<table rules=groups bgcolor=#eeeeee cellspacing=0 cellpadding=2 bordercolorlight=#003388 bordercolordark=#ffffff width=100% >	<tr><td class=lightblue><span id=spnStsAde1>&nbsp;</span>	</td></tr>	</table></td><td align=center><input type=button class=button style="width:30px" name=btnApaga1  value=X intIndex=1  onclick=ApagarLinha(this.intIndex)></td></tr><tr class=clsSilver><td><input type=text class=text name=txtNroAcesso2	maxlength=25 size=15 value="" onKeyDown="if (ValidaProvedor(this)){parent.IFrmProcesso1.TamanhoMax(this)}"></td><td><input type=text class=text name=txtCabo2		maxlength=2 size=5 value= "" onKeyUp="ValidarTipo(this,0)" ></td><td><input type=text class=text name=txtPar2  maxlength=9 size=10 value="" onKeyUp="ValidarNTipo(this,0,4,4,1,0,4)" TIPO=N  ></td><td><input type=text class=text name=txtLateral2		maxlength=2 size=5 value=""></td><td><select name=cboTipoCabo2 >			<option value=""></option>			<option value="H" >H</option>			<option value="X" >X</option>			<option value="C" >C</option>		</select></td><td><input type=text class=text name=txtCaixaEmenda2  maxlength=3 size=5  value="" ></td><td ALIGN=CENTER><input type=text class=text name=txtObs2  maxlength=300 size=10 value="" ></td><td>	<select name=cboAcao2 >		<option value=""></option>		<option value=I  >Instalação</option>		<option value=R  >Retirada</option>		<option value=M  >Manter Facilidade</option>	</select></td><td class=lightblue align=center>	<table rules=groups bgcolor=#eeeeee cellspacing=0 cellpadding=2 bordercolorlight=#003388 bordercolordark=#ffffff width=100% >	<tr><td class=lightblue><span id=spnStsAde2>&nbsp;</span>	</td></tr>	</table></td><td align=center><input type=button class=button style="width:30px" name=btnApaga2  value=X intIndex=2  onclick=ApagarLinha(this.intIndex)></td></tr><tr class=clsSilver><td><input type=text class=text name=txtNroAcesso3	maxlength=25 size=15 value="" onKeyDown="if (ValidaProvedor(this)){parent.IFrmProcesso1.TamanhoMax(this)}"></td><td><input type=text class=text name=txtCabo3		maxlength=2 size=5 value= "" onKeyUp="ValidarTipo(this,0)" ></td><td><input type=text class=text name=txtPar3  maxlength=9 size=10 value="" onKeyUp="ValidarNTipo(this,0,4,4,1,0,4)" TIPO=N  ></td><td><input type=text class=text name=txtLateral3		maxlength=2 size=5 value=""></td><td><select name=cboTipoCabo3 >			<option value=""></option>			<option value="H" >H</option>			<option value="X" >X</option>			<option value="C" >C</option>		</select></td><td><input type=text class=text name=txtCaixaEmenda3  maxlength=3 size=5  value="" ></td><td ALIGN=CENTER><input type=text class=text name=txtObs3  maxlength=300 size=10 value="" ></td><td>	<select name=cboAcao3 >		<option value=""></option>		<option value=I  >Instalação</option>		<option value=R  >Retirada</option>		<option value=M  >Manter Facilidade</option>	</select></td><td class=lightblue align=center>	<table rules=groups bgcolor=#eeeeee cellspacing=0 cellpadding=2 bordercolorlight=#003388 bordercolordark=#ffffff width=100% >	<tr><td class=lightblue><span id=spnStsAde3>&nbsp;</span>	</td></tr>	</table></td><td align=center><input type=button class=button style="width:30px" name=btnApaga3  value=X intIndex=3  onclick=ApagarLinha(this.intIndex)></td></tr><tr class=clsSilver><td><input type=text class=text name=txtNroAcesso4	maxlength=25 size=15 value="" onKeyDown="if (ValidaProvedor(this)){parent.IFrmProcesso1.TamanhoMax(this)}"></td><td><input type=text class=text name=txtCabo4		maxlength=2 size=5 value= "" onKeyUp="ValidarTipo(this,0)" ></td><td><input type=text class=text name=txtPar4  maxlength=9 size=10 value="" onKeyUp="ValidarNTipo(this,0,4,4,1,0,4)" TIPO=N  ></td><td><input type=text class=text name=txtLateral4		maxlength=2 size=5 value=""></td><td><select name=cboTipoCabo4 >			<option value=""></option>			<option value="H" >H</option>			<option value="X" >X</option>			<option value="C" >C</option>		</select></td><td><input type=text class=text name=txtCaixaEmenda4  maxlength=3 size=5  value="" ></td><td ALIGN=CENTER><input type=text class=text name=txtObs4  maxlength=300 size=10 value="" ></td><td>	<select name=cboAcao4 >		<option value=""></option>		<option value=I  >Instalação</option>		<option value=R  >Retirada</option>		<option value=M  >Manter Facilidade</option>	</select></td><td class=lightblue align=center>	<table rules=groups bgcolor=#eeeeee cellspacing=0 cellpadding=2 bordercolorlight=#003388 bordercolordark=#ffffff width=100% >	<tr><td class=lightblue><span id=spnStsAde4>&nbsp;</span>	</td></tr>	</table></td><td align=center><input type=button class=button style="width:30px" name=btnApaga4  value=X intIndex=4  onclick=ApagarLinha(this.intIndex)></td></tr><tr class=clsSilver><td align=center><font color=red>•</font></td><td align=center>N2</td><td align=center>N4-N4</td><td align=center>A2</td><td align=center></td><td align=center>A3</td><td align=center>A300</td><td align=center></td><td></td><td align=center><font color=red>••</font></td></tr></table>')
+
+function AbrirParam(obj)
+{
+	with (document.forms[0])
+	{
+		switch (obj.value)
+		{
+			case "1":
+				spnDet.innerHTML = strDet
+				spnNDet.innerHTML = ""
+				spnAde.innerHTML = ""
+				break
+			case "2":
+				spnDet.innerHTML = ""
+				spnNDet.innerHTML = strNDet
+				spnAde.innerHTML = ""
+				break
+			case "3":
+				spnDet.innerHTML = ""
+				spnNDet.innerHTML = ""
+				spnAde.innerHTML = strAde
+				break
+			default:	
+				spnDet.innerHTML = ""
+				spnNDet.innerHTML = ""
+				spnAde.innerHTML = ""
+
+		}
+	}
+}
+
+function SelecionarRede(obj)
+{
+	with (document.forms[0]) 
+	{
+		if (obj.value == "7")
+		{
+			cboRede.value = 1
+			spnDet.innerHTML = strDet
+			spnNDet.innerHTML = ""
+			spnAde.innerHTML = ""
+
+		}
+	}
+}
+
+spnAde.innerHTML = '<table rules=groups  cellspacing=1 cellpadding=1 bordercolorlight=#003388 bordercolordark=#ffffff width=760>	<tr>		<td bgcolor=#003388 colspan=10><font color=white>FACILIDADES DO PEDIDO</font></td>	</tr>	<tr class=clsSilver>		<td>Nº Acesso</td>		<td>Cabo</td>		<td>Par</td>		<td>Lateral</td>		<td nowrap>T. Cabo</td>		<td nowrap>Cx. Emenda</td>		<td nowrap>Obs</td>		<td>Ação</td>		<td width=120px >Status</td>		<td>&nbsp;</td>	</tr><tr class=clsSilver><td><input type=text class=text name=txtNroAcesso1	maxlength=25 size=15 value="11111111" onKeyDown="if (ValidaProvedor(this)){parent.IFrmProcesso1.TamanhoMax(this)}"></td><td><input type=text class=text name=txtCabo1		maxlength=2 size=5 value= "22" onKeyUp="ValidarTipo(this,0)" ></td><td><input type=text class=text name=txtPar1  maxlength=9 size=10 value="0001-0002" onKeyUp="ValidarNTipo(this,0,4,4,1,0,4)" TIPO=N  ></td><td><input type=text class=text name=txtLateral1		maxlength=2 size=5 value="LL"></td><td><select name=cboTipoCabo1 >			<option value=""></option>			<option value="H"  selected >H</option>			<option value="X" >X</option>			<option value="C" >C</option>		</select></td><td><input type=text class=text name=txtCaixaEmenda1  maxlength=3 size=5  value="CXX" ></td><td ALIGN=CENTER><input type=text class=text name=txtObs1  maxlength=300 size=10 value="OBS" ></td><td>	<select name=cboAcao1 >		<option value=""></option>		<option value=I  selected  >Instalação</option>		<option value=R  >Retirada</option>		<option value=M  >Manter Facilidade</option>	</select></td><td class=lightblue align=center>	<table rules=groups bgcolor=#eeeeee cellspacing=0 cellpadding=2 bordercolorlight=#003388 bordercolordark=#ffffff width=100% >	<tr><td class=lightblue><span id=spnStsAde1>&nbsp;</span>	</td></tr>	</table></td><td align=center><input type=button class=button style="width:30px" name=btnApaga1  value=X intIndex=1  onclick=ApagarLinha(this.intIndex)></td></tr><tr class=clsSilver><td><input type=text class=text name=txtNroAcesso2	maxlength=25 size=15 value="" onKeyDown="if (ValidaProvedor(this)){parent.IFrmProcesso1.TamanhoMax(this)}"></td><td><input type=text class=text name=txtCabo2		maxlength=2 size=5 value= "" onKeyUp="ValidarTipo(this,0)" ></td><td><input type=text class=text name=txtPar2  maxlength=9 size=10 value="" onKeyUp="ValidarNTipo(this,0,4,4,1,0,4)" TIPO=N  ></td><td><input type=text class=text name=txtLateral2		maxlength=2 size=5 value=""></td><td><select name=cboTipoCabo2 >			<option value=""></option>			<option value="H" >H</option>			<option value="X" >X</option>			<option value="C" >C</option>		</select></td><td><input type=text class=text name=txtCaixaEmenda2  maxlength=3 size=5  value="" ></td><td ALIGN=CENTER><input type=text class=text name=txtObs2  maxlength=300 size=10 value="" ></td><td>	<select name=cboAcao2 >		<option value=""></option>		<option value=I  >Instalação</option>		<option value=R  >Retirada</option>		<option value=M  >Manter Facilidade</option>	</select></td><td class=lightblue align=center>	<table rules=groups bgcolor=#eeeeee cellspacing=0 cellpadding=2 bordercolorlight=#003388 bordercolordark=#ffffff width=100% >	<tr><td class=lightblue><span id=spnStsAde2>&nbsp;</span>	</td></tr>	</table></td><td align=center><input type=button class=button style="width:30px" name=btnApaga2  value=X intIndex=2  onclick=ApagarLinha(this.intIndex)></td></tr><tr class=clsSilver><td><input type=text class=text name=txtNroAcesso3	maxlength=25 size=15 value="" onKeyDown="if (ValidaProvedor(this)){parent.IFrmProcesso1.TamanhoMax(this)}"></td><td><input type=text class=text name=txtCabo3		maxlength=2 size=5 value= "" onKeyUp="ValidarTipo(this,0)" ></td><td><input type=text class=text name=txtPar3  maxlength=9 size=10 value="" onKeyUp="ValidarNTipo(this,0,4,4,1,0,4)" TIPO=N  ></td><td><input type=text class=text name=txtLateral3		maxlength=2 size=5 value=""></td><td><select name=cboTipoCabo3 >			<option value=""></option>			<option value="H" >H</option>			<option value="X" >X</option>			<option value="C" >C</option>		</select></td><td><input type=text class=text name=txtCaixaEmenda3  maxlength=3 size=5  value="" ></td><td ALIGN=CENTER><input type=text class=text name=txtObs3  maxlength=300 size=10 value="" ></td><td>	<select name=cboAcao3 >		<option value=""></option>		<option value=I  >Instalação</option>		<option value=R  >Retirada</option>		<option value=M  >Manter Facilidade</option>	</select></td><td class=lightblue align=center>	<table rules=groups bgcolor=#eeeeee cellspacing=0 cellpadding=2 bordercolorlight=#003388 bordercolordark=#ffffff width=100% >	<tr><td class=lightblue><span id=spnStsAde3>&nbsp;</span>	</td></tr>	</table></td><td align=center><input type=button class=button style="width:30px" name=btnApaga3  value=X intIndex=3  onclick=ApagarLinha(this.intIndex)></td></tr><tr class=clsSilver><td><input type=text class=text name=txtNroAcesso4	maxlength=25 size=15 value="" onKeyDown="if (ValidaProvedor(this)){parent.IFrmProcesso1.TamanhoMax(this)}"></td><td><input type=text class=text name=txtCabo4		maxlength=2 size=5 value= "" onKeyUp="ValidarTipo(this,0)" ></td><td><input type=text class=text name=txtPar4  maxlength=9 size=10 value="" onKeyUp="ValidarNTipo(this,0,4,4,1,0,4)" TIPO=N  ></td><td><input type=text class=text name=txtLateral4		maxlength=2 size=5 value=""></td><td><select name=cboTipoCabo4 >			<option value=""></option>			<option value="H" >H</option>			<option value="X" >X</option>			<option value="C" >C</option>		</select></td><td><input type=text class=text name=txtCaixaEmenda4  maxlength=3 size=5  value="" ></td><td ALIGN=CENTER><input type=text class=text name=txtObs4  maxlength=300 size=10 value="" ></td><td>	<select name=cboAcao4 >		<option value=""></option>		<option value=I  >Instalação</option>		<option value=R  >Retirada</option>		<option value=M  >Manter Facilidade</option>	</select></td><td class=lightblue align=center>	<table rules=groups bgcolor=#eeeeee cellspacing=0 cellpadding=2 bordercolorlight=#003388 bordercolordark=#ffffff width=100% >	<tr><td class=lightblue><span id=spnStsAde4>&nbsp;</span>	</td></tr>	</table></td><td align=center><input type=button class=button style="width:30px" name=btnApaga4  value=X intIndex=4  onclick=ApagarLinha(this.intIndex)></td></tr><tr class=clsSilver><td align=center><font color=red>•</font></td><td align=center>N2</td><td align=center>N4-N4</td><td align=center>A2</td><td align=center></td><td align=center>A3</td><td align=center>A300</td><td align=center></td><td></td><td align=center><font color=red>••</font></td></tr></table>';setTimeout("ResgatarPadraoProvedor(document.forms[0].cboProvedor,1)",300)
+
+function PosicoesLivre(strPagina)
+{
+	with (document.forms[0])
+	{
+		if (!ValidarCampos(cboLocalConfig,"Local de Configuração")) return false
+		if (!ValidarCampos(cboRegimeCntr,"Prazos de Contratação de Acesso")) return false
+		if (!ValidarCampos(cboDistLocalConfig,"Distribuidor")) return false
+		if (!ValidarCampos(cboRede,"Rede")) return false
+		
+		switch (strPagina)
+		{
+			case "L": //livres
+				window.open('consultalivres_main.asp?strEscConfig='+cboLocalConfig.value+'&strRegId='+cboRegimeCntr.value+'&strDistrib='+cboDistLocalConfig.value+'&strSis='+cboRede.value,'consulta','menubar=yes,statusbar=yes,resizable=no,scrollbars=yes,width=500,height=400,top=25,left=25');
+				break
+			case "O": //Ocupada
+				window.open('consultaocupadas_main.asp?strEscConfig='+cboLocalConfig.value+'&strRegId='+cboRegimeCntr.value+'&strDistrib='+cboDistLocalConfig.value+'&strSis='+cboRede.value,'ocupadas','menubar=yes,statusbar=yes,resizable=no,scrollbars=yes,width=650,height=400,top=25,left=25');
+				break
+		}
+	}	
+}
+
+function ValidaProvedor(obj)
+{
+	with (document.forms[0])
+	{
+		if (cboProvedor.value == "")
+		{
+			alert("Selecione um Provedor Pimeiro!")
+			obj.value = ""
+			cboProvedor.focus()
+			return false
+		}
+	}
+	return true
+}
+//-->
+</SCRIPT>
+
+<iframe	id			= "IFrmProcesso"
+	    name        = "IFrmProcesso" 
+	    width       = "100%" 
+	    height      = "100%"
+	    frameborder = "0"
+	    scrolling   = "no" 
+	    align       = "left">
+</iFrame>
+</body>
+</html>
