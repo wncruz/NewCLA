@@ -1,0 +1,60 @@
+<!--#include file="../inc/data.asp"-->
+<%
+equi = Request.Form("hdnTecnologia")
+
+'response.write "<script>alert('"&equi&"')</script>"
+'response.end
+if Request.Form("rdoPortaID") = "" then
+	PortaId = Request.Form("hdnrdoPortaID")
+else 
+	PortaId = Request.Form("rdoPortaID")
+end if
+Vetor_Campos(1)="adInteger,8,adParamInput, " & Request.Form("hdnOntID")
+Vetor_Campos(2)="adInteger,4,adParamInput, " & Request.Form("hdnOrisol_ID")
+Vetor_Campos(3)="adWChar,10,adParamInput, " & Request.Form("hdnAcl_IDAcessoLogico")
+Vetor_Campos(4)="adWChar,5,adParamInput, "  & Request.Form("hdnvlan")
+Vetor_Campos(5)="adWChar,20,adParamInput, "  & Request.Form("hdnportaolt")
+Vetor_Campos(6)="adWChar,13,adParamInput, "  & Request.Form("hdnpe")
+Vetor_Campos(7)="adInteger,8,adParamInput, "  & PortaId 'Request.Form("rdoPortaID")
+Vetor_Campos(8)="adWChar,30,adParamInput, "  & Request.Form("txtDesigONT")
+Vetor_Campos(9)="adInteger,4,adParamOutput,0 "
+Vetor_Campos(10)="adWChar,50,adParamInput, "  & Request.Form("hdnId_Acesso")
+Vetor_Campos(11)="adWChar,5,adParamInput, "  & Request.Form("hdnSvlan")
+Vetor_Campos(12)="adWChar,20,adParamInput, " & Request.Form("txtSwitch")
+Vetor_Campos(13)="adWChar,30,adParamInput, " & Request.Form("txtPortaSwitch")
+Vetor_Campos(14)="adInteger,4,adParamInput, " & Request.Form("hdnTipoServico")
+
+
+Call APENDA_PARAM("CLA_sp_ins_ONTPorta",14,Vetor_Campos)
+'response.write APENDA_PARAMstr("CLA_sp_ins_ONTPorta",10,Vetor_Campos)
+'response.end
+ObjCmd.Execute'pega dbaction
+DBAction = ObjCmd.Parameters("RET").value
+
+%>
+<script language=javascript>
+<%
+If DBAction <> "0" Then
+	%>
+		alert('<%=DBAction%> - Facilidade não alocada. Verifique os campos obrigatórios.');	
+	<%
+ELSE
+	
+		if equi = "ADE DSLAM" then
+	%>
+			parent.GravarUplinkDSLAM();
+			alert('Facilidade Alocada com Sucesso!');
+			
+			//parent.ResgatarEthernetEDD();
+	<%
+	
+		else 				
+	%>
+			alert('Facilidade Alocada com Sucesso!');
+			parent.window.close();
+	<%		
+		end if
+END IF
+%>
+</script>
+

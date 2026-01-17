@@ -1,0 +1,38 @@
+<%@ Language=VBScript %>
+<%
+'•IMPLEMENT SOFT - IMPLEMENTAÇÕES E SOLUÇÕES EM INFORMÁTICA
+'	- Sistema			: CLA
+'	- Arquivo			: AcessosFisicosApg.asp
+'	- Descrição			: Lista de Acesso Físicos
+%>
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" Content="Microsoft Visual Studio 6.0">
+<link rel=stylesheet type="text/css" href="../css/cla.css">
+</HEAD>
+<BODY topmargin=0 leftmargin=0 bgColor=#eeeeee class=TA>
+<Form name=Form1 method=Post>
+	<span id=spnAcessoFisApg></span>
+</Form>	
+</BODY>
+</HTML>
+<SCRIPT LANGUAGE=javascript>
+<!--
+//Verifica se o Xml já esta carregado
+function CheckStateIframeApg()
+{
+  var state = document.readyState;
+  if (state == "complete")
+  {
+	parent.CarregarListaApg()
+  }
+}
+
+function CarregarIframe()
+{
+	document.onreadystatechange = CheckStateIframeApg;
+	document.resolveExternals = false;
+}
+CarregarIframe()
+//-->
+</SCRIPT>

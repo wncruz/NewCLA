@@ -1,0 +1,462 @@
+<%@ CodePage=65001 %>
+<%
+
+	Response.ContentType = "text/html; charset=utf-8"
+	Response.Charset = "UTF-8"
+
+'•IMPLEMENT SOFT - IMPLEMENTAÇÕES E SOLUÇÕES EM INFORMÁTICA
+'	- Sistema			: CLA
+'	- Arquivo			: AcessoLogico.ASP
+'	- Descrição			: Alteração/Desativação/Cancelamento de Solicitação
+%>
+<!--#include file="../inc/data.asp"-->
+<!--#include file="../inc/header.asp"-->
+<%
+Dim strDtPedido
+strDtPedido = right("0" & day(now),2) & "/" & right("0" & month(now),2) & "/" & year(now)
+Function FormatarXmlLog(strXml)
+
+	Dim strXmlDadosAux
+	'Retira a quebra de linha que tem no final XML e passa para a variável que vai para o HTML
+	strXmlDadosAux = Replace(strXml,Chr(13),"") 
+	strXmlDadosAux = Replace(strXmlDadosAux,Chr(10),"")
+
+	FormatarXmlLog = strXmlDadosAux
+        
+End Function
+
+if Trim(Request("acao")) = "" then
+	Response.Write "<script language=javascript>window.location.replace('main.asp')</script>"
+	Response.End 
+End if
+%>
+
+<SCRIPT LANGUAGE=javascript>
+<!--
+function ResgatarServico(obj)
+{
+	with (document.forms[0])
+	{
+		if (obj=='[object]') var strObj = obj.value
+		else var strObj = obj
+
+		if (cboServicoPedido.value != "")
+		{
+			hdnAcao.value = "ResgatarPadraoServico"
+			hdnCboServico.value = strObj
+			target = "IFrmProcesso"
+			action = "ProcessoCla.asp"
+			submit()
+			return
+		}else{
+			spnServico.innerHTML = ""
+		}
+		
+	}	
+}
+
+function ResgatarAcessoLogico()
+{
+	with (document.forms[0])
+	{
+		if (!ValidarDM(txtPedido)) return
+		switch (hdnOrigem.value)
+		{
+			case "des":
+				hdnTipoProcesso.value = 2
+				break
+			case "alt":
+				hdnTipoProcesso.value = 3
+				break
+			case "can":
+				hdnTipoProcesso.value = 4
+				break
+		}
+
+		if (txtNroContrServ.value != "")
+		{
+			hdnDesigServ.value = ""
+			cboServicoPedido.value = ""
+			spnServico.innerHTML = ""
+			hdnAcao.value = "ResgatarAcessoLogico"
+			hdn678.value = ""
+			hdnSolId.value = ""
+			hdnAcfId.value = ""
+			method = "post"
+			target = "IFrmProcesso2"
+			action = "ProcessoAcessoLog.asp"
+			submit()
+		}
+		else
+		{
+			hdnAcao.value = "ResgatarAcessoLogico"
+			if (!MontarDesigServico()) return
+			hdn678.value = ""
+			hdnSolId.value = ""
+			hdnAcfId.value = ""
+			method = "post"
+			target = "IFrmProcesso2"
+			action = "ProcessoAcessoLog.asp"
+			submit()
+		}	
+	}
+}
+
+function DetalharItem(dblSolId)
+{
+	with (document.forms[0])
+	{
+		PopularXml()
+		hdnSolId.value = dblSolId
+		DetalharFac()
+	}	
+}
+
+function EfetivarProcesso()
+{
+	with (document.forms[0])
+	{
+		switch (hdnOrigem.value)
+		{
+			case "alt":
+				PopularXml()
+				hdnAcao.value = "Alteracao"
+				hdnTipoProcesso.value = 3
+				target = self.name 
+				action = "solicitacao.asp"
+				submit()
+				break
+		}		
+	}	
+}
+function Enviar()
+{
+	var objAryRet
+	
+	with (document.forms[0])
+	{
+		if (hdn678.value == "")
+		{
+			alert("Selecione um acesso lógico!")
+			return
+		}
+		else
+		{
+			switch (hdnOrigem.value)
+			{
+				case "des":
+					if (confirm("Confirma a desativação do serviço?"))
+					{
+						hdnTipoProcesso.value = 2
+						intRet = window.showModalDialog('ProcessoDesativacao.asp?hdnAcao=Desativacao&hdnIdLog='+hdn678.value+'&hdnAcfId='+hdnAcfId.value+'&hdnTipoProcesso='+hdnTipoProcesso.value,"","dialogHeight: 300px; dialogWidth: 700px; dialogTop: px; dialogLeft: px; edge: Raised; center: Yes; help: No; resizable: No; status: No;");
+						try
+						{
+							objAryRet = intRet.split(",")
+							intRet = objAryRet[0]
+						}
+						catch(e){intRet = 0}
+						if (parseInt(intRet) == 146 || parseInt(intRet) == 145 || parseInt(intRet) == 117 || parseInt(intRet) == 2 || parseInt(intRet) == 124)
+						{
+							spnSolId.innerHTML = objAryRet[1]
+							ResgatarAcessoLogico() 
+						}
+					}	
+					break
+				case "alt":
+					hdnAcao.value = "ValidarProcesso"
+					hdnTipoProcesso.value = 3
+					target = "IFrmProcesso"
+					action = "ProcessoCla.asp"
+					submit()
+					break
+				case "can":
+				    //btnEnviar.disabled=true; // PRSS - 7/11/2005
+					if (confirm("Confirma o cancelamento do serviço?"))
+					{
+						hdnTipoProcesso.value = 4
+						intRet = window.showModalDialog('ProcessoDesativacao.asp?hdnAcao=Desativacao&hdnIdLog='+hdn678.value+'&hdnAcfId='+hdnAcfId.value+'&hdnTipoProcesso='+hdnTipoProcesso.value,"","dialogHeight: 300px; dialogWidth: 700px; dialogTop: px; dialogLeft: px; edge: Raised; center: Yes; help: No; resizable: No; status: No;");
+						try
+						{
+							objAryRet = intRet.split(",")
+							intRet = objAryRet[0]
+						}
+						catch(e){intRet = 0}
+						
+						if (parseInt(intRet) == 145 || parseInt(intRet) == 146 || parseInt(intRet) == 117 || parseInt(intRet) == 2 || parseInt(intRet) == 124  || parseInt(intRet) == 1 || parseInt(intRet) == 170)
+						{
+							spnSolId.innerHTML = objAryRet[1] 
+							ResgatarAcessoLogico() 
+						}
+					}
+					else
+					//  btnEnviar.disabled=false; // PRSS - 7/11/2005
+					break
+			}
+		}
+	}	
+}
+
+function AtualizarSolId(obj)
+{
+	with (document.forms[0])
+	{
+		hdn678.value = obj.value
+		hdnSolId.value = obj.SolId
+		hdnAcfId.value = obj.AcfId
+	}
+}
+function AtId(solid,acfid,vall){
+	with (document.forms[0])
+		{
+				hdn678.value = vall
+				hdnSolId.value = solid
+				hdnAcfId.value = acfid
+		}
+	}
+function LimparAcessoLogico()
+{
+	LimparForm();
+	spnServico.innerHTML = ""
+	IFrmProcesso2.location.replace("../html/blank.htm")
+	spnLinks.innerHTML  = ""
+	setarFocus('txtSolId');
+}
+
+function CarregarDocLog()
+{
+	document.onreadystatechange = CheckStateDocLog;
+	document.resolveExternals = false;
+}
+
+function CheckStateDocLog()
+{
+  var state = document.readyState;
+  
+  if (state == "complete")
+  {
+	CarregarLista()
+  }
+}
+
+var objXmlGeral = new ActiveXObject("Microsoft.XMLDOM")
+
+function CarregarLista()
+{
+	objXmlGeral.onreadystatechange = CheckStateXml;
+	objXmlGeral.resolveExternals = false;
+	<%if Request.Form("hdnXmlReturn") = "" then%>
+		objXmlGeral.loadXML("<xDados/>")
+	<%Else%>
+		objXmlGeral.loadXML("<%=FormatarXMLLog(Request.Form("hdnXmlReturn"))%>") 
+	<%End if%>	
+}
+//Verifica se o Xml já esta carregado
+function CheckStateXml()
+{
+  var state = objXmlGeral.readyState;
+  
+  if (state == 4)
+  {
+    var err = objXmlGeral.parseError;
+    if (err.errorCode != 0)
+    {
+      alert(err.reason)
+    } 
+    else 
+    {
+		var strServico = new String(RequestNode(objXmlGeral,"cboServicoPedido"))
+		if (strServico != "")
+		{
+			PopularForm()
+			document.forms[0].hdnJSReturn.value = "PopularForm();ResgatarAcessoLogico();"
+			ResgatarServico(strServico)
+		}else{
+			document.forms[0].hdnJSReturn.value = ""
+			PopularForm()
+			ResgatarAcessoLogico()
+		}	
+	}
+  }
+}
+
+CarregarDocLog()
+//-->
+</SCRIPT>
+<form method="post" name=Form1 >
+<input type=hidden name="hdnAcao">
+<input type=hidden name="hdnCboServico">
+<input type=hidden name="hdnDesignacao">
+<input type=hidden name="hdn678">
+<input type=hidden name="hdnAcfId">
+<input type=hidden name="hdnSolId">
+<input type=hidden name="hdnDesigServ">
+<input type=hidden name="hdnTipoProcesso">
+<input type=hidden name="hdnXmlReturn">
+<input type=hidden name="hdnJSReturn">
+
+<input type="hidden" name="hdnPaginaOrig"	value="<%=Request.ServerVariables("SCRIPT_NAME")%>?acao=<%=Trim(Request("acao"))%>">
+<input type=hidden name="hdnOrigem" value="<%=Trim(Request("acao"))%>">
+<input type=hidden name="acao" value="<%=Trim(Request("acao"))%>">
+<tr>
+<td >
+<table cellspacing="1" cellpadding="0" border=0 width="760">
+	<tr >
+		<th width=25%>&nbsp;•&nbsp;Solicitação de Acesso</th>
+		<th width=25%>&nbsp;Nº&nbsp;:&nbsp;<span id=spnSolId></Span></th>
+		<th width=25%>&nbsp;Tipo&nbsp;:&nbsp;
+		<%
+		Select Case Request.QueryString("acao") 
+			Case "alt"
+				Response.Write "Alteração"
+			Case "des"
+				Response.Write "Desativação"
+			Case "can"
+				Response.Write "Cancelamento"
+		End Select
+		%>
+		</th>
+		<th width=25%>&nbsp;Data&nbsp;:&nbsp;<%=strDtPedido%></th>
+	</tr>	
+</table>	
+
+<table border=0 cellspacing="1" cellpadding = 0 width="760" >
+<tr class=clsSilver>
+<td>
+	Pedido de Acesso
+</td>
+<td>
+	<input type="text" class="text" name="txtPedido" value="DM-" maxlength="13" size="15"></td>
+</tr>
+<tr class=clsSilver>
+	<td width=25% >Nº Solicitação</td>
+	<td><input type="text" name="txtSolId" size=10 class=text onKeyUp="ValidarTipo(this,0)" maxlength=10></td>
+</tr>
+<tr class=clsSilver>
+	<td width=25% >Id Acesso Lógico&nbsp;(678)</td>
+	<td><input type="text" name="txtIdLog" size=10 class=text onKeyUp="ValidarTipo(this,0)" maxlength=10></td>
+</tr>
+
+<input type=hidden name="cboServicoPedido">
+<input type=hidden name="txtNroContrServ">
+<input type=hidden name="txtCliente">
+<input type=hidden name="txtEndereco">
+<input type=hidden name="txtNroEnd">
+<input type=hidden name="txtComplemento">
+<input type=hidden name="txtNumAcs">
+
+
+<!--
+
+<tr class=clsSilver>
+	<td width=25% >Número do Acesso</td>
+	<td><input type="text" name="txtNumAcs" size=25 class=text  maxlength=10></td>
+</tr>
+
+<tr class=clsSilver>
+	<td width=25% >Serviço</td>
+	<td>
+	
+	<%
+	'seleciona servico
+	set objRS = db.execute("CLA_sp_sel_servico")
+	%>
+		<select name="cboServicoPedido" disabled onchange="ResgatarServico(this)">
+			<option value=""></option>
+		<%
+			While Not objRS.eof
+				Response.Write "<Option value='" & objRS("Ser_ID") & ",1'>" & objRS("Ser_Desc") & "</Option>"
+				objRS.MoveNext
+			Wend
+		%>
+		</select>
+	</td>
+</tr>
+<tr class=clsSilver>
+	<td>Designação do Serviço</td>
+	<td >
+		<span id=spnServico></span>
+
+	</td>
+</tr>
+<tr class=clsSilver>
+	<td width=25% >Nro Contrato Serviço</td>
+	<td><input type="text" name="txtNroContrServ" Disabled size=20 class=text></td>
+</tr>
+<tr class=clsSilver>
+	<td >Cliente</td>
+	<td ><input type="text" class="text" name="txtCliente" disabled value="" maxlength="60" size="50"></td>
+</tr>
+<tr class=clsSilver>
+	<td nowrap>Endereço</td>
+	<td nowrap>
+		<input type="text" class="text" name="txtEndereco" value="" disabled maxlength="60" size="50">&nbsp;Nº&nbsp;
+		<input type="text" class="text" name="txtNroEnd" value=""  disabled maxlength="10" size="10">&nbsp;
+		Compl&nbsp;<input type="text" class="text" name="txtComplemento"  disabled value="" maxlength="30" size="20">	</td>
+</tr>
+-->
+
+<tr>
+	<td colspan=2 align="center" height=30px >
+		<input type="button" class="button" name="btnProcurar" value="Procurar" style="width:100px" onclick="ResgatarAcessoLogico()" accesskey="P" onmouseover="showtip(this,event,'Procurar (Alt+P)');">&nbsp;
+		<%
+		Select Case Trim(Ucase(Request("acao")))
+			Case "ALT"
+				Response.Write "<input type=button class=button name=btnEnviar value=Alterar onclick=""Enviar()"" accesskey=I onmouseover='showtip(this,event,""Enviar (Alt+I)"");'>&nbsp;"
+		End Select
+		%>
+		<input type="button" class="button" name="btnLimpar" value="Limpar" onclick="LimparAcessoLogico();" accesskey="L" onmouseover="showtip(this,event,'Limpar  (Alt+L)');">&nbsp;
+		<input type="button" class="button" name="btnSair" value=" Sair " onClick="javascript:window.location.replace('main.asp')" accesskey="X" onmouseover="showtip(this,event,'Sair (Alt+X)');">
+	</td>
+</tr>
+</table>
+<span id=spnLinks></span>
+<table border=0 width=758 cellspacing=1 cellpadding=1 >
+<tr>
+	<% if Trim(Ucase(Request("acao")))  <> "CAN" and Trim(Ucase(Request("acao")))  <> "DES" then %>
+	<th width=24px></th>
+	<%end if %>
+	<th width=78px><span id=spnCol1 onmouseover="showtip(this,event,'Id do Acesso Lógico');" onmouseout="hidetip();">Id Log</span></th>
+	<th width=160px><span id=spnCol2 onmouseover="showtip(this,event,'Nome do Cliente');" onmouseout="hidetip();">Cliente</span></th>
+	<th width=120px><span id=spnCol3 onmouseover="showtip(this,event,'Id do Acesso Físico');" onmouseout="hidetip();">Id Físico</span></th>
+	<th width=20px><span id=spnCol4 onmouseover="showtip(this,event,'Proprietário do Acesso Físico');" onmouseout="hidetip();">Prop</span></th>
+	<th width=158px><span id=spnCol5 onmouseover="showtip(this,event,'Endereço');" onmouseout="hidetip();">Endereço</span></th>
+	<th width=20px><span id=spnCol6 onmouseover="showtip(this,event,'Compartilhamento');" onmouseout="hidetip();">C</span></th>
+	<th width=90px><span id=spnCol7 onmouseover="showtip(this,event,'Velocidade do Acesso Físico');" onmouseout="hidetip();">Vel Fis</span></th>
+	<th width=90px><span id=spnCol8 onmouseover="showtip(this,event,'Velocidade do Acesso Lógico');" onmouseout="hidetip();">Vel Log</span></th>
+</tr>
+</table>
+<table border=0 width=774 cellspacing=0 cellpadding=0 >
+<tr>
+	<td width=774>
+		<iframe	id			= "IFrmProcesso2"
+			    name        = "IFrmProcesso2" 
+			    width       = "774"
+			    height      = "250"
+			    frameborder = "0"
+			    scrolling   = "overflow" 
+			    align       = "left">
+		</iFrame>
+	</td>
+</tr>	
+</table>
+<iframe	id			= "IFrmProcesso"
+	    name        = "IFrmProcesso" 
+	    width       = "0"
+	    height      = "0"
+	    frameborder = "0"
+	    scrolling   = "no" 
+	    align       = "left">
+</iFrame>
+</td>
+</tr>
+</table>
+<input type=hidden name=hdnXls>
+<input type=hidden name=hdnXls>
+<input type=hidden name=hdnXls>
+<input type=hidden name=hdnXls>
+<input type=hidden name=hdnXls>
+<input type=hidden name=hdnNomeCons value="Acessos">
+</form>
+</body>
+</html>
+<%DesconectarCla()%>

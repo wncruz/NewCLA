@@ -1,0 +1,34 @@
+<%
+dblSolId = Request("hdnSolId")
+%>
+<HTML>
+<HEAD>
+<Title>CLA - Controle Local de Acesso</Title>
+<link rel=stylesheet type="text/css" href="../css/cla.css">
+<script language='javascript' src="../javascript/cla.js"></script>
+</HEAD>
+<BODY class=TA scroll=no>
+<table border=0 cellspacing="1" cellpadding="0" width="100%">  
+	<tr>
+		<td>
+			<iframe	id			= "IFrmMotivoPend"
+				    name        = "IFrmMotivoPend" 
+				    width       = "590px" 
+				    height      = "150px"
+				    src			= "../inc/MotivoPendencia.asp?dblSolId=<%=dblSolId%>&dblPedId=<%=dblPedId%>"
+				    frameborder = "0"
+				    scrolling   = "no" 
+				    align       = "left">
+			</iFrame>
+		</td>
+	</tr>
+</table>
+<table border=0 cellspacing="1" cellpadding="0" width="100%">  
+<tr>
+	<td align=center>
+		<input type="button" class="button" name="btnSair" value=" Sair " onClick="javascript:window.close()" style="width:100px" accesskey="X" onmouseover="showtip(this,event,'Sair (Alt+X)');">
+	</td>
+</tr>
+</table>		
+</BODY>
+</HTML>

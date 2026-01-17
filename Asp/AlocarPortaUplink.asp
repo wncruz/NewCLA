@@ -1,0 +1,175 @@
+<!--#include file="../inc/data.asp"-->
+<%
+
+'response.write "<script>alert('"&Request.Form("cboLocalInstala")&"')</script>"
+'response.write "<script>alert('"&Request.Form("cboDistLocalInstala")&"')</script>"
+'response.write "<script>alert('"&Request.Form("hdnPedId")&"')</script>"
+'response.write "<script>alert('"&Request.Form("hdnRede")&"')</script>"
+'response.write "<script>alert('"&Request.Form("hdnRede")&"')</script>"
+'response.write "<script>alert('"&Request.Form("hdnProvedor")&"')</script>"
+
+
+Vetor_Campos(1)="adInteger,2,adParamInput," & Server.HTMLEncode(Request.Form("cboLocalInstala"))
+Vetor_Campos(2)="adInteger,2,adParamInput," & Server.HTMLEncode(Request.Form("cboDistLocalInstala"))
+Vetor_Campos(3)="adInteger,2,adParamInput," & Server.HTMLEncode(Request.Form("hdnProvedor"))
+Vetor_Campos(4)="adInteger,2,adParamInput," & Server.HTMLEncode(Request.Form("hdnRede"))
+Vetor_Campos(5)="adInteger,2,adParamInput," & strPlataforma
+Vetor_Campos(6)="adInteger,2,adParamOutput,0"
+
+strSqlRet = APENDA_PARAMSTR("CLA_sp_check_recurso2",6,Vetor_Campos)
+Set objRSRec = db.execute(strSqlRet)
+Set DBAction = objRSRec("ret")
+
+dblRecId = ""
+If DBAction = 0 then
+	dblRecId = objRSRec("Rec_ID")
+End if
+if Request.Form("hdnTipoProcesso") <> "4" and dblRecId = "" then
+	Response.Write "<script language=javascript>parent.resposta(" & Cint("0" & DBAction) & ",'');</script>"
+	Response.End 
+End if
+
+
+'response.write "<script>alert('"&Request.Form("rdoPortaUplinkID")&"')</script>"
+
+'if Request.Form("rdoPortaUplinkID") = "" then
+'	PortaId = Request.Form("hdnrdoPortaUplinkID")
+'else 
+'	PortaId = Request.Form("rdoPortaUplinkID")
+'end if
+
+equi = Request.Form("hdnEqui")
+
+if Request.Form("hdnEqui") = "METRO" then
+	Uplink = Request.Form("hdnUplinkMETRO")
+	PortaId = Request.Form("hdnrdoPortaUplinkIDMETRO")
+end if
+if Request.Form("hdnEqui") = "EDD" then
+	Uplink = Request.Form("hdnUplinkEDD")
+	PortaId = Request.Form("hdnrdoPortaUplinkIDEDD")
+end if 
+if Request.Form("hdnEqui") = "Interconexao" then
+	Uplink = Request.Form("hdnUplinkInterconexao")
+	PortaId = Request.Form("hdnrdoPortaUplinkIDInterconexao")
+end if
+
+if Request.Form("hdnEqui") = "DSLAM" then
+	
+	''set rsEqui = db.execute (	"  select top 1  cla_ont.ont_desig " &_
+	''							"  from cla_ontvlan 	 " &_
+	''							"  inner join cla_ontporta		on cla_ontvlan.ontporta_id = cla_ontporta.ontporta_id " &_
+	''							"  inner join cla_ont				on cla_ontporta.ont_id = cla_ont.ont_id " &_
+	''							"  where acl_idacessologico = '" & Request.Form("hdnIdLog") & "'" )
+	''							 
+	''if not rsEqui.Eof then ' and objRSSolic.Bof) then  
+		
+	''	Uplink = rsEqui("ont_desig") 
+		
+		
+	''end if 
+	
+	Uplink = Request.Form("hdnUplinkDSLAM")
+	PortaId = Request.Form("hdnrdoPortaDSLAM")
+	XMLDslam = Request.Form("hdnXMLDSLAM")
+	
+end if
+
+'response.write "<script>alert('"&XMLDslam&"')</script>"
+
+'response.write "<script>alert('"&PortaId&"')</script>"'
+
+'response.write "<script>alert('"&Uplink&"')</script>"
+
+'response.write "<script>alert('"&Request.Form("hdnIdLog")&"')</script>"
+
+'response.write "<script>alert('"&Request.Form("hdnSolId")&"')</script>"
+
+'response.write "<script>alert('"&Request.Form("hdnAcfIdRadio")&"')</script>"
+
+'response.write "<script>alert('"&PortaId&"')</script>"
+	if Request.Form("hdnEqui") = "DSLAM" then
+		Vetor_Campos(1)="adWChar,10,adParamInput, " & Request.Form("hdnIdLog")
+		Vetor_Campos(2)="adInteger,8,adParamInput, "  & PortaId 'Request.Form("rdoPortaID")
+		Vetor_Campos(3)="adInteger,8,adParamInput, " & Request.Form("hdnAcfIdRadio")
+		Vetor_Campos(4)="adWChar,30,adParamInput, "  & Uplink ' Request.Form("hdnUplink")
+		Vetor_Campos(5)="adWChar,30,adParamInput, "  & dblRecId
+		Vetor_Campos(6)="adWChar,30,adParamInput, "  & Request.Form("hdnSolId")
+		Vetor_Campos(7)="adInteger,4,adParamOutput,0 "
+		Vetor_Campos(8)="adWChar,30,adParamInput, "  
+		Vetor_Campos(9)="adWChar,30,adParamInput, "  
+		Vetor_Campos(10)="adWChar,30,adParamInput, " 
+		Vetor_Campos(11)="adWChar,3000,adParamInput, " & XMLDslam
+
+
+		Call APENDA_PARAM("CLA_SP_INS_DSLAM",11,Vetor_Campos)
+		'response.write APENDA_PARAMstr("CLA_sp_ins_ONTPorta",10,Vetor_Campos)
+		'response.end
+		ObjCmd.Execute'pega dbaction
+		DBAction = ObjCmd.Parameters("RET").value
+		
+	else
+	
+		Vetor_Campos(1)="adWChar,10,adParamInput, " & Request.Form("hdnIdLog")
+		Vetor_Campos(2)="adInteger,8,adParamInput, "  & PortaId 'Request.Form("rdoPortaID")
+		Vetor_Campos(3)="adInteger,8,adParamInput, " & Request.Form("hdnAcfIdRadio")
+		Vetor_Campos(4)="adWChar,30,adParamInput, "  & Uplink ' Request.Form("hdnUplink")
+		Vetor_Campos(5)="adWChar,30,adParamInput, "  & dblRecId
+		Vetor_Campos(6)="adWChar,30,adParamInput, "  & Request.Form("hdnSolId")
+		Vetor_Campos(7)="adInteger,4,adParamOutput,0 "
+
+		Call APENDA_PARAM("CLA_SP_INS_UPLINK",7,Vetor_Campos)
+		'response.write APENDA_PARAMstr("CLA_sp_ins_ONTPorta",10,Vetor_Campos)
+		'response.end
+		ObjCmd.Execute'pega dbaction
+		DBAction = ObjCmd.Parameters("RET").value
+	
+	end if 
+%>
+<script language=javascript>
+<%
+If DBAction <> "0" Then
+	%>
+		alert('<%=DBAction%> - Facilidade não alocada. Verifique os campos obrigatórios.');	
+		
+		
+		
+	<%
+ELSE
+	%>
+		alert('Facilidade Alocada com Sucesso!');
+		<%
+		if equi = "EDD" then
+		%>
+			parent.ResgatarEthernetEDD();
+		<%
+		end if
+		%>
+		<%
+		if equi = "METRO" then
+		%>
+			parent.ResgatarEthernetMetro();
+		<%
+		end if
+		%>
+		<%
+		if equi = "Interconexao" then
+		%>
+			parent.ResgatarEthernetInterconexao();
+		<%
+		end if
+		%>
+		<%
+		if equi = "DSLAM" then
+		%>
+			//parent.ResgatarDslam();
+			parent.parent.window.close();
+		<%
+		end if
+		%>
+		
+		//parent.window.close();
+	<%
+END IF
+%>
+</script>
+

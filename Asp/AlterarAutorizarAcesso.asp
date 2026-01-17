@@ -1,0 +1,410 @@
+<!--#include file="../inc/data.asp"-->
+<!--#include file="../inc/header.asp"-->
+<%
+dim strAprovID
+dim strAprov_Utilizado
+dim strDisabled_Aprov_Utilz
+
+strContrato = null
+strSer_Id = null
+strVel_ID = null
+strProvedor_ID = null
+strCboSistemaOrderEntry = null
+strOeNumero = null
+strOeAno = null
+strOeItem = null
+strSenha = null
+
+strAprovID= Request.Form("hdnAprovID")
+strAprov_Utilizado = Request.Form("hdnAprov_Utilizado")
+
+if (Server.HTMLEncode(request("hdnAcao"))="Alterar" and strAprovID <> "") then
+   
+	 strContrato = Replace(Server.HTMLEncode(request("txtContrato")),"'","")
+	 strSer_Id = Server.HTMLEncode(request("cboServicoPedido"))
+	 strCboSistemaOrderEntry = Server.HTMLEncode(request("cboSistemaOrderEntry"))
+	 strVel_ID = Server.HTMLEncode(request("cboVelAcesso"))
+	 strProvedor_ID = Server.HTMLEncode(request("cboCLA_Provedor"))
+	 strOeNumero = Server.HTMLEncode(equest("txtOeNumero"))
+	 strOeAno = Server.HTMLEncode(request("txtOeAno"))
+	 strOeItem = Server.HTMLEncode(request("txtOeItem"))
+	 strSenha = Server.HTMLEncode(request("txtSenha"))
+	   
+	
+	Vetor_Campos(1)="adInteger,8,adParamInput,"  & strAprovID
+	Vetor_Campos(2)="adWChar,30,adParamInput,"   & strContrato
+	Vetor_Campos(3)="adInteger,8,adParamInput,"  & strSer_Id
+	Vetor_Campos(4)="adInteger,8,adParamInput,"  & strVel_ID
+	Vetor_Campos(5)="adInteger,4,adParamInput,"  & strProvedor_ID
+	Vetor_Campos(6)="adWChar,20,adParamInput,"   & strCboSistemaOrderEntry
+	Vetor_Campos(7)="adWChar,7,adParamInput,"    & strOeNumero
+	Vetor_Campos(8)="adWChar,4,adParamInput,"    & strOeAno
+	Vetor_Campos(9)="adWChar,3,adParamInput,"    & strOeItem
+	Vetor_Campos(10)="adWChar,10,adParamInput,"  & trim(strSenha)
+	Vetor_Campos(11)="adInteger,4,adParamInput," & dblUsuId
+	Vetor_Campos(12)="adInteger,4,adParamOutput, null"
+	Vetor_Campos(13)="adWChar,100,adParamOutput, null"
+	
+	Call APENDA_PARAM("CLA_sp_upd_AprovAcesso",13,Vetor_Campos)
+		
+	ObjCmd.Execute'pega dbaction
+	DBAction = ObjCmd.Parameters("RET").value
+		
+	DBAction2 = trim(ObjCmd.Parameters("RET1").value)
+	if 	DBAction = 1 then
+		Response.write "<script>alert('"&DBAction2&"')</script>"
+		
+	%>
+	<script>
+        window.location.replace('ConsultarAutorizarAcesso.asp')
+    </script>
+    <%
+	else
+	    %>
+	    <script language="VBscript">
+    	  MsgBox "Erro ao gravar os dados.",16,"Erro <%=DBAction%>"
+        </script>
+		<%
+	end if
+	
+Elseif strAprovID <> "" then
+
+	'Preenche o vetor de parametros da procedure
+	Vetor_Campos(1)="adInteger,4,adParamInput," & strAprovID
+	
+	strSql = APENDA_PARAMSTR("CLA_sp_sel_AprovAcesso",1,Vetor_Campos)
+	
+	'Chama a procedure
+	Call PaginarRS(0,strSql)
+	
+	if not objRSPag.Eof and not objRSPag.Bof then
+		strContrato = objRSPag("Aprov_Contrato")
+		strSer_Id = objRSPag("Ser_ID")
+		'anProvedor = objRSPag("Pro_ID")
+		strVel_ID = objRSPag("Vel_ID")
+		strProvedor_ID = objRSPag("Provedor_ID")
+		strCboSistemaOrderEntry = objRSPag("Aprov_OeSistema")
+		strOeAno = objRSPag("Aprov_OeAno")
+		strOeNumero = objRSPag("Aprov_OeNumero")
+		strOeItem = objRSPag("Aprov_OeItem")
+		strSenha = objRSPag("Aprov_Senha")
+		strAprovada = objRSPag("Aprov_Aprovador")
+		strRecusada = objRSPag("Aprov_Recusado")
+	end if			
+end if
+
+if (strAprov_Utilizado = "1" or strAprovada <> "" or strRecusada <> "") then
+	strDisabled_Aprov_Utilz = "disabled=" & chr(34) & "true" & chr(34)
+else
+	strDisabled_Aprov_Utilz = ""
+end if 
+
+dblacao = ""
+%>
+
+
+<script language='javascript' src="../javascript/cla.js"></script>
+<form name="Form_1" action="AlterarAutorizarAcesso.asp" method="post" >
+<input type=hidden name=hdnAprovID value="<%=strAprovID%>">
+<input type=hidden name=hdnAprov_Utilizado value="<%=strAprov_Utilizado%>">
+<SCRIPT LANGUAGE="JavaScript">
+function Gravar()
+{
+	with (document.forms[0])
+	{
+		var strContrato = new String();
+		strContrato = txtContrato.value;
+		strContrato = strContrato.replace(/^\s+|\s+$/g,"")
+		if (strContrato != "" && cboServicoPedido.value != "" && cboVelAcesso.value != "" && txtOeNumero.value != "" && txtOeAno.value != "" && txtOeItem.value != "" && txtSenha.value != "" && cboSistemaOrderEntry.value != "")
+		{
+		  hdnAcao.value = "Alterar";
+		  submit();
+		}
+		else
+		{
+			alert("Informe os campos obrigatórios :: ")
+			txtContrato.focus();
+		}
+	}
+}
+
+
+//PRSSILV - AJAX
+var xmlhttp = null;
+
+
+function detalhes(var_detalhes,var_span,var_span2)
+{
+if (var_detalhes == 'EXIBIR')
+  {
+  var_id_exibir = 'SPAN_EXIBIR'+var_span;
+  var_id_ocultar = 'SPAN_OCULTAR'+var_span;
+  var_id_exibir2 = 'SPAN_EXIBIR'+var_span2;
+  var_id_ocultar2 = 'SPAN_OCULTAR'+var_span2;
+
+  document.all[var_id_exibir].style.display = "block";
+  document.all[var_id_ocultar].style.display = "none";
+  document.all[var_id_exibir2].style.display = "block";
+  document.all[var_id_ocultar2].style.display = "none";
+  }
+if (var_detalhes == 'OCULTAR')
+  {
+  var_id_exibir = 'SPAN_EXIBIR'+var_span;
+  var_id_ocultar = 'SPAN_OCULTAR'+var_span;
+  var_id_exibir2 = 'SPAN_EXIBIR'+var_span2;
+  var_id_ocultar2 = 'SPAN_OCULTAR'+var_span2;
+
+  document.all[var_id_exibir].style.display = "none";
+  document.all[var_id_ocultar].style.display = "block";
+  document.all[var_id_exibir2].style.display = "none";
+  document.all[var_id_ocultar2].style.display = "block";
+  }
+}
+
+function ValidarItemOE(campo)
+  {
+    if (campo.value == "0")
+    {
+	  campo.value = "001"
+	}							    
+}
+</script>
+<input type=hidden name=hdnAcao>
+<tr>
+	<td >
+		<table border="0" cellspacing="1" cellpadding=0 width="760">
+			<tr>
+				<th colspan=2><p align=center>Autorização de Acessos Terceiros.</p></td>
+			</tr>
+			<tr class=clsSilver>
+				<td>&nbsp;</td>
+			</tr>
+		<span id='SPAN_EXIBIR1' style='display:block'>
+		<table border="0" cellspacing="1" cellpadding=0 width="760">
+						<tr class=clsSilver>
+							<td width="83"><font class="clsObrig">:: </font>Contrato</td>
+							<td width="658" colspan="2">
+							<input type="text" class="text" name="txtContrato" value="<%=strContrato%>" <%=strDisabled_Aprov_Utilz%> maxlength="30" size="35" tabindex="2" ></td>
+						</tr>
+						
+					   	<tr class=clsSilver>
+					 		<td width="83"><font class="clsObrig">:: </font>Serviço</td>
+							<td width="658" colspan="2">
+							<select name="cboServicoPedido" <%=strDisabled_Aprov_Utilz%> tabindex="3">
+							<option ></option>
+			<%
+			    set objRS = db.execute("CLA_sp_sel_servico null,null,null,1")
+			    
+				While Not objRS.eof
+					strItemSel = ""
+					if Trim(strSer_Id) = Trim(objRS("Ser_ID")) then strItemSel = " Selected " End if
+					Response.Write "<Option value='" & objRS("Ser_ID") & "'" & strItemSel & ">" & objRS("Ser_Desc") & "</Option>"
+					objRS.MoveNext
+				Wend
+				strItemSel = ""
+			%>
+			</select>							
+						</td>
+						</tr>
+																		
+						<tr class=clsSilver>
+			<td width="83" nowrap><font class="clsObrig">&nbsp;&nbsp;</font>Provedor</td>
+			<td width="512" nowrap colspan="2">
+				<select name="cboCLA_Provedor" <%=strDisabled_Aprov_Utilz%> tabindex="4">
+					<option value=""></option>
+					<%'Provedores
+					set objRS = db.execute("CLA_sp_sel_provedor")
+					do while not objRS.eof
+					strItemSel = ""
+					if Trim(strProvedor_ID) = Trim(objRS("Pro_id")) then strItemSel = " Selected " End if
+					%>
+					<option value="<%=objRS("Pro_id")%>" <%=strItemSel%>><%=objRS("Pro_Nome")%></option>
+					<%
+						objRS.movenext
+					loop
+					%>
+				</select>
+			</td>
+		</tr>
+                        
+					   	<tr class=clsSilver>
+					 		<td width="83" nowrap><font class="clsObrig">:: </font>Velocidade do Acesso:</td>
+							<td width="512" nowrap colspan="2">
+							  <select name="cboVelAcesso" <%=strDisabled_Aprov_Utilz%> style="width:150px" tabindex="5">
+				              <option ></option>
+				<%
+					set objRS = db.execute("CLA_sp_sel_velocidade ")
+					While Not objRS.eof
+						strItemSel = ""
+						if Trim(strVel_ID) = Trim(objRS("Vel_ID")) then strItemSel = " Selected " End if
+						Response.Write "<Option value='" & Trim(objRS("Vel_ID")) & "'" & strItemSel & ">" & objRS("Vel_Desc") & "</Option>"
+						objRS.MoveNext
+					Wend
+					strItemSel = ""
+				%>
+			</select>
+							</td>
+						</tr>
+																		
+						
+					<tr class=clsSilver>
+					<td width="83" nowrap><font class="clsObrig">:: </font>OE</td>
+					<td width="512" nowrap colspan="2"><select name="cboSistemaOrderEntry" <%=strDisabled_Aprov_Utilz%> <%if strOrigem="APG" then%> <%=bbloqueia%> <%else%> <%=bdesbloqueia%> <% End if%> tabindex="6">
+					<Option ></Option>
+					<Option value="APG"	 <%if strCboSistemaOrderEntry = "APG" then Response.Write " selected " End If%>>APG</Option>
+					<Option value="CFD"			<%if strCboSistemaOrderEntry = "CFD" then Response.Write " selected " End If%>>CFD</Option>
+					<Option value="SGA VOZ 0300"			<%if strCboSistemaOrderEntry = "SGA VOZ 0300" then Response.Write " selected " End If%>>SGA VOZ 0300</Option>
+					<Option value="SGA VOZ 0800 FASE 1"		<%if strCboSistemaOrderEntry = "SGA VOZ 0800 FASE 1" then Response.Write " selected " End If%>>SGA VOZ 0800 FASE 1</Option>
+					<Option value="SGA VOZ VIP'S"			<%if strCboSistemaOrderEntry = "SGA VOZ VIP'S" then Response.Write " selected " End If%>>SGA VOZ VIP'S</Option>
+					<Option value="SGA DADOS"	<%if strCboSistemaOrderEntry = "SGA DADOS" then Response.Write " Selected " End If%> >SGA DADOS</Option>
+					<Option value="SGA PLUS"	<%if strCboSistemaOrderEntry = "SGA PLUS" then Response.Write " selected " End If%>>SGA PLUS</Option>
+					<Option value="ADFAC"		<%if strCboSistemaOrderEntry = "ADFAC" then Response.Write " selected " End If%>>ADFAC</Option>
+					<Option value="CFM"			<%if strCboSistemaOrderEntry = "CFM" then Response.Write " selected " End If%>>CFM</Option>
+					<Option value="CFT"			<%if strCboSistemaOrderEntry = "CFT" then Response.Write " selected " End If%>>CFT</Option>
+				</Select>
+							Ano: 
+							<input type="text" class="text" <%=strDisabled_Aprov_Utilz%> name="txtOeAno" value="<%=strOeAno%>" maxlength="4" size="4" tabindex="7" TIPO="N" onBlur="CompletarCampo(this)" onKeyUp="ValidarTipo(this,0)">&nbsp; Número: 
+							 <input type="text" class="text" <%=strDisabled_Aprov_Utilz%> name="txtOeNumero" value="<%=strOeNumero%>" maxlength="7" size="7" tabindex="8" TIPO="N" onBlur="CompletarCampo(this)" onKeyUp="ValidarTipo(this,0)"> Item: 
+							<input type="text" class="text" <%=strDisabled_Aprov_Utilz%> name="txtOeItem" value="<%=strOeItem%>" maxlength="3" size="3" tabindex="9" TIPO="N" onBlur="CompletarCampo(this);ValidarItemOE(this);" onKeyUp="ValidarTipo(this,0)"></td>
+						</tr>
+																		
+						
+					   	<tr class=clsSilver>
+					 		<td width="83">&nbsp;</td>
+							<td width="329">&nbsp;
+							</td>
+							<td width="463">&nbsp;
+				</td>
+						</tr>
+		</table>
+		
+		<table border="0" cellspacing="1" cellpadding=0 width="760">			
+					   	<tr class=clsSilver>
+					 		<td width="83"><b>Senha</b></td>
+							<td width="429">							
+							<input type="text" class="text" readonly="true" name="txtSenha" readonly="<%=strUtilizado%>" value="<%=strSenha%>" style="background-color:#CDCDCF; color:#666" maxlength="11" size="12">
+							<%
+							Set objRSPerf = db.execute("CLA_sp_view_loginusuario '" & strLoginRede & "'")
+							If not objRSPerf.eof then
+								var_Usu_PerfCadSenha = objRSPerf("Usu_PerfCadSenha")
+								var_Usu_PerfAltDesig = objRSPerf("Usu_PerfAltDesig")
+							End if
+
+							if var_Usu_PerfCadSenha = 1 then
+							%>
+							  <script language="VBscript">
+							  	function Aprovar()
+							    	returnvalue=MsgBox ("Confirma a aprovação da senha <%=strSenha%>?",36,"Confirmação definitiva de Senha PIN.")
+							                
+							    	If returnvalue=6 Then
+									form_confirma.hdnTpAprovacao.value=1
+							      	form_confirma.submit()  
+							    	Else
+							                        
+							    	End If
+								end function
+								
+								function recusar()
+							    	returnvalue=MsgBox ("Confirma a recusa da senha <%=strSenha%>?",36,"Confirmação definitiva de Senha PIN.")
+							                
+							    	If returnvalue=6 Then
+									form_confirma.hdnTpAprovacao.value=2
+							      	form_confirma.submit()
+							    	Else
+							                        
+							    	End If
+								end function
+							  </script>
+								&nbsp;&nbsp;&nbsp;
+								<%if (strAprovada = "" and strRecusada = "") or (isnull(strAprovada) and isnull(strRecusada)) then%>
+									<input type="button" class="button" name="btnAprovar" <%=strDisabled_Aprov_Utilz%> value="Aprovar" onClick="Aprovar()" accesskey="A" onMouseOver="showtip(this,event,'Gravar (Alt+A)');" tabindex="9">&nbsp;
+									&nbsp;
+									<input type="button" class="button" name="btnAprovar" <%=strDisabled_Aprov_Utilz%> value="Recusar" onClick="Recusar()" accesskey="R" onMouseOver="showtip(this,event,'Gravar (Alt+R)');" tabindex="9">&nbsp;
+								<%elseif strAprovada <> "" then%>
+								  <font color = green>Aprovada</font>
+								<%elseif strRecusada <> "" then%>
+								  <font color = red>Recusada</font>								
+								<%end if%>						
+ 							<%end if%>
+				
+							<td width="463">&nbsp;
+				</td>
+						</tr>
+																		
+						
+					   	<tr class=clsSilver>
+					 		<td width="83">&nbsp;</td>
+							<td width="658" colspan="2">&nbsp;</td>
+						</tr>
+																		
+					</td>
+				</tr>
+			</table>
+
+		</table>
+		</span>
+		<span id='SPAN_EXIBIR2' style='display:none'></span>
+		
+		<span id='SPAN_OCULTAR1' style="display:none">
+		<table border="0" cellspacing="1" cellpadding=0 width="760">
+		<tr class=clsSilver>
+		  <td width="156"><font class="clsObrig">:: </font>Pedido de Acesso:</td>
+		  <td>
+
+			<input type="text" class="text" name="txtPedNum" value="<%if Server.HTMLEncode(request("txtPedNum")) <> "" then response.write ucase(request("txtPedNum")) else response.write "DM-" end if%>" maxlength="13" size="15"></td>
+		</tr>
+		<tr class=clsSilver>
+		  <td width="156"><font class="clsObrig">:: </font>Custo (R$):</td>
+		  <td>
+			<input type="text" class="text" name="txtCusto" value="<%=strCusto%>" maxlength="14" size="20" tabindex="3" onKeyPress="return(MascaraMoeda(this,'.',',',event,14))"></td>
+		</tr>
+		<tr class=clsSilver>
+		  <td width="156">&nbsp;</td>
+		  <td>&nbsp;</td>
+		</tr>
+		</table>
+		</span>
+		<span id='SPAN_OCULTAR2' style="display:none"></span>	
+																
+		
+		<table border="0" cellspacing="1" cellpadding=0 width="760">
+		<tr>
+			<td colspan=2 align="center"><br>
+				<input type="button" class="button" name="btnGravar" <%=strDisabled_Aprov_Utilz%> value="Gravar" onClick="Gravar()" accesskey="G" onMouseOver="showtip(this,event,'Gravar (Alt+G)');" tabindex="9">&nbsp;
+				<input type="button" class="button" name="btnLimpar"  <%=strDisabled_Aprov_Utilz%> value="Limpar" onClick="LimparForm();document.Form_1.txtSenha.value='<%=strSenha%>'" accesskey="L" onMouseOver="showtip(this,event,'Limpar (Alt+L)');">&nbsp;
+				<input type="button" class="button" name="Voltar" value="Voltar" onClick="javascript:window.location.replace('ConsultarAutorizarAcesso.asp')" accesskey="B" onMouseOver="showtip(this,event,'Voltar (Alt+B)');">
+				<input type="button" class="button" name="btnSair" value=" Sair " onClick="javascript:window.location.replace('main.asp')" accesskey="X" onMouseOver="showtip(this,event,'Sair (Alt+X)');">
+			</td>
+		</tr>
+		</table>
+		<table width="760" border=0>
+		<tr>
+			<td>
+				<font class="clsObrig">:: </font> Campos de preenchimento obrigatório.
+			</td>
+		</tr>
+		<tr>
+			<td>&nbsp;
+				</td>
+		</tr>
+		<tr>
+			<td height="23">&nbsp;
+				</td>
+		</tr>
+		</table>
+	</td>
+</tr>
+</table>
+</form>
+<form name="form_confirma" method="post" action="ProcessoAprovarSenha.asp">
+<input type="hidden" name="hdnTpAprovacao">
+<input type="hidden" name="hdnSenha" value="<%=strSenha%>">
+</form>
+</body>
+<script>
+</script>
+</html>
+<%
+Set objRS = Nothing
+DesconectarCla()
+%>

@@ -1,0 +1,97 @@
+<!--#include file="../inc/data.asp"-->
+
+<!--#include file="../inc/header.asp"-->
+<%
+if request("action") = "Incluir-me como Agente do Pedido" then
+	set sp = db.execute("CLA_sp_ins_agentepedido " & dblUsuId & "," & request("id") & ",0")
+end if
+
+if request("action")="Excluir" then
+	for i = 1 to request("excluir").count
+		if request("excluir")(i) <> "" then
+			set	sp = db.execute("CLA_sp_del_agentepedido " & request("id") & "," & request("excluir")(i)&",NULL")
+		end if
+	next
+end if
+
+if request("id") <> "" then
+	set rs = db.execute("CLA_sp_view_agentepedido " & request("id"))
+	set acp = db.execute("CLA_sp_view_pedidoacaopedido " & request("id"))
+%>
+<tr>
+<td align="center" class="titulo">
+<form name="f" method="post">
+<script language="JavaScript">
+     function seleciona_tudo(){
+   	   for (var i=0;i<document.f.elements.length;i++){
+		var e = document.f.elements[i];
+		if (e.name != 'excluirtudo')
+			e.checked = document.f.excluirtudo.checked;
+	   }
+	}
+	function checa(f){
+		if (window.confirm('Deseja excluir os registros selecionados ?') == false){
+			return false;
+		}
+		return true;
+	}
+</script>
+Agente do Pedido &nbsp;-&nbsp; <%=ucase(acp("Acp_Prefixo") & "-" & right("00000" & acp("Acp_Numero"),5) & "/" & acp("Acp_Ano"))%><br><br>
+</td>
+</tr>
+<tr>
+<td align="center">
+<%
+if rs.eof then
+msg="Informe um novo agente<br><br>" 
+end if
+
+if not rs.eof then
+%>
+<table border="0" cellspacing="0" bgcolor="#dddddd" width="760">
+<tr>
+<th>Usuário</th>
+<th>Nome</th>
+<th>UserName</th>
+<th width="20"><input type="checkbox" name="excluirtudo" onclick="seleciona_tudo(this)">Tudo</th>
+</tr>
+<%
+cor = "#dddddd"
+do while not rs.eof
+if cor = "#dddddd" then
+	cor = "#eeeeee"
+else
+	cor = "#dddddd"
+end if
+%>
+<tr>
+<input type="hidden" name="id" value="<%=request("id")%>">
+<td bgcolor="<%=cor%>" width="70" align="right"><%=rs("Usu_ID")%>&nbsp; </td>
+<td bgcolor="<%=cor%>">&nbsp;<%=rs("Usu_Nome")%></td>
+<td bgcolor="<%=cor%>">&nbsp;<%=rs("Usu_Username")%></td>
+<td bgcolor="<%=cor%>"><input type="checkbox" name="excluir" value="<%=rs("Usu_ID")%>"></td>
+</tr>
+<%
+rs.movenext
+loop 
+%>
+</table><br>
+<%end if%>
+<br><%=msg%><br>
+<%
+set inc = db.execute("CLA_sp_view_agentepedido2 " & request("id") & "," & dblUsuId)
+if inc.eof then
+%>
+<input type="submit" class="button" name="action" value="Incluir-me como Agente do Pedido">
+<%end if%>
+<%if msg = "" then%><input type="submit" class="button" name="action" value="Excluir" onClick="return checa(this)"><%end if%>
+
+</form>
+</td>
+</tr>
+
+<%end if%>
+
+</table>
+</body>
+</html>
