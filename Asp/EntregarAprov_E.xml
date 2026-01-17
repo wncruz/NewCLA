@@ -1,0 +1,37 @@
+<retorno-cla>
+	<acao>ALT</acao>
+	<origem>SGAV</origem>
+	<id-tarefa>433967</id-tarefa>
+	<id-logico>6777284041</id-logico>
+	<id-solicitacao>783807</id-solicitacao>
+	<qtd-acessos>2</qtd-acessos>
+	<acessos-fisicos>
+		<acesso>
+			<id-acessoFisico>BRE 70000002430</id-acessoFisico>
+			<tecnologia>3</tecnologia>
+			<tipo-contrato>54</tipo-contrato>
+			<velocidade>2M</velocidade>
+			<vel-conversao>2048</vel-conversao>
+			<proprietario>EBT</proprietario>
+			<dt-construcao>20/06/2011 4:06:00 PM</dt-construcao>
+			<dt-aceite>10/01/2011</dt-aceite>
+			<interface>G703</interface>
+			<tp-vel>0</tp-vel>
+			<cnl>BRE </cnl>
+			<compl-estacao>AG</compl-estacao>
+			<interface-estacao>G703</interface-estacao>
+			<SiglaCentroCliente>BRE UVM</SiglaCentroCliente>
+			<EstacaoConfiguracao>BRE AG </EstacaoConfiguracao>
+			<numero-acesso>BRE001081</numero-acesso>
+			<ccto></ccto>
+			<qtd-modem>2</qtd-modem>
+			<prop-modem>EBT</prop-modem>
+			<tp-aceite></tp-aceite>
+			<distribuidor>DBX PADE                      </distribuidor>
+			<rede>ADE</rede>
+			<cabo>01</cabo>
+			<par>0009</par>
+			<tp-cabo>X</tp-cabo>
+		</acesso>
+	</acessos-fisicos>
+</retorno-cla>

@@ -1,0 +1,38 @@
+<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+	<soap:Body>
+		<executeClass>
+			<envName>APG</envName>
+			<className>INTERFCONSTRUIRRETURN</className>
+			<parameters>
+				<parameter name="processo">ATV</parameter>
+				<parameter name="acao">CAN</parameter>
+				<parameter name="idLogico">6787346632</parameter>
+				<parameter name="idTarefaApg">32870</parameter>
+				<parameter name="numeroSolicitacao"></parameter>
+				<parameter name="propriedadeAcesso"></parameter>
+				<parameter name="dataSolicitacaoConstrucao"></parameter>
+				<parameter name="retorno">OK</parameter>
+				<parameter name="dataEstocagem">13/12/2011</parameter>
+				<parameter name="acessoterceiroCodigoProvedor"></parameter>
+				<parameter name="acessoterceiroNomeProvedor"></parameter>
+				<parameter name="acessoterceiroEstacao"></parameter>
+				<parameter name="acessoterceiroSlot"></parameter>
+				<parameter name="acessoterceiroTimeslot"></parameter>
+				<parameter name="acessoebtNomeInstaladoraRecurso"></parameter>
+				<parameter name="acessoebtNomeEmpresaConstrutoraInfra"></parameter>
+				<parameter name="acessoebtDataAceitacaoInfra"></parameter>
+				<parameter name="acessoebtNumeroAcessoAde"></parameter>
+				<parameter name="acessoebtNumeroOtsAcessoEmbratel"></parameter>
+				<parameter name="acessoebtDesignacaoBandabasicaCriada"></parameter>
+				<parameter name="bloco"></parameter>
+				<parameter name="cabo"></parameter>
+				<parameter name="par"></parameter>
+				<parameter name="pino"></parameter>
+			</parameters>
+			<userData>
+				<usrLogin>sisecla</usrLogin>
+				<password>36-74142-12611467-95-2011442125126-58-15117</password>
+			</userData>
+		</executeClass>
+	</soap:Body>
+</soap:Envelope>

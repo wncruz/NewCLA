@@ -1,0 +1,49 @@
+<retorno-cla>
+	<acao>ALT</acao>
+	<origem>SGAV</origem>
+	<id-tarefa>425741</id-tarefa>
+	<id-logico>6777052260</id-logico>
+	<id-solicitacao>790615</id-solicitacao>
+	<qtd-acessos>1</qtd-acessos>
+	<acessos-fisicos>
+		<acesso>
+			<id-acessoFisico>GRS 00000001857</id-acessoFisico>
+			<tecnologia>0</tecnologia>
+			<provedor>VIVAX2</provedor>
+			<tipo-contrato>414</tipo-contrato>
+			<velocidade>2M</velocidade>
+			<vel-conversao>2048</vel-conversao>
+			<proprietario>TER</proprietario>
+			<dt-construcao>01/07/2011 5:50:00 PM</dt-construcao>
+			<dt-aceite>01/07/2011</dt-aceite>
+			<interface>G703</interface>
+			<tp-vel>0</tp-vel>
+			<cnl>SPO </cnl>
+			<compl-estacao>PH</compl-estacao>
+			<interface-estacao>G703</interface-estacao>
+			<rede>Deterministico</rede>
+			<numero-acesso>CEBSP-FAT04102</numero-acesso>
+			<numero-acesso-cli>GRS 00000000387</numero-acesso-cli>
+			<ccto>S</ccto>
+			<cnla>SPO</cnla>
+			<cnlb>GRS</cnlb>
+			<tipo-circuito>I</tipo-circuito>
+			<qtd-modem>2</qtd-modem>
+			<prop-modem>TER</prop-modem>
+			<tp-aceite>Aceite Técnico e Comercial</tp-aceite>
+			<distribuidor>DID2 MT                       </distribuidor>
+			<plataforma>LUCENT</plataforma>
+			<SiglaCentroCliente></SiglaCentroCliente>
+			<EstacaoConfiguracao>SPO PH </EstacaoConfiguracao>
+			<fila>4A</fila>
+			<bastidor>408</bastidor>
+			<regua>10</regua>
+			<posicao>60</posicao>
+			<dominio>60</dominio>
+			<no>01</no>
+			<slot>01</slot>
+			<porta>01</porta>
+			<time-slot>0001-0031</time-slot>
+		</acesso>
+	</acessos-fisicos>
+</retorno-cla>
