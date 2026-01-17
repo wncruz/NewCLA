@@ -1,0 +1,13 @@
+titulo01=<b>Recadastro</b>
+Ajuda aguardando SO.
+ 
+ 
+<--! 	Padrão de Formatação:
+ 
+	<font color="#FF0000"> A </font>  : Texto Colorido
+	<b> A </b>                        : Texto Negrito
+	<u> A </u>                        : Texto Sublinhado
+	<i> A </i>                        : Texto Itálico
+	<br>                              : Quebra de Linha
+ 
+-->
