@@ -1,0 +1,16 @@
+TD
+{
+    FONT-WEIGHT: bold;
+    FONT-SIZE: 8pt;
+    COLOR: #003388;
+    FONT-FAMILY: Arial;
+    background : #eeeeee;
+}
+INPUT.button
+{
+    FONT-SIZE: 8pt;
+    FONT-FAMILY: Arial, Helvetica;
+    width:100px;
+}
+
+	

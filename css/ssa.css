@@ -1,0 +1,198 @@
+A
+{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight: normal;
+	color: #003388;
+    TEXT-DECORATION: none
+}
+A:hover
+{
+    TEXT-DECORATION: underline
+}
+A.white
+{
+    FONT-WEIGHT: bold;
+    COLOR: #ffffff
+}
+P
+{
+    FONT-SIZE: 8pt;
+    FONT-STYLE: normal;
+    FONT-FAMILY: Arial
+}
+H1
+{
+}
+H2
+{
+}
+H3
+{
+}
+BODY
+{
+}
+TD
+{
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight: normal;
+	color: #000000;
+}
+TH
+{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight: bold;
+	color: #000000;
+    BACKGROUND-COLOR: #FFCC00;
+    TEXT-ALIGN: left
+}
+TD.clsSilver
+{
+    BACKGROUND-COLOR: #eeeeee
+}
+TD.clsSilver1
+{
+    BACKGROUND-COLOR: #f1f1f1
+}
+TD.clsSilver2
+{
+    BACKGROUND-COLOR: #dcdcdc
+}
+TD.blue
+{
+    FONT-WEIGHT: bold;
+    FONT-SIZE: 8pt;
+    COLOR: #003399;
+    FONT-FAMILY: Arial, Helvetica
+}
+TD.lightblue
+{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight: normal;
+	color: #000000;
+}
+TD.titulo
+{
+	background:#FFCC00;
+	color:black;
+	font-family:Verdana;
+	font-size:13;
+	font-weight:bold;
+	text-align:center
+}
+INPUT.text
+{
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight: normal;
+	color: #000000;
+	text-decoration: none;
+	background-color: #FFFFFF;
+	border-top: 1px solid #0F1F5F;
+	border-right: 1px solid #0F1F5F;
+	border-bottom: 1px solid #0F1F5F;
+	border-left: 1px solid #0F1F5F;
+}
+INPUT.button
+{
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 9px;
+	font-weight: normal;
+	color: #000000;
+	text-decoration: none;
+	background-color: #f1f1f1;
+	border-top: 1px solid #0F1F5F;
+	border-right: 1px solid #0F1F5F;
+	border-bottom: 1px solid #0F1F5F;
+	border-left: 1px solid #0F1F5F;
+	width:100px
+}
+TEXTAREA
+{
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight: normal;
+	color: #000000;
+	text-decoration: none;
+	background-color: #FFFFFF;
+	border-top: 1px solid #0F1F5F;
+	border-right: 1px solid #0F1F5F;
+	border-bottom: 1px solid #0F1F5F;
+	border-left: 1px solid #0F1F5F;
+	scrollbar-3dlight-color:#003388;
+	scrollbar-arrow-color:#003388;
+	scrollbar-base-color:#ffffff;
+   	scrollbar-darkshadow-color:#ffffff;
+   	scrollbar-face-color:#f1f1f1;
+	scrollbar-shadow-color:#003388;
+}
+SELECT
+{
+	background-color: #ffffff; 
+	color: #000000; 
+	border-top: 1px solid #0F1F5F; 
+	border-right: 1px solid #0F1F5F; 
+	border-bottom: 1px solid #0F1F5F; 
+	border-left: 1px solid #0F1F5F; 
+	font-family: verdana, arial; 
+	font-size: 11px; 
+}
+INPUT.disabled
+{
+    FONT-WEIGHT: bold;
+    FONT-SIZE: 8pt;
+    COLOR: darkgray;
+    FONT-FAMILY: Arial, Helvetica
+}
+.clsObrig
+{                         
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight: bold;
+	color: #000000;
+	text-decoration: none;
+}
+
+TR.clsSilver
+{
+    BACKGROUND-COLOR: #EEEEEE;
+}
+TR.clsSilver1
+{
+    BACKGROUND-COLOR: #f2f2f2
+}
+TR.clsSilver2
+{
+    BACKGROUND-COLOR: #dcdcdc;
+}
+.clsMenu
+{
+	font-family: arial ,verdana, helvetica, sans-serif;
+	text-decoration: none; 
+	color:#000000; 
+	FONT-WEIGHT: bold; 
+	font-size: 8pt
+}
+.clsAzulClaro {
+	background : #AACCEE;
+	font-family : Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size : 8pt;
+	font-weight : bold;
+}
+.TableLine
+{
+    BORDER-COLLAPSE: collapse;
+    bordercolor: black;
+    mso-padding-alt: 0cm 5.4pt 0cm 5.4pt
+}
+.TA {scrollbar-3dlight-color:#003388;
+     scrollbar-arrow-color:#003388;
+     scrollbar-base-color:#003388;
+     scrollbar-darkshadow-color:#003388;
+     scrollbar-face-color:#f1f1f1;
+     scrollbar-highlight-color:#f1f1f1;
+	  scrollbar-shadow-color:#f1f1f1}

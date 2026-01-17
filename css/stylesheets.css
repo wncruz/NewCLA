@@ -1,0 +1,53 @@
+TD
+{
+    FONT-SIZE: 11px;
+    COLOR: #344756;
+    FONT-FAMILY: tahoma,sans-serif
+}
+.tabela_registros
+{
+background-color: white;
+}
+
+.titulos_registros
+{
+font-family: Tahoma, Verdana, Arial;
+font-size: 11px;
+color: white;
+background-color: #6699CC;
+}
+
+A:visited
+{
+    FONT-WEIGHT: bold;
+    FONT-SIZE: 11px;
+    COLOR: #000000;
+    FONT-FAMILY: tahoma,arial,sans-serif;
+    POSITION: relative;
+    TEXT-DECORATION: none
+}
+A:link
+{
+    FONT-WEIGHT: bold;
+    FONT-SIZE: 11px;
+    COLOR: #000000;
+    FONT-FAMILY: tahoma,arial,sans-serif;
+    POSITION: relative;
+    TEXT-DECORATION: none
+}
+A:hover
+{
+    FONT-SIZE: 11px;
+    COLOR: #D01209;
+    FONT-FAMILY: tahoma,arial,sans-serif;
+    TEXT-DECORATION: none
+}
+A:active
+{
+    FONT-WEIGHT: bold;
+    FONT-SIZE: 11px;
+    COLOR: #000000;
+    FONT-FAMILY: tahoma,arial,sans-serif;
+    POSITION: relative;
+    TEXT-DECORATION: none
+}
