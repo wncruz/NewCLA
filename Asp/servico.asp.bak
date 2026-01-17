@@ -1,0 +1,279 @@
+<%
+'•IMPLEMENT SOFT - IMPLEMENTAÇÕES E SOLUÇÕES EM INFORMÁTICA
+'	- Sistema			: CLA
+'	- Arquivo			: Servico.asp
+'	- Responsável		: Vital
+'	- Descrição			: Cadastra/Altera Serviços
+%>
+<!--#include file="../inc/data.asp"-->
+<%
+Dim dblId
+Dim strDesc				
+Dim strCodigo			
+Dim strSigla			
+Dim strPadraoDesig1 	
+Dim strPadraoDesig2 	
+Dim strPadraoDesig3 	
+Dim strPadraoDesig4 	
+Dim strLabelPadraoDesig1
+Dim strLabelPadraoDesig2
+Dim strLabelPadraoDesig3
+Dim strLabelPadraoDesig4
+Dim objRSSer
+
+dblId = request("ID")
+if Trim(dblId) = "" then
+	dblId = Request.Form("hdnId") 
+End if
+if Trim(Request.Form("hdnAcao")) = "Gravar" then
+
+	if dblId="" then
+		Vetor_Campos(1)="adInteger,2,adParamInput,"
+	else
+		Vetor_Campos(1)="adInteger,2,adParamInput,"& dblId
+	end if
+
+	Vetor_Campos(2)="adWChar,4,adParamInput,"&	Trim(Request.Form("txtCodigo"))
+	Vetor_Campos(3)="adWChar,30,adParamInput,"&	Trim(Request.Form("txtDesc"))
+	Vetor_Campos(4)="adWChar,4,adParamInput,"&	Trim(Request.Form("txtSigla"))
+	Vetor_Campos(5)="adWChar,100,adParamInput,"& Trim(Request.Form("txtPadraoDesig1"))
+	Vetor_Campos(6)="adWChar,100,adParamInput,"& Trim(Request.Form("txtPadraoDesig2"))
+	Vetor_Campos(7)="adWChar,100,adParamInput,"& Trim(Request.Form("txtPadraoDesig3"))
+	Vetor_Campos(8)="adWChar,100,adParamInput,"& Trim(Request.Form("txtPadraoDesig4"))
+	Vetor_Campos(9)="adWChar,100,adParamInput,"& Trim(Request.Form("txtLabelPadraoDesig1"))
+	Vetor_Campos(10)="adWChar,100,adParamInput,"& Trim(Request.Form("txtLabelPadraoDesig2"))
+	Vetor_Campos(11)="adWChar,100,adParamInput,"& Trim(Request.Form("txtLabelPadraoDesig3"))
+	Vetor_Campos(12)="adWChar,100,adParamInput,"& Trim(Request.Form("txtLabelPadraoDesig4"))
+	Vetor_Campos(13)="adWChar,10,adParamInput," & strloginrede 
+	Vetor_Campos(14)="adInteger,2,adParamOutput,0"  
+
+	Call APENDA_PARAM("CLA_sp_ins_servico",14,Vetor_Campos)
+	ObjCmd.Execute'pega dbaction
+	DBAction = ObjCmd.Parameters("RET").value
+
+End if
+
+if dblId<> "" then
+
+	Set objRSSer = db.execute("CLA_sp_sel_servico " & dblId)
+
+	if Not objRSSer.Eof and not objRSSer.Bof then
+		strDesc				= TratarAspasHtml(objRSSer("Ser_Desc"))
+		strCodigo			= TratarAspasHtml(objRSSer("Ser_Cod"))
+		strSigla			= TratarAspasHtml(objRSSer("Ser_Sigla"))
+		strPadraoDesig1 	= TratarAspasHtml(objRSSer("Ser_PadraoDesignacao1"))
+		strPadraoDesig2 	= TratarAspasHtml(objRSSer("Ser_PadraoDesignacao2"))
+		strPadraoDesig3 	= TratarAspasHtml(objRSSer("Ser_PadraoDesignacao3"))
+		strPadraoDesig4 	= TratarAspasHtml(objRSSer("Ser_PadraoDesignacao4"))
+		strLabelPadraoDesig1= TratarAspasHtml(objRSSer("Ser_LabelPadraoDesignacao1"))
+		strLabelPadraoDesig2= TratarAspasHtml(objRSSer("Ser_LabelPadraoDesignacao2"))
+		strLabelPadraoDesig3= TratarAspasHtml(objRSSer("Ser_LabelPadraoDesignacao3"))
+		strLabelPadraoDesig4= TratarAspasHtml(objRSSer("Ser_LabelPadraoDesignacao4"))
+
+	End if
+Else
+	strDesc					= TratarAspasHtml(Request.Form("txtDesc"))
+	strCodigo				= TratarAspasHtml(Request.Form("txtCodigo"))
+	strSigla				= TratarAspasHtml(Request.Form("txtSigla"))
+	strPadraoDesig1			= TratarAspasHtml(Request.Form("txtPadraoDesig1"))
+	strPadraoDesig2			= TratarAspasHtml(Request.Form("txtPadraoDesig2"))
+	strPadraoDesig3			= TratarAspasHtml(Request.Form("txtPadraoDesig3"))
+	strPadraoDesig4			= TratarAspasHtml(Request.Form("txtPadraoDesig4"))
+	strLabelPadraoDesig1	= TratarAspasHtml(Request.Form("txtLabelPadraoDesig1"))
+	strLabelPadraoDesig2	= TratarAspasHtml(Request.Form("txtLabelPadraoDesig2"))
+	strLabelPadraoDesig3	= TratarAspasHtml(Request.Form("txtLabelPadraoDesig3"))
+	strLabelPadraoDesig4	= TratarAspasHtml(Request.Form("txtLabelPadraoDesig4"))
+End if
+%>
+<!--#include file="../inc/header.asp"-->
+<form action="servico.asp" method="post" >
+<input type=hidden name=hdnId value="<%=dblId%>">
+<input type=hidden name=hdnAcao>
+<input type=hidden name=hdnCboServico>
+<input type=hidden name=hdnDesigServ>
+<SCRIPT LANGUAGE="JavaScript">
+function GravarServico() 
+{
+	with (document.forms[0]){
+		if (!ValidarCampos(txtCodigo,"O Código")) return false;
+		if (!ValidarCampos(txtSigla,"A Sigla")) return false;
+		if (!ValidarCampos(txtDesc,"A Descrição")) return false;
+		if (!ValidarCampos(txtPadraoDesig1,"Padrão de Designação 1")) return false;
+		if (!ValidarCampos(txtLabelPadraoDesig1,"O Rótulo do Padrão de Designação 1")) return false;
+		
+		hdnAcao.value = "Gravar"
+		target = self.name
+		action = "servico.asp"
+		submit()
+		return true;
+	}
+
+}
+function AreadeTeste(){
+	with (document.forms[0]){
+		if (!MontarDesigServico(true)) return
+		alert("•"+Replace(hdnDesigServ.value,"$"," ")+"•")
+	}
+}		
+
+</script>
+<tr><td>
+<table border="0" cellspacing="1" cellpadding=0 width="760">
+<tr>
+	<th colspan=2><p align="center">Cadastro de Serviço</p></th>
+</tr>
+<tr class=clsSilver>
+	<td width="80"><font class="clsObrig">:: </font>Código</td>
+	<td>
+		<input type="text" class="text" name="txtCodigo" value="<%=strCodigo%>" maxlength="4" size="4">
+	</td>
+</tr>
+<tr class=clsSilver>
+	<td width="80"><font class="clsObrig">:: </font>Sigla</td>
+	<td>
+		<input type="text" class="text" name="txtSigla" value="<%=strSigla%>" maxlength="4" size="4">
+	</td>
+</tr>
+
+<tr class=clsSilver>
+	<td width="80"><font class="clsObrig">:: </font>Descrição</td>
+	<td>
+		<input type="text" class="text" name="txtDesc" value="<%=strDesc%>" maxlength="30" size="60">
+	</td>
+</tr>
+<tr class=clsSilver>
+	<td>
+		<font class="clsObrig">:: </font>Padrão de Designação de Serviço
+	</td>
+	<td>
+		<table border=0>
+			<tr align=center>
+				<td></td>
+				<td >Rótulo</td>
+				<td >Padrão de designação</td>
+			</tr>
+			<tr>
+				<td>1 • </td>
+				<td><input type="text" class="text" name="txtLabelPadraoDesig1" size="45" maxlength="100" value="<%=strLabelPadraoDesig1%>"></td>
+				<td><input type="text" class="text" name="txtPadraoDesig1" maxlength="100" size="45" value="<%=strPadraoDesig1%>"></td>
+			</tr>
+			<tr>
+				<td>2 • </td>
+				<td><input type="text" class="text" name="txtLabelPadraoDesig2" maxlength="100" size="45" value="<%=strLabelPadraoDesig2%>"></td>
+				<td><input type="text" class="text" name="txtPadraoDesig2" maxlength="100" size="45" value="<%=strPadraoDesig2%>"></td>
+			</tr>
+			<tr>
+				<td>3 • </td>
+				<td><input type="text" class="text" name="txtLabelPadraoDesig3" maxlength="100" size="45" value="<%=strLabelPadraoDesig3%>"></td>
+				<td><input type="text" class="text" name="txtPadraoDesig3" maxlength="100" size="45" value="<%=strPadraoDesig3%>"></td>
+			</tr>
+			<tr>
+				<td>4 • </td>
+				<td><input type="text" class="text" name="txtLabelPadraoDesig4" maxlength="100" size="45" value="<%=strLabelPadraoDesig4%>"></td>
+				<td><input type="text" class="text" name="txtPadraoDesig4" maxlength="100" size="45" value="<%=strPadraoDesig4%>"></td>
+			</tr>
+
+		</table>		
+	</td>
+</tr>
+<tr class=clsSilver>
+	<td>&nbsp;&nbsp;&nbsp;&nbsp;Área de Teste</td>
+	<td >
+	<%
+	'seleciona servico
+	set objRS = db.execute("CLA_sp_sel_servico")
+	%>
+		<select name="cboServicoPedido" onchange="ResgatarServico(this)">
+			<option ></option>
+		<%
+			While Not objRS.eof
+				strItemSel = ""
+				if Trim(dblSerId) = Trim(objRS("Ser_ID")) then strItemSel = " Selected " End if
+				Response.Write "<Option value='" & objRS("Ser_ID") & ",1'" & strItemSel & ">" & objRS("Ser_Desc") & "</Option>"
+				objRS.MoveNext
+			Wend
+			strItemSel = ""
+		%>
+		</select>&nbsp;<input type="button" class="button" name="btnTestar" value="Testar Padrão" onclick="AreadeTeste()" accesskey="K" onmouseover="showtip(this,event,'Testar (Alt+K)');">&nbsp;
+	</td>
+</tr>
+<tr class="clsSilver">
+	<td >&nbsp;&nbsp;&nbsp;&nbsp;Designação do Serviço</td>
+	<td >
+		<span id=spnServico></span>
+		<!--Table serviço-->
+	</td>
+</tr>
+</table>
+<table width="760" border=0>
+<tr>
+<td colspan=2 align="center"><br>
+	<!--RAIO X
+	<input type="button" class="button" name="btnGravar" value="Gravar" onclick="GravarServico()" accesskey="I" onmouseover="showtip(this,event,'Incluir (Alt+I)');">&nbsp;
+	-->
+	<input type="button" class="button" name="btnLimpar" value="Limpar" onclick="document.forms[0].hdnId.value = '';LimparForm();setarFocus('txtCodigo')" accesskey="L" onmouseover="showtip(this,event,'Limpar (Alt+L)');">&nbsp;
+	<input type="button" class="button" name="Voltar" value="Voltar" onClick="javascript:window.location.replace('servico_main.asp')" accesskey="B" onmouseover="showtip(this,event,'Voltar (Alt+B)');">
+	<input type="button" class="button" name="btnSair" value=" Sair " onClick="javascript:window.location.replace('main.asp')" accesskey="X" onmouseover="showtip(this,event,'Sair (Alt+X)');">
+</td>
+</tr>
+</table>
+<table width="760" border=1 class=TableLine>
+<tr class=clsSilver2>
+	<td>
+		<font class="clsObrig">- </font> É permitido a gravação de maior conteúdo nos campos de (Rótulo/Padrão de designação) do que os textbox apresentam.
+	</td>
+</tr>
+<tr class=clsSilver>
+	<td>
+		<font class="clsObrig">- </font>Ex.: Rótulo:&nbsp;<font class="clsObrig">CNL(A4)+COMPL(A6)+CNL(A4)+COMPL(A6)+COMPLEMENTO(A6)+N4</font>&nbsp;&nbsp;Padrão:&nbsp;<font class="clsObrig">A4+A6+A4+A6+A6+N4</font>
+	</td>
+</tr>
+<tr class=clsSilver2>
+	<td>
+		<font class="clsObrig">- </font>Para Campos Obrigatórios utilize o caracter "*" no padrão de designação e o caracter "::" no rótulo do padrão para fazer a sinalização da obrigatóriedade.
+	</td>
+</tr>
+<tr class=clsSilver>
+	<td>
+		<font class="clsObrig">- </font><font class="clsObrig"> Ex.: CNL(A4)+::COMPL(A6)+CNL(A4)+COMPL(A6)+COMPLEMENTO(A6)+::N4</font>&nbsp;&nbsp;Padrão:&nbsp;<font class="clsObrig">A4+A6*+A4+A6+A6+N4*</font>.
+	</td>
+</tr>
+<tr class=clsSilver2>
+	<td>
+		<font class="clsObrig">- </font>Desta forma, o 2º e o último campo desse padrão se tornam obrigatótios. Os demais serão preenchidos com espaços em branco se não foram informados no preenchimento, independentes de serem alfanuméricos ou numéricos.
+	</td>
+</tr>
+<tr class=clsSilver>
+	<td>
+		<font class="clsObrig">- </font>Para intervalos utilize a sintaxe <b>N2<01..99></b> isso significa um numérico de duas posições entre 01 e 99.
+	</td>																	
+</tr>
+<tr class=clsSilver2>
+	<td>
+		<font class="clsObrig">- </font><b>Legenda: A - Alfanumérico;  N - Numérico;  L - Letra;  <font class="clsObrig">:: </font> - Campos de preenchimento obrigatório.</b>
+	</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</body>
+<SCRIPT LANGUAGE=javascript>
+<!--
+setarFocus('txtCodigo')
+//-->
+</SCRIPT>
+<iframe	id			= "IFrmProcesso"
+		name        = "IFrmProcesso"
+		width       = "0"
+		height      = "0"
+		frameborder = "0"
+		scrolling   = "no" 
+		align       = "left">
+</iFrame>
+
+</html>
+<%
+Set objRSSer = Nothing
+DesconectarCla()
+%>

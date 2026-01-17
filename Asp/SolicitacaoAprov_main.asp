@@ -1,0 +1,487 @@
+<%@ CodePage=65001 %>
+<%
+Response.ContentType = "text/html; charset=utf-8"
+Response.Charset = "UTF-8"
+%>
+<!--#include file="../inc/data.asp"-->
+<!--#include file="../inc/header.asp"-->
+<head>
+    
+</head>
+<%
+'•EMBRATEL - IMPLEMENTAÇÕES E SOLUÇÕES EM INFORMÁTICA
+'	- Sistema			: CLA
+'	- Arquivo			: SolicitacaoAprov_Main.asp
+'	- Descrição			: Solicitação vindas do sistemas Aprovisionador
+
+Set objXmlDados = Server.CreateObject("Microsoft.XMLDOM")
+if Request.Form("hdnXmlReturn") <> "" then
+	objXmlDados.loadXml(Request.Form("hdnXmlReturn"))
+Else
+	objXmlDados.loadXml("<xDados/>")
+End if
+
+%>
+<script language='javascript' src="../javascript/help.js"></script>
+<SCRIPT LANGUAGE="JavaScript">
+var objXmlGeral = new ActiveXObject("Microsoft.XMLDOM")
+function checa(f) {
+	return true;
+}
+
+function AtId(solid,acfid,vall,AprovisiId){
+	with (document.forms[0])
+		{
+				hdn678.value = vall
+				hdnSolId.value = solid
+				hdnAcfId.value = acfid
+				hdnAprovisiId.value = AprovisiId
+		}
+	}
+
+function ConsultarPedidosPend()
+{
+	with (document.forms[0])
+	{
+		if (cboAcao.value == "" && txt_oe_numero.value == "")
+		{
+			alert("Selecione uma ação.")
+			return;
+		}
+		
+		if (cboAcao.value == "REC" && txt_oe_numero.value == "")
+		{
+			alert("Informe o número da Order Entry.");
+			txt_oe_numero.focus();
+			return;
+		}
+	
+		hdnAcao.value = "SEL"
+		target = self.name
+		action = "SolicitacaoAprov_main.asp?Consulta=1"
+		submit()
+	}
+}
+
+function DetalharItem(dblSolId)
+{
+	with (document.forms[0])
+	{
+		//PopularXml()
+		hdnSolId.value = dblSolId
+		DetalharFac()
+	}
+}
+
+function CompletarCampoIA(obj)
+{
+	//alert(obj.value)
+	if (obj.value != "" && obj.value != 0 )
+	{
+		var intLen = parseInt(obj.size) - parseInt(obj.value.length)
+	
+		switch (obj.TIPO.toUpperCase())
+		{
+			case "N":
+				for (var intIndex=0;intIndex<intLen;intIndex++)
+				{
+					obj.value = "0" + obj.value
+				}
+				break
+			default :
+				for (var intIndex=0;intIndex<intLen;intIndex++)
+				{
+					obj.value = obj.value + " "
+					//alert(obj.value)
+				}
+		}
+	}	
+}
+</script>
+
+<form action="SolicitacaoAprov_main.asp" name="Form1" method="post" onsubmit="return checa(this)">
+<input type=hidden name=hdnPedId>
+<input type=hidden name=hdnSolId>
+<input type=hidden name=hdnAprovisiId>
+<input type=hidden name=hdnXmlReturn>
+<input type=hidden name=hdnOEOrigem value="Aprov">
+<input type=hidden name=hdnAcaoApg>
+<tr>
+<td >
+
+<table border=0 cellspacing="1" cellpadding="0" width="760" >
+<tr >
+	<th colspan=2 ><table width="760"><tr><th><center>Solicitação de Acesso - Aprovisionador</th>
+	<!--
+	Good Início 
+			<th width="26">
+			<div id="ajuda1" style="position:absolute; left:-1000px; top:-1000px; width:234; height:223; z-index:1;visibility: hidden; border: 0px none;">
+		    <object name="button" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" codebase="https://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,29,0" width="234" height="223">
+            	<param name="movie" value="../imagens/Help/help.swf?arquivo=../imagens/Help/SolicitacaoAprov_main.txt">
+    			<param name="quality" value="high">
+    		<embed src="../imagens/Help/help.swf?arquivo=../imagens/Help/SolicitacaoAprov_main.txt" quality="high" pluginspage="https://www.macromedia.com/go/getflashplayer" type="application/x-shockwave-flash" width="234" height="223"></embed>
+ 			</object>
+			</div>
+						
+			<div id="espaco_left" title="Ajuda">
+			<a href="javascript:;" onMouseOver="showAjudaImg('duvida1','ajuda1',10,20 );" onClick="hideAjuda('ajuda1');">
+			<img src="../imagens/question_b.gif" border="0" id="duvida1" style="cursor:pointer"/></a>
+			</div>			
+			</th>
+Good Fim			
+-->			
+</tr>
+</table>
+		</th>
+</tr>
+<tr class=clsSilver>
+	<td>Aprovisionador</td>
+	<td>
+	    <select name="Cbo_OrisolAprov">
+		  <option value=""></option> 
+		  <%
+		  set rsCboOrisolAprov = db.execute("select Orisol_ID,OriSol_Alias from CLA_OrigemSolicitacao where Orisol_InterfAprov = 1 order by orisol_alias ")
+		  do while not rsCboOrisolAprov.eof
+		  %>
+			<option value="<%=rsCboOrisolAprov("Orisol_ID")%>" <%if request("Cbo_OrisolAprov") = rsCboOrisolAprov("Orisol_ID") then%>selected<%end if%>
+		  <%
+		    'if strGrupo <> "" then
+			  'if trim(strGrupo) = trim(gr("GCli_ID")) then
+			    'response.write "selected"
+			  'end if
+			'end if
+		  %>
+			><%=ucase(rsCboOrisolAprov("OriSol_Alias"))%></option>
+		  <%
+			rsCboOrisolAprov.movenext
+			loop
+		  %>
+		</select>
+	</td>
+</tr>
+<tr class=clsSilver>
+	<td>Acao</td>
+	<td>
+		<select name="cboAcao">
+			 <!-- <option value="" > Selecione uma Ação </option> -->
+			  <option value="ATV" <%if request("cboAcao") = "ATV" then%>selected<%end if%>>ATIVAÇÃO</option>
+			 <!--  <option value="CAN" <%if request("cboAcao") = "CAN" then%>selected<%end if%>>CANCELAMENTO</option> -->
+			  <option value="ALT" <%if request("cboAcao") = "ALT" then%>selected<%end if%>>ALTERACAO</option>
+			  <option value="DES" <%if request("cboAcao") = "DES" then%>selected<%end if%>>DESATIVAÇÃO</option>
+			  <!--
+			  <option value=""> ----------------------- </option>
+			  -->
+			  <!--<option value="REC" <%'if request("cboAcao") = "REC" then%>selected<%'end if%>>RECADASTRO</option> -->
+		</select>
+	</td>
+</tr>
+
+<tr class=clsSilver>
+	<td>OE</td>
+	<td>
+        <input id="txt_oe_numero" type="text" title="Número" maxlength="10" size="11" 
+            class=text onKeyUp="ValidarTipo(this,0)" 
+            name="txt_oe_numero" value='<%=request("txt_oe_numero")%>'>&nbsp;/
+        <input id="txt_oe_ano" type="text" title="Ano" maxlength="4" size="5" 
+            class=text onKeyUp="ValidarTipo(this,0)" name="txt_oe_ano" 
+            value='<%=request("txt_oe_ano")%>'>&nbsp;item&nbsp;
+        <input id="txt_oe_item" type="text" title="Item" maxlength="3" size="4" 
+            class=text onKeyUp="ValidarTipo(this,0)" name="txt_oe_item" 
+            value='<%=request("txt_oe_item")%>'>
+	</td>
+</tr>
+<!--
+<tr class=clsSilver>
+	<td>IA - CFD</td>
+	<td>
+         <input id="txt_ia" type="text" class="text" maxlength="40" 
+            name="txt_ia" size="41" value='<%=request("txt_ia")%>' />
+	</td>
+</tr>
+-->
+<tr class=clsSilver>
+	<td>SOLICITACAO - CFD</td>
+	<td>
+        <input id="txt_variavel" type="text" title="XXXXXXXX" maxlength="8" size="8" 
+            class=text name="txt_variavel" value='<%=request("txt_variavel")%>' onblur="CompletarCampoIA(this)" TIPO="A">&nbsp;
+        <input id="txt_ss" type="text" title="IA" maxlength="2" size="2" 
+            class=text name="txt_ss"         value='<%=request("txt_ss")%>' onblur="CompletarCampoIA(this)" TIPO="A">&nbsp;
+		<input id="txt_num_sol" type="text" title="Numero" maxlength="4" size="4" 
+            class=text name="txt_num_sol"    onKeyUp="ValidarTipo(this,0)"     value='<%=request("txt_num_sol")%>' onblur="CompletarCampoIA(this)" TIPO="N">&nbsp;/
+		<input id="txt_ano_sol" type="text" title="Ano" maxlength="4" size="4" 
+            class=text name="txt_ano_sol"      onKeyUp="ValidarTipo(this,0)"   value='<%=request("txt_ano_sol")%>' onblur="CompletarCampoIA(this)">&nbsp;
+        
+	</td>
+</tr>
+<tr class=clsSilver>
+	<td>Cliente</td>
+	<td>
+	    <input id="txt_cliente" type="text" class="text" maxlength="60" 
+            name="txt_cliente" size="61" value='<%=request("txt_cliente")%>' /></td>
+</tr>
+<tr class=clsSilver>
+	<td>Designação</td>
+	<td>
+	    <input id="txt_designacao" type="text" class="text" maxlength="60" 
+            name="txt_designacao" size="61"  value='<%=request("txt_designacao")%>'></td>
+</tr>
+
+<%
+Dim IntNumOE_id
+IntNumOE_id = null
+IntNumOE_id = Request.form("txtNumOE")
+%>
+
+<tr>
+	<td colspan=2 align=center height=35px>
+		<input type="button" name="btconsulta" value="Consultar" class="button" onClick="ConsultarPedidosPend()">&nbsp;
+		<input type="button" class="button" name="btnSair" value=" Sair " onClick="javascript:window.location.replace('main.asp')" style="width:100px">
+        </td>
+</tr>
+<tr>
+	<td colspan=2 align=center height=35px>
+	<iframe	id			= "IFrmProcesso"
+			name        = "IFrmProcesso"
+			width       = "0"
+			height      = "0"
+			frameborder = "0"
+			scrolling   = "no"
+			align       = "left">
+	</iFrame>
+	</td>
+</tr>
+</table>
+<span id=spnLinks></span>
+<%
+Dim strClass
+Dim dblEstId
+Dim intIndex
+Dim strSql
+Dim intCount
+Dim strSel
+Dim strXls
+Dim strLink
+Dim strHtml
+
+if Request.ServerVariables("CONTENT_LENGTH") = 0  then
+	dblUsuIdFac = dblUsuId
+End If
+
+Set objXmlDados = Server.CreateObject("Microsoft.XMLDOM")
+if Request.Form("hdnXMLReturn") <> "" then
+	objXmlDados.loadXml(Request.Form("hdnXMLReturn"))
+	set objNodeAux = objXmlDados.getElementsByTagName("cboUsuario")
+	if objNodeAux.length > 0 then dblUsuIdFac = objNodeAux(0).childNodes(0).text
+End if
+
+if dblUsuIdFac = "" then dblUsuIdFac = "null" End if
+
+'inseri teste para verificar se deve ou não realizar a consulta
+if Request.QueryString ("Consulta") = "1" or Request.QueryString ("btn") <> "" then
+	strResponse = RetornaTabela(dblUsuId) 
+	Response.Write strResponse 
+	%>
+	<!--#include file="../inc/ControlesPaginacao.asp"-->
+	<%
+end if
+%>
+<input type=hidden name=hdnXls value="<%=strXls%>">
+<input type="hidden" name="hdnPaginaOrig"	value="<%=Request.ServerVariables("SCRIPT_NAME")%>">
+<input type=hidden name=hdnXls>
+<input type=hidden name=hdnXls>
+<input type=hidden name=hdnXls>
+<input type=hidden name=hdnXls>
+<input type=hidden name=hdnAcao>
+<input type=hidden name=hdnOrigem>
+<input type=hidden name=hdnNomeCons value="PedidosPend">
+<input type=hidden name="hdn678" value =<%=Request.Form("hdn678")%>>
+<input type=hidden name=hdnAcfId value=<%=Request.Form("hdnAcfId")%>>
+</form>
+
+</body>
+</html>
+<SCRIPT LANGUAGE=javascript>
+spnLinks.innerHTML = '<%=TratarAspasJS(strLink)%>'
+
+function EditarFac(dblSolId,AprovisiId,strAcao,StrOrigem)
+{
+	with (document.forms[0])
+	{
+		
+		hdnSolId.value = dblSolId
+		hdnAprovisiId.value = AprovisiId
+		hdnOEOrigem.value = "Aprov"
+		hdnAcao.value = strAcao					
+		hdnOrigem.value = StrOrigem			
+		action = "SolicitacaoAprov.asp"		
+		submit()		
+	}
+}
+</SCRIPT>
+
+<%
+Set objRSPag = Nothing
+DesconectarCla()
+
+function RetornaTabela(Usuario)
+
+	txt_ia = request("txt_variavel") + request("txt_ss") + request("txt_num_sol") + request("txt_ano_sol")   
+	
+	'response.write "<script>alert('"&txt_ia&"')</script>"
+	
+   	Vetor_Campos(1)="adInteger,10,adParamInput," 
+	Vetor_Campos(2)="adInteger,10,adParamInput,"
+	Vetor_Campos(3)="adWChar,30,adParamInput,null"		
+	Vetor_Campos(4)="adWChar,5,adParamInput,"	& request("cboAcao")
+	Vetor_Campos(5)="adInteger,10,adParamInput," & Usuario
+	Vetor_Campos(6)="adWChar,7,adParamInput," & request("txt_Oe_numero")
+	Vetor_Campos(7)="adWChar,4,adParamInput," & request("txt_Oe_Ano")
+	Vetor_Campos(8)="adInteger,4,adParamInput," & request("txt_Oe_Item")
+	Vetor_Campos(9)="adWChar,60,adParamInput," & request("txt_Cliente")
+	Vetor_Campos(10)="adWChar,30,adParamInput," & request("txt_Designacao")
+	Vetor_Campos(11)="adInteger,10,adParamInput," & request("Cbo_OrisolAprov")
+	Vetor_Campos(12)="adWChar,40,adParamInput," & txt_ia ' request("txt_ia")
+
+    strSql = APENDA_PARAMSTRSQL("CLA_sp_sel_Aprovisionador ",12,Vetor_Campos)
+	
+	'Response.Write 	strSql
+
+	call paginarRS(1,strSql)
+	intCount=1
+
+	if not objRSPag.Eof and not objRSPag.Bof then
+		'Link Xls/Impressão
+		strLink =	"<table border=0 width=760><tr><td colspan=2 align=right>" & _
+						"<a href='javascript:AbrirXls()' onmouseover=""showtip(this,event,'Consulta em formato Excel...')""><img src='../imagens/excel.gif' border=0></a>&nbsp;" & _
+						"<a href='javascript:TelaImpressao(800,600,""Pedidos Pendentes - " & date() & " " & Time() & " "")' onmouseover=""showtip(this,event,'Tela de Impressão...')""><img src='../imagens/impressora.gif' border=0></a></td></tr>" & _
+						"</table>"
+
+		strHtml = "<table border=0 cellspacing=1 width=760>" & _
+						"<tr>" & _
+							"<th >+</th>" & _
+							"<th width=120>&nbsp;Numero/Ano OE</th>" & _
+							"<th>&nbsp;Item OE</th>" & _
+							"<th >&nbsp;Ponta</th>" & _
+							"<th>&nbsp;Cliente</th>" & _
+							"<th>&nbsp;Ação</th>" & _
+							"<th nowrap>&nbsp;Serviço</th>" & _
+							"<th>&nbsp;Endereço</th>" & _
+							"<th>&nbsp;Designação <br>&nbsp;do Serviço</th>" & _
+							"<th>&nbsp;Aprovisionador </th>" & _
+						"</tr>"
+		strXls = strHtml
+
+		For intIndex = 1 to objRSPag.PageSize
+
+			if (intCount mod 2) <> 0 then strClass = "clsSilver" else strClass = "clsSilver2" End if
+
+			if isnull(objRSPag("sol_id")) Then strsolicitacao = "0" Else strsolicitacao = objRSPag("sol_id") End if
+
+			If trim(objRSPag("Acao")) = "ATV" Then StrAcao = "Ativacao" 	End if 
+
+			If trim(objRSPag("Acao")) = "ALT" Then StrAcao = "Alteracao" 	End if 
+			
+			If trim(objRSPag("Acao")) = "CAN" Then StrAcao = "Cancelamento" End if 
+			
+			If trim(objRSPag("Acao")) = "DES" Then StrAcao = "Desativacao" 	End if
+			
+			If trim(request("cboAcao")) = "REC" Then 
+			
+				StrOrigem = "Recadastro" 	
+			
+			End if
+			
+			If trim(objRSPag("Acao")) = "CAN" or trim(objRSPag("Acao")) = "DES" then	
+				
+				Set objRS = db.Execute("SELECT acf_id FROM CLA_VIEW_SOLICITACAOMIN WHERE sol_id = '" & strsolicitacao & "'")
+				if Not objRS.Eof and Not objRS.Bof then  acf_id = objRS("acf_id") end if
+				
+			End IF
+			strHtml = strHtml & "<tr class='" & strClass & "'>" '& _
+			
+			if isnull(objRSPag("sol_id")) then 
+				strHtml = strHtml & "<td>&nbsp;&nbsp;&nbsp;</td>"
+			else
+				strHtml = strHtml & "<td ><a href='javascript:DetalharItem(" & trim(objRSPag("sol_id")) & ")'>...&nbsp;</a></td>"
+			end if 
+			
+			select case trim(objRSPag("Acao"))
+			Case "DES"
+				if Trim(objRSPag("OriSol_Descricao")) = "CFD" then
+			  	 strHtml = strHtml & "<td ><a href=" &chr(34)& "javascript:AtId('" & strsolicitacao & "','" & acf_id & "','" & objRSPag("acl_idacessologico") &  "', '" & objRSPag("Aprovisi_id") & "');DesCanSolicitacao(" & strsolicitacao & ",2)" &chr(34)&">"  &  objRSPag("IA") &  "</a></td>"
+			    else
+			   strHtml = strHtml & "<td ><a href=" &chr(34)& "javascript:AtId('" & strsolicitacao & "','" & acf_id & "','" & objRSPag("acl_idacessologico") &  "', '" & objRSPag("Aprovisi_id") & "');DesCanSolicitacao(" & strsolicitacao & ",2)" &chr(34)&">" & "OE:" & right("00000000" & Trim(objRSPag("OE_Numero")),8) & "/" & objRSPag("OE_Ano") & "</a></td>"
+				end if 	
+			Case "CAN"
+			   strHtml = strHtml & "<td ><a href=" &chr(34)& "javascript:AtId('" & strsolicitacao & "','" & acf_id & "','" & objRSPag("acl_idacessologico") &  "', '" & objRSPag("Aprovisi_id") & "');DesCanSolicitacao(" & strsolicitacao & ",4)" &chr(34)&">" & "OE:" & right("00000000" & Trim(objRSPag("OE_Numero")),8) & "/" & objRSPag("OE_Ano") & "</a></td>"
+			
+			Case else
+				if Trim(objRSPag("OriSol_Descricao")) = "CFD" then
+			   			strHtml = strHtml & "<td ><a href='javascript:EditarFac(" & strsolicitacao & "," & objRSPag("Aprovisi_id") & ",""" & StrAcao & """,""" & StrOrigem & """)'>" &  objRSPag("IA") & "</a></td>"
+				ELSE
+			   strHtml = strHtml & "<td ><a href='javascript:EditarFac(" & strsolicitacao & "," & objRSPag("Aprovisi_id") & ",""" & StrAcao & """,""" & StrOrigem & """)'>" & "OE:" & right("00000000" & Trim(objRSPag("OE_Numero")),8) & "/" & objRSPag("OE_Ano") & "</a></td>"
+				END IF 
+			
+			End select
+			
+			if Trim(objRSPag("OriSol_Descricao")) = "SGAV" then
+			  strOriSol_Descricao = "SGA Voz"
+			elseif Trim(objRSPag("OriSol_Descricao")) = "SGAP" then
+			  strOriSol_Descricao = "SGA Plus"
+			else
+			  strOriSol_Descricao = Trim(objRSPag("OriSol_Descricao"))
+			end if
+																
+			set objRSserv = db.execute("CLA_sp_sel_servico null,null,'"& objRSPag("Ser_Desc") &"',null")
+			if Not objRSserv.Eof and not objRSserv.Bof then
+				Servico = objRSserv("Ser_Desc")
+			end if
+																
+			strHtml = strHtml & "<td >" & objRSPag("OE_Item") & "</td>" & _
+								"<td >" & objRSPag("Id_Endereco") & "</td>" & _
+								"<td >" & objRSPag("Cli_Nome") & "</td>" & _
+								"<td >" & objRSPag("Acao") & "</td>" & _
+								"<td >" & objRSPag("Ser_Desc") & "</td>" & _
+								"<td >" & Trim(objRSPag("Tpl_Sigla")) & " " & Trim(objRSPag("End_NomeLogr")) & ", " & _
+									Trim(objRSPag("End_NroLogr")) & " " & Trim(objRSPag("End_Bairro")) & " " & _
+									Trim(objRSPag("Cidade")) & " " & Trim(objRSPag("Est_Sigla"))  & "</td>" & _
+								"<td >" & Trim(objRSPag("Acl_designacaoServico")) & "</td>" & _
+								"<td >" & Ucase(strOriSol_Descricao) & "</td>" & "</tr>"
+
+			strXls = strXls & "<tr class='" & strClass & "'>" & _
+								"<td></td>"& _
+								
+								"<td >" & "OE:" & objRSPag("OE_Numero") & "/" & objRSPag("OE_Ano") & "</td>" & _
+								
+								"<td >" & objRSPag("OE_Item") & "</td>" & _
+								"<td >" & objRSPag("Id_Endereco") & "</td>" & _
+								"<td >" & objRSPag("Cli_Nome") & "</td>" & _
+								"<td >" & objRSPag("Acao") & "</td>" & _
+								"<td >" & objRSPag("Acl_NContratoServico") & "</td>" & _
+
+								"<td >" & Trim(objRSPag("Tpl_Sigla")) & " " & Trim(objRSPag("End_NomeLogr")) & ", " & _
+									Trim(objRSPag("End_NroLogr")) & " " & Trim(objRSPag("End_Bairro")) & " " & _
+									Trim(objRSPag("Cidade")) & " " & Trim(objRSPag("Est_Sigla"))  & "</td>" & _
+
+								"<td >" & Trim(objRSPag("Acl_designacaoServico")) & "</td>" & _
+								"<td >" & Ucase(strOriSol_Descricao) & "</td>" & _
+							"</tr>"
+
+			intCount = intCount+1
+			objRSPag.MoveNext
+			if objRSPag.EOF then Exit For
+		Next
+		strHtml = strHtml & "</table>"
+		strXls = strXls & "</table>"
+		RetornaTabela = strHtml
+	Else
+		strHtml ="<table width= 760 border= 0 cellspacing= 0 cellpadding= 0 valign=top>"
+		strHtml = strHtml + "<tr>"
+		strHtml = strHtml + "<td align=center valign=center width=100% height=20 ><font color=red>&nbsp;•&nbsp;Registro(s) não encontrado(s).</font></td>"
+		strHtml = strHtml + "</tr>"
+		strHtml = strHtml + "</table>"
+		RetornaTabela = strHtml
+	End if
+
+End function
+%>
