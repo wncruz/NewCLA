@@ -1,0 +1,477 @@
+/*
+=====================================================================================
+Objetivo		: Retorna o valor de um node se não existir retorna ""
+Premissas		: Enviar objeto XML 
+Entradas		: objXml - objeto XML
+				  strNomeNode - Nome do node
+				  intChave - Indentificador do no	
+Retorno			: Valor do node ou ""
+=====================================================================================
+*/
+function RequestNodeAcesso(objXML,strNomeNode,intChave)
+{
+	objNode = objXML.selectSingleNode("//xDados/Acesso[intIndice="+parseInt(intChave)+"]")
+	var objNodeRequest = objNode.getElementsByTagName(strNomeNode)
+
+	if (objNodeRequest.length != 0)
+	{
+		return objNodeRequest.item(0).text
+		
+	}	
+	else
+	{
+		return ""		
+	}
+}
+/*
+=====================================================================================
+Objetivo		: Cria/Atualiza nodes no Xml de Acessos
+Premissas		: Existir objeto XML na página que faz o include
+Entradas		: blnLimpar - booleana se limpa os campos do acesso ou não
+Retorno			: Atualiza lista com item adicionado
+=====================================================================================
+*/
+function xmlUpd(blnLimpar)
+{
+	for (var intIndex=0;intIndex<document.Form2.elements.length;intIndex++)
+	{
+		var elemento = document.Form2.elements[intIndex];
+		if (elemento.type == "radio"){
+			if (elemento.checked){
+				if (document.Form2.hdnIntIndice.value != ""){
+					AdicionarNodeAcesso(objXmlGeral,elemento.name,elemento.value,document.Form2.hdnIntIndice.value)
+					AdicionarNodeAcesso(objXmlGeral,elemento.name+"Index",elemento.Index,document.Form2.hdnIntIndice.value)
+				}
+				else{
+					AdicionarNodeAcesso(objXmlGeral,elemento.name,elemento.value,intIndice)
+					AdicionarNodeAcesso(objXmlGeral,elemento.name+"Index",elemento.Index,intIndice)
+				}	
+			}	
+		}
+		else{
+			if (document.Form2.hdnIntIndice.value != ""){
+				AdicionarNodeAcesso(objXmlGeral,elemento.name,elemento.value,document.Form2.hdnIntIndice.value)
+			}
+			else{
+				AdicionarNodeAcesso(objXmlGeral,elemento.name,elemento.value,intIndice)
+			}	
+		}	
+		//Cria um node com o text dos combos
+		if (elemento.type == "select-one"){
+			if (document.Form2.hdnIntIndice.value != ""){
+				AdicionarNodeAcesso(objXmlGeral,elemento.name+"Text",elemento[elemento.selectedIndex].text,document.Form2.hdnIntIndice.value)
+			}
+			else{	
+				AdicionarNodeAcesso(objXmlGeral,elemento.name+"Text",elemento[elemento.selectedIndex].text,intIndice)
+			}
+		}
+
+		if (blnLimpar){
+			//Não pode limpar o conteúdo do radio somente fazer checked=false
+			if (elemento.type != 'button' && elemento.type != 'hidden' && elemento.type != 'radio')	elemento.value = ""
+			if (elemento.type == 'radio')
+			{
+				elemento.checked = false
+			}
+		}	
+	}
+	if (blnLimpar)
+	{
+		try{
+			spnListaIdFis.innerHTML = ""
+		}catch(e){}	
+	}	
+	//Limpar os controle de busca de estação Destino/Origem e de Cidade(CNL)
+	document.Form2.hdnCNLAtual.value = ""
+	document.Form2.hdnCNLAtual1.value = ""
+	document.Form2.hdnEstacaoOrigem.value = ""
+	document.Form2.hdnEstacaoDestino.value = ""
+
+	if (document.forms[1].hdnIntIndice.value != ""){
+		if (RequestNodeAcesso(objXmlGeral,"Acf_Id",document.forms[1].hdnIntIndice.value) != ""){
+			AdicionarNodeAcesso(objXmlGeral,'TipoAcao','A',document.forms[1].hdnIntIndice.value)
+		}else{
+			AdicionarNodeAcesso(objXmlGeral,'TipoAcao','N',document.forms[1].hdnIntIndice.value)
+		}	
+	}
+	else{	
+		AdicionarNodeAcesso(objXmlGeral,'TipoAcao','N',intIndice)
+	}
+
+	try{
+		document.Form2.btnAddAcesso.value = "Adicionar"
+	}catch(e){}
+
+	intIndice += 1
+	document.Form2.hdnIntIndice.value = ""
+}
+/*
+=====================================================================================
+Objetivo		: Adiciona item a lista que acessos adicionados
+Premissas		: Existir objeto XML na página que faz o include
+Entradas		: 
+Retorno			: Mostra Html no Iframe de acessos adicionados
+=====================================================================================
+*/
+function AtualizarLista(){
+	if (arguments.length > 0){
+		var intOptSel = arguments[0]
+	}else{
+		var	intOptSel = 9999
+	}
+	var objNode = objXmlGeral.selectNodes("//xDados/Acesso[TipoAcao='N' || TipoAcao='A']")
+
+	var strAcesso =  new String("<table border=0 width=740 cellspacing=1 cellpadding=0>")
+	//Refaz a lista de Ids no IFRAME
+	for (var intIndex=0;intIndex<objNode.length;intIndex++){
+		if ((intIndex%2)!=0){
+			strAcesso += "<tr class=clsSilver>"
+		}
+		else{
+			strAcesso += "<tr class=clsSilver2>"
+		}	
+		intChave = objNode[intIndex].childNodes[0].text
+		strAcesso += "<td width=15>" + RequestNodeAcesso(objXmlGeral,"intOrdem",intChave)  + "</td>"
+		if (intOptSel == intIndex){
+			strAcesso += "<td width=35 align=center><input type=radio name=rdoAcesso value=" + intChave + " onClick='parent.EditarAcessoLista(this)' checked ></td>"
+		}else{	
+			strAcesso += "<td width=35 align=center><input type=radio name=rdoAcesso value=" + intChave + " onClick='parent.EditarAcessoLista(this)'></td>"
+		}			
+		strAcesso += "<td width=50>" + RequestNodeAcesso(objXmlGeral,"rdoPropAcessoFisico",intChave)  + "</td>"
+		strAcesso += "<td width=185>" + RequestNodeAcesso(objXmlGeral,"cboProvedorText",intChave)  + "</td>"
+		if (RequestNodeAcesso(objXmlGeral,"cboTipoVel",intChave) != ""){
+			strAcesso += "<td width=200>" + RequestNodeAcesso(objXmlGeral,"cboVelAcessoText",intChave)  + " " + RequestNodeAcesso(objXmlGeral,"cboTipoVelText",intChave) +"</td>"
+		}else{
+			strAcesso += "<td width=200>" + RequestNodeAcesso(objXmlGeral,"cboVelAcessoText",intChave) + "</td>"
+		}	
+		//Endereço
+		strAcesso += "<td width=255>" +  RequestNodeAcesso(objXmlGeral,"cboLogrEnd",intChave) + " " + RequestNodeAcesso(objXmlGeral,"txtEnd",intChave)
+		strAcesso += ", " + RequestNodeAcesso(objXmlGeral,"txtNroEnd",intChave)  
+		strAcesso += " " + RequestNodeAcesso(objXmlGeral,"txtComplEnd",intChave)  
+		strAcesso += " " + RequestNodeAcesso(objXmlGeral,"txtCepEnd",intChave)  
+		strAcesso += " " + RequestNodeAcesso(objXmlGeral,"txtEndCid",intChave)  
+		strAcesso += " " + RequestNodeAcesso(objXmlGeral,"txtEndCidDesc",intChave)
+		strAcesso += "</td></tr>"
+	}	
+	strAcesso += "</table>"
+	parent.IFrmAcessoFis.spnAcessoFis.innerHTML = strAcesso
+}
+/*
+=====================================================================================
+Objetivo		: Popula os campos de acesso físico
+Premissas		: Existir objeto XML na página que faz o include
+Entradas		: intChave -  Chave identificadora do item editado
+Retorno			: Atualiza campos do formulário com informção
+=====================================================================================
+*/
+function EditarAcesso(intChave){
+		
+	
+	var	objNode = objXmlGeral.selectNodes("//xDados/Acesso[intIndice="+parseInt(intChave)+"]")
+	
+	//Refaz a lista de Ids no IFRAME
+	for (var intIndex=0;intIndex<objNode.length;intIndex++){
+		for (var intIndexII=0;intIndexII<objNode[intIndex].childNodes.length;intIndexII++){
+			try{
+				//Caso de radio button
+				if (objNode[intIndex].childNodes[intIndexII].nodeName == "rdoPropAcessoFisico"){
+					eval("document.Form2."+objNode[intIndex].childNodes[intIndexII].nodeName+"["+RequestNodeAcesso(objXmlGeral,"rdoPropAcessoFisicoIndex",objNode[intIndex].childNodes[0].text)+"].checked = true")
+					
+				}
+				else{
+					//eval("document.Form2."+objNode[intIndex].childNodes[intIndexII].nodeName+".value='"+objNode[intIndex].childNodes[intIndexII].text+"'")
+					var objChildForm = new Object(eval("document.Form2."+objNode[intIndex].childNodes[intIndexII].nodeName))
+					//alert(objNode[intIndex].childNodes[intIndexII].text + " = " + objNode[intIndex].childNodes[intIndexII].nodeName)
+					if (objChildForm.type != "button"){
+						objChildForm.value = objNode[intIndex].childNodes[intIndexII].text
+					}	
+				}	
+			}catch(e){}
+		}	
+	}	
+
+	if (objNode.length > 0)
+	{
+		var intChaveFis = RequestNodeAcesso(objXmlGeral,"Aec_Id",intChave)
+		if (intChaveFis == "") intChaveFis = 0
+		var objNodeFis = objXmlGeral.selectNodes("//xDados/Acesso/IdFisico[Aec_Id="+intChaveFis+"]")
+		var strAcessoIdFis =  new String("<table border=0 width=759 cellspacing=0 cellpadding=0>")
+		//Refaz a lista de Ids no IFRAME
+		for (var intIndex=0;intIndex<objNodeFis.length;intIndex++)
+		{
+			var intAcfId = objNodeFis[intIndex].childNodes[0].text
+			var intAecId = objNodeFis[intIndex].childNodes[2].text
+			var objNodePed = objXmlGeral.selectNodes("//xDados/Acesso/Pedido[Acf_Id="+intAcfId+"]")
+			strAcessoIdFis += "<tr class=clsSilver>"
+			strAcessoIdFis += "<td >&nbsp;Pedido</td>"
+			strAcessoIdFis += "<td>&nbsp;"+objNodePed[0].childNodes[1].text +"</td>"
+			strAcessoIdFis += "<td >&nbsp;ID Físico</td>"
+			strAcessoIdFis += "<td >"
+			try{
+				strAcessoIdFis +=objNodeFis[intIndex].childNodes[3].text
+			}catch(e){}	
+			strAcessoIdFis +="</td>"
+			strAcessoIdFis += "<td >&nbsp;Nº Acesso</td>"
+			strAcessoIdFis += "<td >"
+			try{
+				strAcessoIdFis += objNodeFis[intIndex].childNodes[4].text
+			}catch(e){}	
+			strAcessoIdFis +="</td>"
+			strAcessoIdFis += "</tr>"
+			strAcessoIdFis += "<tr></tr>"
+		}
+		strAcessoIdFis += "</table>"
+		//Qtde circuitos
+		var objNodeCircuitos = objXmlGeral.selectNodes("//xDados/Acesso/Pedido[Aec_Id="+intAecId+"]")
+		if (objNodeCircuitos.length > 0)
+		{
+			var intQtdeCir = 1
+			var intQtdeCirAtual = RequestNodeAcesso(objXmlGeral,"txtQtdeCircuitos",intChave)
+			if (intQtdeCirAtual == ""){intQtdeCirAtual = 1}
+			var intPedId = objNodeCircuitos[0].childNodes[0].text
+			for (var intIndex=0;intIndex<objNodeCircuitos.length;intIndex++)
+			{
+				if (intPedId != objNodeCircuitos[intIndex].childNodes[0].text)
+				{
+					intQtdeCir += 1
+				}
+			}
+			if (intQtdeCirAtual == intQtdeCir)
+			{
+				document.Form2.txtQtdeCircuitos.value = intQtdeCir
+			}else
+			{
+				document.Form2.txtQtdeCircuitos.value = intQtdeCirAtual
+			}	
+		}
+	}
+	else{
+		strAcessoIdFis = ""
+	}	
+
+	document.Form2.hdnIntIndice.value = intChave //Chave Atual no Html
+	//Acerta o disabled para o provedor quando temos EBT
+	if (RequestNodeAcesso(objXmlGeral,"rdoPropAcessoFisico",intChave) != "EBT"){
+		document.forms[1].cboProvedor.disabled = false
+	}
+	else{
+		document.forms[1].cboProvedor.disabled = true
+	}
+
+	DesabilitarCamposAlt(true,intChave)
+	parent.spnListaIdFis.innerHTML = strAcessoIdFis
+
+}
+/*
+=====================================================================================
+Objetivo		: Remove acesso do XML
+Premissas		: Existir objeto XML na página que faz o include
+Entradas		: intIndice - Chave o item a ser removido
+				  blnLimpar - booleana para limpar os campos do formulário depois de remover
+Retorno			: Atualiza lista do Iframe de acessos adicionados
+=====================================================================================
+*/
+function RemoverAcesso(intIndice,blnLimpar)
+{
+	if (RequestNodeAcesso(objXmlGeral,"Acf_Id",intIndice) != ""){
+		
+		AdicionarNodeAcesso(objXmlGeral,'TipoAcao','R',intIndice)
+	}
+	else
+	{
+		var	objNode = objXmlGeral.selectNodes("//xDados/Acesso[intIndice="+parseInt(intIndice)+"]")
+		if (objNode.length > 0)
+		{
+			objNode[0].parentNode.removeChild(objNode[0])
+			document.Form2.hdnIntIndice.value = ""
+		}
+		else{
+			alert("Item não encontrado.")
+			return
+		}
+	}		
+
+	for (var intIndex=0;intIndex<document.Form2.elements.length;intIndex++)
+	{
+		var elemento = document.Form2.elements[intIndex];
+		if (blnLimpar)
+		{
+			if (elemento.type != 'button' && elemento.type != 'hidden' && elemento.type != 'radio')	elemento.value = ""
+			if (elemento.type == 'radio')
+			{
+				elemento.checked = false
+			}
+		}	
+	}
+	if (blnLimpar){parent.spnListaIdFis.innerHTML = ""}
+}
+/*
+=====================================================================================
+Objetivo		: Adiciona um Node a um objeto XML. Se existir atualiza
+Premissas		: Enviar o objeto XML
+Entradas		: objXMLProcesso - objeto XML
+				  strNomeNode - Nome do Node
+				  strValorNode - Valor do node 
+				  intChave - Chave para identificação/criação do node
+Retorno			: 
+=====================================================================================
+*/
+function AdicionarNodeAcesso(objXMLProcesso,strNomeNode,strValorNode,intChave)
+{	
+	var objElemento
+	var objNodeFilho
+	var intIndex
+	var objNodeList
+	var objNode
+    var objXML = objXMLProcesso
+    if (objXML.xml == "")
+    {
+	   objXML.loadXML("<xDados></xDados>")
+	}   
+	//Verifica se já existe
+	objNodeList = objXML.selectNodes("//xDados/Acesso[intIndice="+parseInt(intChave)+"]")
+	if (objNodeList.length == 0)
+	{
+		//Cria o Node Chave
+		objNode = objXML.createNode("element", "Acesso", "")
+		objXML.documentElement.appendChild (objNode)
+
+		objNodeFilho = objXML.createNode("element", "intIndice", "")
+		objNodeFilho.text = parseInt(intChave)
+		objNode.appendChild (objNodeFilho)
+	}	
+	else
+	{
+		objNode = objXML.selectSingleNode("//xDados/Acesso[intIndice="+parseInt(intChave)+"]")
+	}
+
+	var objNodeListAtual = objNode.getElementsByTagName(strNomeNode)
+	if (objNodeListAtual.length == 0)
+	{
+		//Cria
+		if (strValorNode != ""){
+			objNodeFilho = objXML.createNode("element", strNomeNode, "")
+			objNodeFilho.text = strValorNode
+			objNode.appendChild (objNodeFilho)
+		}	
+	}	
+	else
+	{
+		//Atualiza
+		if (strValorNode != ""){
+			objNodeListAtual.item(0).text = strValorNode
+		}
+		else{//Se esta vazio remove do XML
+			objNodeListAtual.item(0).parentNode.removeChild(objNodeListAtual.item(0)) 
+		}	
+	}	
+}
+//Verifica se o acesso foi alterado e não foi recolocado a lista
+function AcessoAlteradoNaoAtualizado(){
+
+	if (document.Form2.hdnIntIndice.value != ""){
+		intChave = document.Form2.hdnIntIndice.value
+	}else{
+		return false
+	}
+	var objAry = new Array("cboTecnologia","cboVelAcesso","cboTipoVel","cboProvedor","cboRegimeCntr","cboPromocao","cboUFEnd","txtEndCid","txtEndCidDesc","cboLogrEnd","txtEnd","txtNroEnd","txtBairroEnd","txtCepEnd","txtContatoEnd","txtTelEnd","txtCNPJ","txtIE","txtIM","txtComplEnd","txtPropEnd","txtCodSAP","txtNroPI","cboInterFaceEnd","cboTipoPonto","hdnCompartilhamento","hdnIdAcessoFisico","hdnNovoPedido","txtCNLSiglaCentroCliDest","txtComplSiglaCentroCliDest","cboInterFaceEndFis")
+	var intIndexRb = RequestNodeAcesso(objXmlGeral,"rdoPropAcessoFisicoIndex",intChave)
+	if (intIndexRb != ""){
+		if (!document.forms[1].rdoPropAcessoFisico[intIndexRb].checked){
+			return true
+		} 
+	}	
+	for (var intIndex=0;intIndex<objAry.length;intIndex++){
+		var objChildForm = new Object(eval("document.Form2."+objAry[intIndex]))
+		//alert(eval("document.Form2."+objAry[intIndex]+".name") + " : " + objChildForm.value + ' = ' + RequestNodeAcesso(objXmlGeral,objAry[intIndex],intChave))
+		if (objChildForm.value != RequestNodeAcesso(objXmlGeral,objAry[intIndex],intChave))
+		{
+			return true
+		}
+	}
+	return false
+}
+
+function AddTaxaServico(objXMLProcesso,objXmlTaxa)
+{	
+	var objElemento
+	var objNodeFilho
+	var intIndex
+	var objNodeList
+	var objNode
+    var objXML = objXMLProcesso
+    if (objXML.xml == "")
+    {
+	   objXML.loadXML("<xDados></xDados>")
+	}   
+	//Verifica se já existe
+	var objNodeTaxa = objXmlTaxa.selectNodes("//TaxaServico")
+	if (objNodeTaxa.length > 0)
+	{
+		for (var intIndex=0;intIndex<objNodeTaxa.length;intIndex++)
+		{
+			intAcfId = objNodeTaxa[intIndex].childNodes[0].text
+			objNodeList = objXML.selectNodes("//xDados/TaxaServico[Acf_Id="+parseInt(intAcfId)+"]")
+			if (objNodeList.length == 0)
+			{
+				//Cria o Node Chave
+				objNode = objXML.createNode("element", "TaxaServico", "")
+				objXML.documentElement.appendChild (objNode)
+			}	
+			else
+			{
+				objNode = objXML.selectSingleNode("//xDados/TaxaServico[Acf_Id="+parseInt(intAcfId)+"]")
+			}
+
+			for (var intIndexII=0;intIndexII<objNodeTaxa[intIndex].childNodes.length;intIndexII++)
+			{
+				var strNomeNode = objNodeTaxa[intIndex].childNodes[intIndexII].nodeName
+				var strValorNode = objNodeTaxa[intIndex].childNodes[intIndexII].text
+
+				var objNodeListAtual = objNode.getElementsByTagName(strNomeNode)
+				if (objNodeListAtual.length == 0)
+				{
+					//Cria
+					if (strValorNode != ""){
+						objNodeFilho = objXML.createNode("element", strNomeNode, "")
+						objNodeFilho.text = strValorNode
+						objNode.appendChild (objNodeFilho)
+					}	
+				}	
+				else
+				{
+					//Atualiza
+					if (strValorNode != ""){
+						objNodeListAtual.item(0).text = strValorNode
+					}
+					else{//Se esta vazio remove do XML
+						objNodeListAtual.item(0).parentNode.removeChild(objNodeListAtual.item(0)) 
+					}	
+				}	
+			}	
+		}
+	}
+}
+
+//Verifica se o acesso foi alterado e não foi recolocado a lista
+function ValidarPontoInstalacao(){
+
+	var objAry = new Array("cboUFEnd","txtEndCid","txtEndCidDesc","cboLogrEnd","txtEnd","txtNroEnd","txtBairroEnd","txtCepEnd")
+	var objNode = objXmlGeral.selectNodes("//xDados/Acesso")
+	
+	for (var intIndexNode=0;intIndexNode<objNode .length;intIndexNode++)
+	{
+		var blnAchou = true
+		intChave = objNode[intIndexNode].childNodes[0].text
+		for (var intIndex=0;intIndex<objAry.length;intIndex++){
+			var objChildForm = new Object(eval("document.Form2."+objAry[intIndex]))
+			//alert(eval("document.Form2."+objAry[intIndex]+".name") + " : " + objChildForm.value + ' = ' + RequestNodeAcesso(objXmlGeral,objAry[intIndex],intChave))
+			if (objChildForm.value != RequestNodeAcesso(objXmlGeral,objAry[intIndex],intChave))
+			{
+				blnAchou = false
+			}
+		}
+		if (blnAchou) return true
+	}
+	return false
+}

@@ -1,0 +1,503 @@
+/*
+•IMPLEMENT SOFT - IMPLEMENTAÇÕES E SOLUÇÕES EM INFORMÁTICA
+	- Sistema			: CLA
+	- Arquivo			: ConsultaGeral.js
+	- Descrição			: Funções JAVASCRIPT utilizadas na Consulta Geral
+*/
+//Adicionar,Remove opções para o combo de campos selecionados
+function CarregarCombo(intTipo)
+{
+
+	with (document.forms[0])
+	{
+
+		switch (parseInt(intTipo))
+		{
+			case 1:
+			
+				for(var intIndex = 0 ; intIndex < cboCampos.length; intIndex++)
+				{
+					//Carrega opções do combo text/value
+					if (cboCampos[intIndex].selected)
+					{
+						if (RequestNode(objXmlGeral,cboCampos[intIndex].value) == "" &&  ValidaSelecao(cboCampos[intIndex].value) )
+						{
+							var option_combo = new Option(cboCampos[intIndex].text,cboCampos[intIndex].value)
+							var option_combo1 = new Option(cboCampos[intIndex].text,cboCampos[intIndex].value)
+							cboCamposSel.options[cboCamposSel.length] = option_combo
+							cboOrderBy.options[cboOrderBy.length] = option_combo1
+							AdicionarNode(objXmlGeral,cboCampos[intIndex].value,cboCampos[intIndex].value)
+						}	
+					}	
+				}
+				break
+
+			case 2:
+				for(var intIndex = 0 ; intIndex < cboCampos.length; intIndex++)
+				{
+					if (RequestNode(objXmlGeral,cboCampos[intIndex].value) == "" &&  ValidaSelecao(cboCampos[intIndex].value))
+					{
+						//Carrega todas as opções do combo text/value
+						var option_combo = new Option(cboCampos[intIndex].text,cboCampos[intIndex].value)
+						var option_combo1 = new Option(cboCampos[intIndex].text,cboCampos[intIndex].value)
+
+						cboCamposSel.options[cboCamposSel.length] = option_combo
+						cboOrderBy.options[cboOrderBy.length] = option_combo1
+						AdicionarNode(objXmlGeral,cboCampos[intIndex].value,cboCampos[intIndex].value)
+					}	
+				}
+				break
+
+
+			case 3:
+				for(var intIndex=parseInt(cboCamposSel.length)-1;intIndex >= 0;intIndex--)
+				{
+					//Carrega todas as opções do combo text/value
+					if (cboCamposSel[intIndex].selected)
+					{
+						RemoverNode(objXmlGeral,cboCamposSel[intIndex].value,cboCamposSel[intIndex].value)
+						cboCamposSel.remove(intIndex)
+						cboOrderBy.remove(intIndex)
+					}	
+				}
+				break
+
+			case 4:
+				for(var intIndex = parseInt(cboCamposSel.length)-1; intIndex >= 0; intIndex--)
+				{
+					RemoverNode(objXmlGeral,cboCamposSel[intIndex].value,cboCamposSel[intIndex].value)
+					cboCamposSel.remove(intIndex)
+					cboOrderBy.remove(intIndex)
+				}
+				break
+		}	
+
+	}
+}
+
+// Abri link com o totem
+function LinkTotem (Acf_IDAcessoFisico)
+{		
+	with (document.forms[0])
+	{
+
+		var strNome = "Facilidade" 
+		var objJanela = window.open()
+		objJanela.name = strNome
+		target = strNome
+		action = "http://ntspo913/crmsf/ConsuCla.asp?idfis=" +  Acf_IDAcessoFisico
+		submit() 
+	}
+}
+
+//Envia dados para a cosulta
+function Procurar()
+{
+	with (document.forms[0])
+	{
+		if (cboCamposSel.length == 0)
+		{
+			alert("Selecione pelo menos um campo.")
+			return
+		}
+		if (txtNroReg.value == "")
+		{
+			txtNroReg.value = 10
+		}	
+
+		
+		if (txtNroReg.value > 100)
+		{
+			alert("A quantidade maxima de registros é 100.")
+	 		txtNroReg.focus()
+			return
+		}	
+
+		if (VerificarFluxo("CLA_PEDIDO.NUMERODOPEDIDO-A-"))
+		{
+			if (!Validar(hdnDM)) return
+
+			for (var intIndex=0;intIndex<cboCamposSel.length;intIndex++)
+			{
+				cboCamposSel[intIndex].selected = true
+			}
+			
+			//PRSS - 09/05/2006  - INÍCIO
+			//Otimização da consulta geral: Abrir o registro imediatamente após a cunsulta.
+			if (document.forms[0].hdnDM.value.length == 13)
+		      {
+		      //alert("consulta direta")
+			  hdnAcao.value = "ProcuraGeral"
+			  target = "IFrmProcesso"
+			  action = "ProcessoConsultaGeralDireta.asp"
+			  submit()
+		      return(false)
+		      }
+			//PRSS - 09/05/2006 - FIM
+									
+			hdnAcao.value = "ProcuraGeral"
+			target = "IFrmProcesso"
+			action = "ProcessoConsultaGeral.asp"
+			submit()
+		}	
+		else	
+		{
+		
+			for (var intIndex=0;intIndex<cboCamposSel.length;intIndex++)
+			{
+				cboCamposSel[intIndex].selected = true
+			}
+			hdnAcao.value = "ProcuraGeral"
+			target = "IFrmProcesso"
+			action = "ProcessoConsultaGeral.asp"
+			submit()
+		}	
+	}
+}
+	
+//Adicionar campos como filtro
+function AddFiltro()
+{
+	var strHtml = new String("")
+	var blnAchou = false
+	var blnCamposSel = false
+	var objAtyTipo
+	var strTipo
+	var strValida
+	var strMaxLen
+	var strValidaIII
+
+	with (document.forms[0])
+	{
+		for(var intIndex = 0 ; intIndex < cboCamposSel.length; intIndex++)
+		{
+			if (cboCamposSel[intIndex].selected == true)
+			{
+				if (cboCamposSel[intIndex].value.toUpperCase() == "Cla_Pedido.NumerodoPedido-A-".toUpperCase())
+				{
+					if (!VerificarFluxo(cboCamposSel[intIndex].value.toUpperCase()))
+					{
+						var strNomeSpan =  "spn"+Math.round(Math.random()*100000)
+						strHtml += "<span id='"+strNomeSpan+"'>"
+						strHtml += "<table border=0 width=100% cellspacing=1 cellpadding=0><tr class=clsSilver><td width=200px >"+cboCamposSel[intIndex].text+"</td><td><input type=text size=20 class=text name='"+cboCamposSel[intIndex].value.toUpperCase()+"' value='DM-'  onBlur='AddValorDM(this)' >"
+						strHtml += "<input type=button class=button onmouseover=\"showtip(this,event,\'Remover Filtro\') \" style=\'width:15px;BORDER-LEFT-STYLE: none\' name='btnRem"+intIndex+"' value='X' onclick=\"RemoverFiltro('"+strNomeSpan+"','"+cboCamposSel[intIndex].value.toUpperCase()+"')\" >"
+						strHtml += "&nbsp;DM-NNNNN/ANO</td></tr></table></span>"
+						objAryFiltro[parseInt(objAryFiltro.length+1)] = cboCamposSel[intIndex].value.toUpperCase()
+						blnCamposSel = true
+					}
+					else
+					{
+						blnAchou = true
+					}	
+				}
+				else
+				{
+					if (!VerificarFluxo(cboCamposSel[intIndex].value.toUpperCase()))
+					{
+						
+						objAtyTipo = cboCamposSel[intIndex].value.split('-')
+						strValida = ""
+						strTipo = ""
+						strMaxLen = ""
+						strValidaII = ""
+						strValidaIII = ""
+						switch (objAtyTipo[1])
+						{
+							case "D":
+								strTipo = "(dd/mm/aaaa)"
+								strValida = 'OnlyNumbers();AdicionaBarraData(this)'
+								strValidaII = 'if (!ValidarTipoInfo(this,1,"'+cboCamposSel[intIndex].text+'")){this.focus()}'
+								strMaxLen = " maxlength=10 "
+								break
+							case "N":	
+								strValidaIII = 'ValidarTipo(this,0);'
+								break
+						}
+
+						var strNomeSpan =  "spn"+Math.round(Math.random()*100000)
+						strHtml += "<span id='"+strNomeSpan+"'>"
+						strHtml += "<table border=0 width=100% cellspacing=1 cellpadding=0><tr class=clsSilver><td width=200px >"+cboCamposSel[intIndex].text+"</td><td>"
+						strHtml += "<input type=text class=text size=20 "+strMaxLen+" name='"+cboCamposSel[intIndex].value.toUpperCase()+"' onKeyPress=\'"+strValida+"\' onBlur=\'"+strValidaII+"\' onKeyUp=\'"+strValidaIII+"\' >"
+						strHtml += "<input type=button class=button onmouseover=\"showtip(this,event,\'Remover Filtro\') \" style=\'width:15px;BORDER-LEFT-STYLE: none\' name='btnRem"+intIndex+"' value='X' onclick=\"RemoverFiltro('"+strNomeSpan+"','"+cboCamposSel[intIndex].value.toUpperCase()+"')\" >"
+						strHtml += "&nbsp;"+strTipo+"</td></tr></table>"
+						strHtml += "</span>"
+						objAryFiltro[parseInt(objAryFiltro.length)] = cboCamposSel[intIndex].value.toUpperCase()
+						blnCamposSel = true
+					}
+					else
+					{
+						blnAchou = true
+					}	
+				}	
+			}
+		}
+		if (!blnCamposSel)
+		{
+			alert("Selecione pelo menos um campo da lista de \"Campos Selecionados\"\nque ainda não foi selecionado para filtro.")
+			return
+		}
+		if (blnAchou)
+		{
+			alert("Alguns campos já estão selecionados como filtros!")
+		}
+		spnFiltro.innerHTML += strHtml
+	}	
+}
+
+//Remove um campo que esta como filtro
+function RemoverFiltro(strSpan,strChave)
+{
+	var strSpanAux = new String(strSpan)
+	eval(strSpanAux+".innerHTML = \'\'")
+
+	for(var intIndex=0;intIndex<objAryFiltro.length;intIndex++)
+	{
+		if (objAryFiltro[intIndex] == strChave)
+		{
+			objAryFiltro[intIndex] = ""
+		}
+	}
+}
+
+//Objeto array onde estão os filtro ativos/selecionados
+var objAryFiltro = new Array()
+
+//Verifica se um filtro já foi adicionado
+function VerificarFluxo(strChave)
+{
+	for(var intIndex=0;intIndex<objAryFiltro.length;intIndex++)
+	{
+		if (objAryFiltro[intIndex] == strChave)
+		{
+			return true
+		}
+	}
+	return false
+}
+
+//Adicionar valor do DM para campo escondido para validações
+function AddValorDM(obj)
+{
+	var retorno = validarEncode(obj);
+
+	with (document.forms[0])
+	{
+		hdnDM.value = obj.value
+
+	}	
+	return retorno
+}
+
+//Limpar filtros,consulta e parametrizações permanecendo como os campos defeult
+function LimparCosultaGeral(objXml)
+{
+	with (document.forms[0])
+	{
+			for(var intIndex=0;intIndex<objAryFiltro.length;intIndex++)
+			{
+				objAryFiltro[intIndex] = ""
+			}
+			CarregarCombo(4)		
+			spnFiltro.innerHTML = ""
+			try{ //Pode não existir
+				IFrmProcesso.spnConsulta.innerHTML = ""
+			}catch(e){}	
+			spnLinks.innerHTML = ""
+			hdnCampos.value = ""
+			hdnDM.value = ""
+			hdnWhere.value = ""
+			//document.forms[0].item(8).value = ""
+			//document.forms[0].item(9).value = ""
+			//document.forms[0].item(10).value = ""
+			//document.forms[0].item(11).value = ""
+			AdicionarItensDefault(objXml)
+	}	
+	AddFiltrosDefault()	
+}
+
+//Envia para tela que detalha o pedido
+function DetalharItem(dblSolId)
+{
+	with (document.forms[0])
+	{
+		hdnSolId.value = dblSolId
+		hdnAcao.value = "DetalheSolicitacao"
+		target = "DetalheSolic"
+		action = "ConsultaGeralDet.asp"
+		submit()
+	}	
+}
+
+//Adiciona itens default para o combo de campos selecionados
+function AdicionarItensDefault(objXml)
+{
+	var objNode = objXml.selectNodes("//xDados/*")
+	with (document.forms[0]){
+		for(var intIndex = 0 ; intIndex<objNode.length; intIndex++){
+			//Carrega opções do combo text/value
+			if (objNode[intIndex].text != ""){
+				if (RequestNode(objXmlGeral,objNode[intIndex].nodeName) == ""){
+					var option_combo = new Option(objNode[intIndex].text,objNode[intIndex].nodeName)
+					var option_combo1 = new Option(objNode[intIndex].text,objNode[intIndex].nodeName)
+					cboCamposSel.options[cboCamposSel.length] = option_combo
+					cboOrderBy.options[cboOrderBy.length] = option_combo1
+					AdicionarNode(objXmlGeral,objNode[intIndex].nodeName,objNode[intIndex].nodeName)
+				}	
+			}	
+		}
+	}	
+}
+
+function AddFiltrosDefault()
+{
+	var strHtml = new String("")
+	var blnAchou = false
+	var blnCamposSel = false
+	var objAtyTipo
+	var strTipo
+	var strValida
+	var strMaxLen
+	var strValidaIII
+
+	with (document.forms[0])
+	{
+		for(var intIndex=0;intIndex<objAryFiltroDef.length;intIndex++)
+		{
+			if (objAryFiltroDef[intIndex].toUpperCase() == "Cla_Pedido.NumerodoPedido-A-".toUpperCase())
+			{
+				if (!VerificarFluxo(objAryFiltroDef[intIndex].toUpperCase()))
+				{
+					var strNomeSpan =  "spn"+Math.round(Math.random()*100000)
+					strHtml += "<span id='"+strNomeSpan+"'>"
+					strHtml += "<table border=0 width=100% cellspacing=1 cellpadding=0><tr class=clsSilver><td width=200px >" + cboCamposSel[intIndex].text + "</td><td><input type=text size=20 class=text name='" + objAryFiltroDef[intIndex].toUpperCase() +"' value='DM-'  onBlur='AddValorDM(this)' >"
+					strHtml += "<input type=button class=button onmouseover=\"showtip(this,event,\'Remover Filtro\') \" style=\'width:15px;BORDER-LEFT-STYLE: none\' name='btnRem"+intIndex+"' value='X' onclick=\"RemoverFiltro('"+strNomeSpan+"','"+objAryFiltroDef[intIndex].toUpperCase()+"')\" >"
+					strHtml += "&nbsp;DM-NNNNN/ANO</td></tr></table></span>"
+					objAryFiltro[parseInt(objAryFiltro.length+1)] = objAryFiltroDef[intIndex].toUpperCase()
+					blnCamposSel = true
+				}
+				else
+				{
+					blnAchou = true
+				}	
+			}
+			else
+			{
+				if (!VerificarFluxo(objAryFiltroDef[intIndex].toUpperCase()))
+				{
+					
+					objAtyTipo = objAryFiltroDef[intIndex].split('-')
+					strValida = ""
+					strTipo = ""
+					strMaxLen = ""
+					strValidaII = "validarEncode(this)"
+					strValidaIII = ""
+					switch (objAtyTipo[1])
+					{
+						case "D":
+							strTipo = "(dd/mm/aaaa)"
+							strValida = 'OnlyNumbers();AdicionaBarraData(this)'
+							strValidaII = 'if (!ValidarTipoInfo(this,1,"'+cboCamposSel[intIndex].text+'")){this.focus()}'
+							strMaxLen = " maxlength=10 "
+							break
+						case "N":	
+							strValidaIII = 'ValidarTipo(this,0);'
+							break
+					}
+
+					var strNomeSpan =  "spn"+Math.round(Math.random()*100000)
+					strHtml += "<span id='"+strNomeSpan+"'>"
+					strHtml += "<table border=0 width=100% cellspacing=1 cellpadding=0><tr class=clsSilver><td width=200px >"+cboCamposSel[intIndex].text+"</td><td>"
+					strHtml += "<input type=text class=text size=20 "+strMaxLen+" name='"+objAryFiltroDef[intIndex].toUpperCase()+"' onKeyPress=\'"+strValida+"\' onBlur=\'"+strValidaII+"\' onKeyUp=\'"+strValidaIII+"\' >"
+					strHtml += "<input type=button class=button onmouseover=\"showtip(this,event,\'Remover Filtro\') \" style=\'width:15px;BORDER-LEFT-STYLE: none\' name='btnRem"+intIndex+"' value='X' onclick=\"RemoverFiltro('"+strNomeSpan+"','"+objAryFiltroDef[intIndex].toUpperCase()+"')\" >"
+					strHtml += "&nbsp;"+strTipo+"</td></tr></table>"
+					strHtml += "</span>"
+					objAryFiltro[parseInt(objAryFiltro.length)] = objAryFiltroDef[intIndex].toUpperCase()
+					blnCamposSel = true
+				}
+				else
+				{
+					blnAchou = true
+				}	
+			}	
+		}	
+	}	
+	spnFiltro.innerHTML += strHtml
+}
+
+
+function ValidaSelecao(campo){
+
+	with (document.forms[0])
+		{
+			try{
+			for (var i = 0 ; i < cboCamposSel.length; i++  ){
+				if (campo == cboCamposSel[i].value)	return false
+			}
+			return true 
+			}
+			catch(e){
+				alert(e.description)
+			}
+		}
+}
+
+
+function htmlEncode(str) {
+	var div = document.createElement('div');
+	div.appendChild(document.createTextNode(str));
+	return div.innerHTML;
+}
+
+function validarEncode(inputElem) {
+	original = inputElem.value;
+	codificado = htmlEncode(original);
+	if (original.length !== codificado.length) {
+		alert("Valor inválido no campo!")
+		inputElem.value = ""
+		return false
+	} else {
+		codificado = LimparTextoSql(original);
+		if (original.length !== codificado.length) {
+			alert("Valor inválido no campo!")
+			inputElem.value = ""
+			return false
+		} else {
+			inputElem.value = codificado
+		}
+	}
+	return true
+}
+
+function LimparTextoSql(str) {
+	str = str.replace(/^\s+|\s+$/g, ""); // Trim
+	str = str.toLowerCase(); // Convert to lowercase
+	str = str.replace(/=/g, "");
+	str = str.replace(/'/g, "");
+	str = str.replace(/""/g, "");
+	str = str.replace(/ or /g, "");
+	str = str.replace(/ and /g, "");
+	str = str.replace(/\(/g, "");
+	str = str.replace(/\)/g, "");
+	str = str.replace(/</g, "");
+	str = str.replace(/>/g, "");
+	str = str.replace(/update/g, "");
+	str = str.replace(/-shutdown/g, "");
+	str = str.replace(/--/g, "");
+	str = str.replace(/#/g, "");
+	str = str.replace(/\$/g, "");
+	str = str.replace(/%/g, "");
+	str = str.replace(/¨/g, "");
+	str = str.replace(/&/g, "");
+	str = str.replace(/'or'1'='1'/g, "");
+	str = str.replace(/insert/g, "");
+	str = str.replace(/drop/g, "");
+	str = str.replace(/delete/g, "");
+	str = str.replace(/xp_/g, "");
+	str = str.replace(/select/g, "");
+	str = str.replace(/\*/g, "");
+	str = str.replace(/http/g, "");
+	str = str.replace(/:/g, "");
+	//str = str.replace(/\//g, "");
+	str = str.toUpperCase(); // Convert to UpperCase
+	return str;
+}
