@@ -1,0 +1,2034 @@
+<!--#include file="../inc/data.asp"-->
+<!--#include file="../inc/xmlAcessos.asp"-->
+<!--#include file="../inc/EnviarRetornoSolic_Apg.asp"-->
+<!--#include file="../inc/EnviarEntregarAprov.asp"-->
+
+
+<%
+'•IMPLEMENT SOFT - IMPLEMENTAÇÕES E SOLUÇÕES EM INFORMÁTICA
+'	- Sistema			: CLA
+'	- Arquivo			: ProcessoSolic.asp
+'	- Descrição			: Funções que atende a Gravação/Alteração da solicitação
+
+'Retira Chr(10) e Chr(13) do objeto xml para enviar p/ o JS/SQL
+Function FormatarXml(objXml)
+
+	Dim strXmlDadosAux
+	'Retira a quebra de linha que tem no final XML e passa para a variável que vai para o HTML
+	strXmlDadosAux = Replace(objXml.xml,Chr(13),"")
+	strXmlDadosAux = Replace(strXmlDadosAux,Chr(10),"")
+
+	FormatarXml = strXmlDadosAux
+End Function
+
+Function indexPropAcesso(strProp)
+	Select Case strProp
+		Case "TER"
+			indexPropAcesso = 0
+		Case "EBT"
+			indexPropAcesso = 1
+		Case "CLI"
+			indexPropAcesso = 2
+	End Select
+End Function
+
+'Adiciona um Node a um objeto XML se existir atualiza
+Function AdicionarNode(strNomeNode,objXML,varValorNode)
+
+	Dim objNodeFilho
+	Dim objNodeList
+
+    If objXML.xml = "" Then
+	   objXML.loadXML "<xmlDados></xmlDados>"
+	End If
+
+	'Verifica se já existe
+	Set objNodeList = objXml.selectNodes("*/" & strNomeNode)
+
+	if objNodeList.Length = 0 then
+		'Cria
+		Set objNodeFilho = objXML.createNode("element", strNomeNode, "")
+		objNodeFilho.text = varValorNode
+		objXML.documentElement.appendChild (objNodeFilho)
+	Else
+		'Atualiza
+		objNodeList.Item(0).Text = varValorNode
+	End If
+
+	Set AdicionarNode = objXML
+
+End Function
+
+Dim objXmlDadosForm
+Set objXmlDadosForm = Server.CreateObject("Microsoft.XMLDOM")
+
+Function EnviarRetornoSolicitacao(dblIdLogico, IdInterfaceAPG, dblSolId)
+
+		x = EnviarRetornoSolic_Apg(dblIdLogico, IdInterfaceAPG, dblSolId)
+
+		strDt_Solic = right("0" & day(now),2) & "/" & right("0" & month(now),2) & "/" & year(now)
+
+	    Vetor_Campos(1)="adWChar,10,adParamInput, " & trim(IdInterfaceAPG)
+		Vetor_Campos(2)="adWChar,10,adParamInput, " & trim(dblSolId)
+		Vetor_Campos(3)="adWChar,10,adParamInput, " & trim(dblIdLogico)
+		Vetor_Campos(4)="adWChar,10,adParamInput, "  & trim(strDt_Solic)
+		Vetor_Campos(5)="adInteger,4,adParamOutput,0 "
+
+		Call APENDA_PARAM("CLA_sp_upd_AtualizaInterfaceAPG",5,Vetor_Campos)
+
+
+		ObjCmd.Execute'pega dbaction
+		DBAction = ObjCmd.Parameters("RET").value
+		
+
+		''Tratar erro
+		If DBAction <> "1" Then
+
+			Response.Write "<script language=javascript>alert('Erro na Proc: " & DBAction & "');</script>"
+
+			StrDescErro = "Erro ao atualizar os dados da Interface (Solid, IDLogico, Data Ativação) "
+			StrDescErro = strDescErro & strDt_Solic &  "," & IdInterfaceAPG & " , " & dblSolId &","& dblIdLogico
+
+
+		    Vetor_Campos(1)="adInteger,4,adParamInput," & dblSolid			 'Solicitação
+			Vetor_Campos(2)="adInteger,4,adParamInput," & IdInterfaceAPG	 'Identificação do APG
+			Vetor_Campos(3)="adInteger,4,adParamInput," & dblIdLogico		 'ID Logico
+			Vetor_Campos(4)="adWChar,255,adParamInput," & StrDescErro		 'Descrição do Erro
+			Vetor_Campos(5)="adInteger,4,adParamOutput,0"
+
+			Call APENDA_PARAM("CLA_sp_ins_ErrosInterfaceAPG",5,Vetor_Campos)
+
+			ObjCmd.Execute'pega dbaction
+			DBAction = ObjCmd.Parameters("RET").value
+
+		End If
+end function
+
+
+'Gravar solicitação de acesso
+Function GravarSolicitacao(intTipoProc,intTipoProcAlt)
+
+	Dim objXmlDadosDB
+	Dim objAcesso
+	Dim strIdLogico
+	Dim dblSolId
+	Dim pi
+	Dim IdInterfaceAPG
+	Dim strOrigemAPG
+
+	Set objXmlDadosDB = Server.CreateObject("Microsoft.XMLDOM")
+	Set doc = Server.CreateObject("Microsoft.XMLDOM")
+	
+	if intTipoProc = 1 then
+		'Recupera dados do xml da página anterior
+		If Trim(Request.Form("hdnXml")) <> "" Then
+			objXmlDadosForm.preserveWhiteSpace = True
+			objXmlDadosForm.loadXML(Request.Form("hdnXml"))
+		Else
+			Response.Write "<script language=javascript>alert('Informações do Acesso são Obrigatórias');</script>"
+			Response.End
+		End If
+	End if
+
+	strOrigemAPG = Request.Form("hdnOrigem")
+	strOrigem = Request.Form("hdnOrigem")
+	if Trim(Request("hdnAntAcesso")) =  "N" and not ( strOrigem = "Aprov" or strOrigem = "APG") then
+	
+		codServico				= Request.Form("hdnCboServico")
+		designacaoServico		= Request.Form("hdnDesigServ")
+		
+		Servico = Split(codServico, ",", -1, 1)
+		codServico = servico(0)
+		
+		'response.write "<script>alert('"&codServico&"')</script>"
+		
+		call validarDesignacao(codServico, designacaoServico , "1")
+	
+	end if 
+
+	Set objXmlDadosForm  = AdicionarNode("intTipoProc",objXmlDadosForm,intTipoProc)
+	''Set objXmlDadosForm  = AdicionarNode("hdnPossuiGeren",objXmlDadosForm,Request.Form("hdnPossuiGeren"))
+
+	if Trim(intTipoProcAlt) <> "" then
+		Set objXmlDadosForm  = AdicionarNode("intTipoProcAlt",objXmlDadosForm,intTipoProcAlt)
+	End if
+	
+	dblSolId	= Request.Form("hdnSolId")
+	dblIdLogico	= Request.Form("hdnIdAcessoLogico")
+	IdInterfaceAPG = Request.Form("hdnIdInterfaceAPG")
+	
+	objXmlDadosDB.loadXml("<xDados/>")
+	
+	if dblIdLogico <> "" then
+		Vetor_Campos(1)="adInteger,4,adParamInput,"
+		Vetor_Campos(2)="adInteger,4,adParamInput,"
+		Vetor_Campos(3)="adInteger,4,adParamInput," & dblIdLogico
+		strSqlRet = APENDA_PARAMSTRSQL("CLA_SP_VIEW_PONTO",3,Vetor_Campos)
+		
+		Set objDicProp = Server.CreateObject("Scripting.Dictionary")
+
+		'Response.Write strSqlRet
+		Set objRSFis = db.Execute(strSqlRet)
+		if Not objRSFis.EOF and not objRSFis.BOF then
+			Set objXmlDadosDB = MontarXmlAcesso(objXmlDadosDB,objRSFis,"")
+		End if
+	End if
+	
+
+	'Salva no disco ...Temporário
+	objXmlDadosForm.save(Server.MapPath("form.xml"))
+	objXmlDadosDB.save(Server.MapPath("DadosDB.xml"))
+
+    strXml = "<?xml version='1.0' encoding='ISO-8859-1'?>" & objXmlDadosForm.xml
+	strXmlDataBase = "<?xml version='1.0' encoding='ISO-8859-1'?>" & objXmlDadosDB.xml
+
+	'Response.Write " objXmlDadosForm: " & strXml
+	'Response.Write " strXmlDataBase: " & strXmlDataBase
+
+	Vetor_Campos(1)="adlongvarchar," & len(strXml)& ",adParamInput," & strXml
+	Vetor_Campos(2)="adlongvarchar," & len(strXmlDataBase)& ",adParamInput," & strXmlDataBase
+
+	strSqlRet = APENDA_PARAMSTR("CLA_sp_ins_solicitacaoAtivacao",2,Vetor_Campos)
+	
+	strXml =  ForXMLAutoQuery(strSqlRet)
+	
+
+	
+	
+
+
+	
+	objXmlDadosForm.loadXml(strXml)
+	Set objNode = objXmlDadosForm.selectNodes("//CLA_RetornoTmp[@Msg_Id=155]")
+	
+	if objNode.length > 0 then
+		
+		dblSolId = objNode(0).attributes(2).value
+
+		If not isnull(IdInterfaceAPG) and IdInterfaceAPG <> "0" and IdInterfaceAPG <> "" then
+			
+			Set objNode = objXmlDadosForm.selectNodes("//CLA_RetornoTmp[@Msg_Id=154]")
+			if objNode.length > 0 then
+				dblIdLogico = objNode(0).attributes(2).value
+			end if
+			
+			strOrigemAPG = Request.Form("hdnOrigem")
+			if strOrigemAPG = "APG" then	
+				x = EnviarRetornoSolicitacao(dblIdLogico, IdInterfaceAPG, dblSolId)	
+			End if
+			
+			if(blnPossuiAvaliador = "0" or blnPossuiAvaliador = "") Then
+				
+				Set objRSPed = db.Execute("CLA_Sp_Sel_PedidoSolicitacao " & dblSolId)
+
+				If Not objRSPed.Eof and Not objRSPed.Bof Then
+					IntPed_ID = objRSPed("Ped_Id")
+				Else
+					IntPed_ID = "0"
+				End If
+
+			 End If 
+
+			
+		End If
+		' Nova Implemntacao Acesso
+		if strOrigem = "Aprov" then	
+			Set objNode = objXmlDadosForm.selectNodes("//CLA_RetornoTmp[@Msg_Id=154]")
+			if objNode.length > 0 then
+				 dblIdLogico = objNode(0).attributes(2).value
+				 Set objRSMisto = db.Execute("select top 1 sts.sol_id from cla_solicitacao sol inner join cla_statussolicitacao sts on sol.stssol_id = sts.stssol_id where sts.sts_id = 38 and Acl_IDAcessoLogico = " & dblIdLogico )
+			     If Not objRSMisto.eof and  not objRSMisto.Bof Then
+				   dblsol_id = objRSMisto("sol_id")
+				 End if
+				 
+				 OrigemSol_ID = Request("hdnOriSol_ID")
+				 Aprovisi_ID = Request("hdnAprovisi_ID")
+				'Só enviar o construir quando todos estiverem construídos.
+				 if (  isnull(dblsol_id) or dblsol_id = "" ) then
+					EnviarEntregarAprov(dblIdLogico)
+					
+					''' Retirada da interface que trata o paralelismo do SGAPlus na fase tratar acesso
+					''' Solicitação de CTERESA conforme email 
+					''' Assunto : Não paralelismo da fase Tratar Acesso com Configuração
+					''' Data: 04/05/2010 
+					''' Inicio
+										
+					
+					
+					'''if OrigemSol_ID = "6" then 
+					'''	Set objRSAprovisi = db.Execute("select ID_Tarefa, Sol_id from cla_aprovisionador where aprovisi_id = " & Aprovisi_ID)
+					'''	If Not objRSAprovisi.eof and  not objRSAprovisi.Bof Then
+					'''   		ID_Tarefa = objRSAprovisi("ID_Tarefa")
+					'''		dblsol_id = objRSAprovisi("Sol_id")
+					''' 	End if
+					'''	Set objRS = db.Execute("select top 1 CONVERT(char(7), convert(char(4), isnull(est.cid_sigla,'')) + ''+ convert(char(3), isnull(est.esc_sigla,'')) )as estacao , acf.acf_proprietario from cla_acessologico acl inner join cla_estacao est on acl.esc_idconfiguracao = est.esc_id inner join cla_acessologicofisico alf  on acl.acl_idacessologico = alf.acl_idacessologico inner join cla_Acessofisico	acf    on alf.acf_id = acf.acf_id where acl.acl_idacessologico = " & dblIdLogico)
+					'''	If Not objRS.eof and  not objRS.Bof Then
+					'''   		estacao = objRS("estacao")
+					'''		propAcesso = objRS("acf_proprietario")
+					'''		Interface_Solicitar_Return ID_Tarefa,OrigemSol_ID,estacao,propAcesso,dblIdLogico,dblsol_id,Aprovisi_ID
+					''' 	End if
+					'''end if
+					
+					''' Retirada da interface que trata o paralelismo do SGAPlus na fase tratar acesso
+					''' Solicitação de CTERESA conforme email 
+					''' Assunto : Não paralelismo da fase Tratar Acesso com Configuração
+					''' Data: 04/05/2010 
+					''' Fim
+					
+					
+					
+				 else
+				    ' Controle de status
+					Set objRSAprovisi = db.Execute("select ID_Tarefa from cla_aprovisionador where aprovisi_id = " & Aprovisi_ID)
+					If Not objRSAprovisi.eof and  not objRSAprovisi.Bof Then
+				   		ID_Tarefa = objRSAprovisi("ID_Tarefa")
+				 	End if
+					
+					Interface_Status_Return ID_Tarefa,OrigemSol_ID,"Solicitação iniciada no CLA.",dblIdLogico,dblsol_id,Aprovisi_ID
+					
+					''' Retirada da interface que trata o paralelismo do SGAPlus na fase tratar acesso
+					''' Solicitação de CTERESA conforme email 
+					''' Assunto : Não paralelismo da fase Tratar Acesso com Configuração
+					''' Data: 04/05/2010 
+					''' Inicio
+					
+					
+					'''if OrigemSol_ID = "6" then 
+					'''	Set objRS = db.Execute("select top 1 CONVERT(char(7), convert(char(4), isnull(est.cid_sigla,'')) + ''+ convert(char(3), isnull(est.esc_sigla,'')) )as estacao , acf.acf_proprietario from cla_acessologico acl inner join cla_estacao est on acl.esc_idconfiguracao = est.esc_id inner join cla_acessologicofisico alf  on acl.acl_idacessologico = alf.acl_idacessologico inner join cla_Acessofisico	acf    on alf.acf_id = acf.acf_id where acl.acl_idacessologico = " & dblIdLogico)
+					'''	If Not objRS.eof and  not objRS.Bof Then
+					'''   		estacao = objRS("estacao")
+					'''		propAcesso = objRS("acf_proprietario")
+					'''		Interface_Solicitar_Return ID_Tarefa,OrigemSol_ID,estacao,propAcesso,dblIdLogico,dblsol_id,Aprovisi_ID
+					''' 	End if
+					'''end if
+					
+					''' Retirada da interface que trata o paralelismo do SGAPlus na fase tratar acesso
+					''' Solicitação de CTERESA conforme email 
+					''' Assunto : Não paralelismo da fase Tratar Acesso com Configuração
+					''' Data: 04/05/2010 
+					''' Fim
+					
+				 end if
+			     
+			end if
+		End if
+		
+	End if
+	'Set objNode = objXmlDadosForm.selectNodes("//CLA_RetornoTmp[@Msg_Id=175]")
+	
+	
+	Set objNodeAlt = objXmlDadosForm.selectNodes("//CLA_RetornoTmp[@Msg_Id=175]")
+	
+	if objNodeAlt.length > 0 and strOrigem = "Aprov" then
+		EnviarEntregarAprov dblIdLogico	
+	end if
+	
+	Response.Write "<script language=javascript>var objXmlRet = new ActiveXObject(""Microsoft.XMLDOM"");objXmlRet.loadXML('" & strXml &"');parent.Message(objXmlRet);</script>"
+	
+	if intTipoProc <> 3 then
+		if dblSolId = "" then dblSolId = Request.Form("hdnSolId")
+		if dblSolId <> "" then	Call EnviarEmailAlteracaoStatus(dblSolId,0,"")
+	Else
+		if intTipoProcAlt = 1 then
+			if dblSolId = "" then dblSolId = Request.Form("hdnSolId")
+			if dblSolId <> "" then	Call EnviarEmailAlteracaoStatus(dblSolId,0,"")
+		End if
+	End if
+
+	%><script>
+	  //PRSS - 05/01/2006
+	  //Habilita o botão GRAVAR da página solicitacao.asp
+	  //parent.parent.document.Form3.btnGravar.disabled=false;
+	  </script>
+	<%
+
+	Set objXmlDadosForm = Nothing
+
+End Function
+
+'Alteração Aline 
+'Rotina : AprovarAcesso
+'Descrição: ---------------
+'Data 21/09/2006
+'Aprovar Acesso - Grava solicitação de Acesso e passa para próxima fase
+Function AprovarAcesso()
+	
+    dblSolId = Trim(Request.Form("hdnSolID"))
+
+	'Seleciona quais são os pedidos da solicitação
+	Set objRSPed = db.Execute("CLA_Sp_Sel_PedidoSolicitacao " & dblSolId)
+
+	if Not objRSPed.eof Then
+
+		IntPed_ID = objRSPed("Ped_ID")
+		StrPossuiAvaliador = objRSPed("PossuiAvaliador")
+		strDtDevolucaoGIC = objRSPed("DtDevolucaoGIC")
+
+	Else
+
+		IntPed_ID = ""
+		StrPossuiAvaliador = "0"
+		strDtDevolucaoGIC = ""
+
+	End If
+	
+	'Atualiza o status da solicitacao
+	Vetor_Campos(1)="adInteger,4,adParamInput," & dblSolId
+	Vetor_Campos(2)="adInteger,4,adParamInput,38"
+	Vetor_Campos(3)="adWChar,30,adParamInput,"  & Trim(strLoginRede)
+	Vetor_Campos(4)="adDate,10,adParamInput,"
+	Vetor_Campos(5)="adWChar,300,adParamInput," & "STATUS AUTOMATICO"
+	Vetor_Campos(6)="adWChar,1,adParamInput,M" 'Status detalhado
+	Vetor_Campos(7)="adInteger,2,adParamOutput,0"
+	Vetor_Campos(8)="adInteger,2,adParamInput, " & IntPed_ID 'Trim(Request.Form("hdnPedId"))
+
+	Call APENDA_PARAM("CLA_sp_ins_StatusSolicitacao",8,Vetor_Campos)
+
+	ObjCmd.Execute'pega dbaction
+	DBAction = ObjCmd.Parameters("RET").value
+	
+	if DBAction = 1 then
+			'Response.Write "<script language=javascript>alert('Motivo da pedência gravado com sucesso.')</script>"
+			'Response.Write "<script language=javascript>parent.IFrmLista.location.href = 'ProcessoMotivoPendencia.asp?strAcao=ResgatarLista&dblSolId=" & Request.Form("hdnSolId") & "&dblPedId=" & Request.Form("hdnPedId") & "'</script>"
+			Call EnviarEmailAlteracaoStatus(dblSolId,38, "Solicitação Aprovada pelo Avaliador")
+	Else
+			Response.Write "<script language=javascript>alert('Não foi possível enviar email.')</script>"
+			Response.End
+	End if
+
+
+	'Atualiza as datas para o avaliador passar de fase
+	Vetor_Campos(1)="adInteger,4,adParamInput," & dblSolId
+	Vetor_Campos(2)="adWChar,1,adParamInput,N"  'Atualiza Data Inicio Avaliacao (S/N)
+	Vetor_Campos(3)="adWChar,1,adParamInput,S"  'Atualiza Data Fim Avaliacao (S/N)
+	Vetor_Campos(4)="adWChar,1,adParamInput,N"  'Atualiza Data Devolução p/ GIC. Caso S, atualiza com data atual. Caso "N", a data é removida(Null).
+	Vetor_Campos(5)="adInteger,4,adParamOutput,0"
+
+	Call APENDA_PARAM("CLA_sp_upd_Avaliacao",5,Vetor_Campos)
+
+	ObjCmd.Execute'pega dbaction
+	DBAction = ObjCmd.Parameters("RET").value
+
+	if DBAction <> 0 then
+		Response.Write "<script language=javascript>parent.resposta(" & Cint("0" & DBAction) & ",'');</script>"
+		Response.End
+	End If
+
+	Set objRSPed = db.Execute("CLA_Sp_Sel_PedidoSolicitacao " & dblSolId)
+
+	if Not objRSPed.eof Then
+
+		IntPed_ID = objRSPed("Ped_ID")
+
+	Else
+
+		IntPed_ID = ""
+
+	End If
+
+	Vetor_Campos(1)="adInteger,4,adParamInput," & dblSolId
+	Vetor_Campos(2)="adInteger,4,adParamInput,201"
+	Vetor_Campos(3)="adWChar,30,adParamInput,"  & Trim(strLoginRede)
+	Vetor_Campos(4)="adDate,10,adParamInput,"
+	Vetor_Campos(5)="adWChar,300,adParamInput," & "Solicitação Aprovada pelo Avaliador"
+	Vetor_Campos(6)="adWChar,1,adParamInput,D" 'Status detalhado
+	Vetor_Campos(7)="adInteger,2,adParamOutput,0"
+	Vetor_Campos(8)="adInteger,2,adParamInput, " & IntPed_ID ''Trim(Request.Form("hdnPedId"))
+
+	Call APENDA_PARAM("CLA_sp_ins_StatusSolicitacao",8,Vetor_Campos)
+
+	ObjCmd.Execute'pega dbaction
+	DBAction = ObjCmd.Parameters("RET").value
+
+
+	Vetor_Campos(1)="adInteger,4,adParamInput," & dblSolId
+	Vetor_Campos(2)="adInteger,4,adParamInput,38"
+	Vetor_Campos(3)="adWChar,30,adParamInput,"  & Trim(strLoginRede)
+	Vetor_Campos(4)="adDate,10,adParamInput,"
+	Vetor_Campos(5)="adWChar,300,adParamInput," & "Solicitação Aprovada pelo Avaliador"
+	Vetor_Campos(6)="adWChar,1,adParamInput,M" 'Status detalhado
+	Vetor_Campos(7)="adInteger,2,adParamOutput,0"
+	Vetor_Campos(8)="adInteger,2,adParamInput, " & IntPed_ID 'Trim(Request.Form("hdnPedId"))
+
+	Call APENDA_PARAM("CLA_sp_ins_StatusSolicitacao",8,Vetor_Campos)
+
+	ObjCmd.Execute'pega dbaction
+	DBAction = ObjCmd.Parameters("RET").value
+
+	if DBAction = 1 then
+
+			'Response.Write "<script language=javascript>alert('Motivo da pedência gravado com sucesso.')</script>"
+			'Response.Write "<script language=javascript>parent.IFrmLista.location.href = 'ProcessoMotivoPendencia.asp?strAcao=ResgatarLista&dblSolId=" & Request.Form("hdnSolId") & "&dblPedId=" & Request.Form("hdnPedId") & "'</script>"
+			Call EnviarEmailAlteracaoStatus(dblSolId, 201, "Solicitação Aprovada pelo Avaliador")
+
+
+			''@@Davif - Caso haja Avaliação do Acesso, Enviar dados atuais ao APG
+			x = EnviarRetornoSolic_Apg(dblIdLogico, IdInterfaceAPG, dblSolId)
+			
+	Else
+			Response.Write "<script language=javascript>alert('Não foi possível finalizar avaliação.')</script>"
+			Response.End
+	End if
+
+	Response.Write "<script language=javascript>alert('Avaliação Concluída ...');window.location.replace('gerenciamento_main.asp');</script>"
+
+	on error resume next
+	if err.number <> 0 then
+		Response.Write "<script language=javascript>alert('" & err.Description & "');</script>"
+	end if
+
+End Function
+
+
+
+Function DevolverAcesso()
+
+	dblSolId = Request.Form("hdnSolId")
+
+    Vetor_Campos(1)="adInteger,4,adParamInput," & dblSolId
+	Vetor_Campos(2)="adWChar,1,adParamInput,N"  'Atualiza Data Inicio Avaliacao (S/N)
+	Vetor_Campos(3)="adWChar,1,adParamInput,N"  'Atualiza Data Fim Avaliacao (S/N)
+	Vetor_Campos(4)="adWChar,1,adParamInput,S"  'Atualiza Data Devolução p/ GIC (S/N)
+	Vetor_Campos(5)="adInteger,4,adParamOutput,0"
+
+	Call APENDA_PARAM("CLA_sp_upd_Avaliacao",5,Vetor_Campos)
+
+	ObjCmd.Execute'pega dbaction
+	DBAction = ObjCmd.Parameters("RET").value
+
+	if DBAction <> 0 then
+		Response.Write "<script language=javascript>parent.resposta(" & Cint("0" & DBAction) & ",'');</script>"
+		Response.End
+	End If
+
+	Set objRSPed = db.Execute("CLA_Sp_Sel_PedidoSolicitacao " & dblSolId)
+
+	if Not objRSPed.eof  Then
+
+		IntPed_ID = objRSPed("Ped_ID")
+
+	Else
+
+		IntPed_ID = ""
+
+	End If
+
+
+	Call EnviarEmailAlteracaoStatus(dblSolId, 204, "Solicitação Devolvida ao GIC pelo Avaliador")
+	
+	Vetor_Campos(1)="adInteger,4,adParamInput," & dblSolId
+	Vetor_Campos(2)="adInteger,4,adParamInput,204"
+	Vetor_Campos(3)="adWChar,30,adParamInput,"  & Trim(strLoginRede)
+	Vetor_Campos(4)="adDate,10,adParamInput,"
+	Vetor_Campos(5)="adWChar,300,adParamInput," & "Solicitação Devolvida ao GIC"
+	Vetor_Campos(6)="adWChar,1,adParamInput,M" 'Status detalhado
+	Vetor_Campos(7)="adInteger,2,adParamOutput,0"
+	Vetor_Campos(8)="adInteger,2,adParamInput, " & intPed_ID 'Trim(Request.Form("hdnPedId"))
+
+	Call APENDA_PARAM("CLA_sp_ins_StatusSolicitacao",8,Vetor_Campos)
+
+	ObjCmd.Execute'pega dbaction
+	DBAction = ObjCmd.Parameters("RET").value
+
+	Vetor_Campos(1)="adInteger,4,adParamInput," & dblSolId
+	Vetor_Campos(2)="adInteger,4,adParamInput,185"
+	Vetor_Campos(3)="adWChar,30,adParamInput,"  & Trim(strLoginRede)
+	Vetor_Campos(4)="adDate,10,adParamInput,"
+	Vetor_Campos(5)="adWChar,300,adParamInput," & "Solicitação Devolvida ao GIC"
+	Vetor_Campos(6)="adWChar,1,adParamInput,D" 'Status detalhado
+	Vetor_Campos(7)="adInteger,2,adParamOutput,0"
+	Vetor_Campos(8)="adInteger,2,adParamInput, " & intPed_ID 'Trim(Request.Form("hdnPedId"))
+
+	Call APENDA_PARAM("CLA_sp_ins_StatusSolicitacao",8,Vetor_Campos)
+
+	ObjCmd.Execute'pega dbaction
+	DBAction = ObjCmd.Parameters("RET").value
+
+	if DBAction = 1 then
+
+			''Response.Write "<script language=javascript>alert('Avaliação Devolvida com Sucesso ... ');</script>"
+			Response.Write "<script language=javascript>alert('Avaliação Devolvida com Sucesso');window.location.replace('gerenciamento_main.asp');</script>"
+
+	Else
+
+			Response.Write "<script language=javascript>alert('Não foi possível gravar o motivo da pendência.')</script>"
+			Response.End
+
+	End if
+
+
+
+End Function
+
+'Alteração Aline 
+'Rotina : AlterarInfoAcesso
+'Descrição: ---------------
+'Data 21/09/2006
+'Gravar Alteração de solicitação de acesso
+Function AlterarInfoAcesso(intTipoProc,intTipoProcAlt)
+
+	Dim objXmlDados
+	Dim objAcesso
+	Dim strIdLogico
+	Dim dblSolId
+	Dim pi
+	Dim IntPed_ID
+	dim strtexto
+
+	if Trim(Request("hdnAntAcesso")) =  "N" then
+	
+		codServico				= Request.Form("hdnCboServico")
+		designacaoServico		= Request.Form("hdnDesigServ")
+		
+		Servico = Split(codServico, ",", -1, 1)
+		codServico = servico(0)
+		
+		call validarDesignacao(codServico, designacaoServico , "1")
+	
+	end if 
+
+	Set objXmlDados = Server.CreateObject("Microsoft.XMLDOM")
+          
+	'Recupera dados do xml da página anterior
+	If Trim(Request.Form("hdnXml")) <> "" Then		
+		objXmlDados.loadXML(Request.Form("hdnXml"))
+	Else
+		Response.Write "<script language=javascript>alert('Informações do Acesso são Obrigatórias');</script>"
+		Response.End
+	End If
+	
+	Set objXmlDados  = AdicionarNode("intTipoProc",objXmlDados,intTipoProc)
+	if Trim(intTipoProcAlt) <> "" then
+		Set objXmlDados  = AdicionarNode("intTipoProcAlt",objXmlDados,intTipoProcAlt)
+	End if
+	'Salva no disco ...Temporário
+	objXmlDados.save(Server.MapPath("xmlAcessos.xml"))
+on error resume next
+
+	strXml = "<?xml version='1.0' encoding='ISO-8859-1'?>" & objXmlDados.xml
+	objXmlDados.save(server.MapPath("xmlavaliacao.xml"))
+	
+	Vetor_Campos(1)="adlongvarchar," & len(strXml)& ",adParamInput," & strXml
+	strSqlRet = APENDA_PARAMSTR("CLA_sp_upd_solicitacaoAlteraAvaliador",1,Vetor_Campos)
+
+	strXml =  ForXMLAutoQuery(strSqlRet)
+
+	if err.number <> 0 then
+		Response.Write "<script language=javascript>alert('" & err.Description & "');</script>"
+	end if
+
+	Response.Write "<script language=javascript>var objXmlRet = new ActiveXObject(""Microsoft.XMLDOM"");objXmlRet.loadXML('" & strXml &"');parent.Message(objXmlRet);</script>"
+	
+	dblSolId = Trim(Request.Form("hdnSolID"))
+        
+	'Response.Write "<script language=javascript>alert('Alteração:" & dblSolId & "');</script>"
+	
+ 	
+	Set objRSPed = db.Execute("CLA_Sp_Sel_PedidoSolicitacao " & dblSolId)
+
+	if Not objRSPed.eof Then
+
+		IntPed_ID = objRSPed("Ped_ID")
+		StrPossuiAvaliador = objRSPed("PossuiAvaliador")
+		strDtDevolucaoGIC = objRSPed("DtDevolucaoGIC")
+
+	Else
+
+		IntPed_ID = ""
+		StrPossuiAvaliador = "0"
+		strDtDevolucaoGIC = ""
+
+	End If
+
+
+	If StrPossuiAvaliador = "1" then ' and not isnull(strDtDevolucaoGIC) Then
+
+		Vetor_Campos(1)="adInteger,4,adParamInput,"	& dblSolId
+		Vetor_Campos(2)="adInteger,4,adParamInput,185" 'Pendente de Avaliação
+		Vetor_Campos(3)="adWChar,30,adParamInput,"	& Trim(strLoginRede)
+		Vetor_Campos(4)="adDate,10,adParamInput,"
+
+		Vetor_Campos(5)="adWChar,300,adParamInput,"	& "Avaliacao OK"
+		Vetor_Campos(6)="adWChar,1,adParamInput,M" 'Status detalhado
+		Vetor_Campos(7)="adInteger,2,adParamOutput,0"
+		Vetor_Campos(8)="adInteger,2,adParamInput, " & IntPed_ID 'Trim(Request.Form("hdnPedId"))
+
+		Call APENDA_PARAM("CLA_sp_ins_StatusSolicitacao",8,Vetor_Campos)
+
+		ObjCmd.Execute'pega	dbaction
+		DBAction = ObjCmd.Parameters("RET").value
+
+		Call EnviarEmailAlteracaoStatus(dblSolId, 185, "Avaliacao OK ")
+
+
+		Vetor_Campos(1)="adInteger,4,adParamInput," & dblSolId
+		Vetor_Campos(2)="adWChar,1,adParamInput,N"  'Atualiza Data Inicio Avaliacao (S/N)
+		Vetor_Campos(3)="adWChar,1,adParamInput,N"  'Atualiza Data Fim Avaliacao (S/N)
+		Vetor_Campos(4)="adWChar,1,adParamInput,N"  'Atualiza Data Devolução p/ GIC (S/N)
+		Vetor_Campos(5)="adInteger,4,adParamOutput,0"
+
+		Call APENDA_PARAM("CLA_sp_upd_Avaliacao",5,Vetor_Campos)
+
+		ObjCmd.Execute'pega dbaction
+		DBAction = ObjCmd.Parameters("RET").value
+
+		if DBAction <> 0 then
+			Response.Write "<script language=javascript>parent.resposta(" & Cint("0" & DBAction) & ",'');</script>"
+			Response.End
+		End If
+
+	End If
+
+	If DBAction <> 1 Then
+		Response.Write "<script language=javascript>parent.resposta(" & Cint("0" & DBAction) & ",'');</script>"		
+		Response.End
+	End If
+
+	If DBAction <> 0 Then	
+		Response.Write "<script language=javascript>parent.resposta(" & Cint("0" & DBAction) & ",'');</script>"				
+		Response.End
+	End If
+	'Response.Write "<script language=javascript>window.location.replace('gerenciamento_main.asp');</script>"
+	
+End Function	
+
+
+
+'@@JKNUP: Nova função.
+Function VerificaRedir()
+	Dim CidSigla
+	Dim PropAcessoFisico
+	Dim CidSiglaPesq
+	Dim strObrigaGla
+	Dim strPossuiAvaliador
+	Dim ObjRSp
+
+
+	CidSigla = Trim(request.form("hdnCNLCliente"))
+	PropAcessoFisico = Trim(request.form("rdoPropAcessoFisico"))
+
+
+	sqlPesq = "CLA_sp_sel_cidadesubcef 0, '"
+	sqlPesq = sqlPesq & trim(CidSigla) & "', 'S'"
+
+	CidSiglaPesq = ""
+
+
+	Set objRSp = db.execute(sqlPesq)
+
+
+	If not ObjRSp.Eof then
+
+			CidSiglaPesq = Trim(objRSp("CidSiglaCef"))
+
+	End if
+
+
+
+	Set objRS = db.execute("CLA_sp_sel_ConfigCtf null,null,'IM'," & CidSiglaPesq)
+
+
+	strObrigaGla = 0
+
+
+	If PropAcessoFisico <> "EBT" Then
+
+		If not objRS.Eof and not objRS.Bof then
+
+			If (objRS("Cfg_RedirecionamentoCarteira")) = 1 then
+
+				strObrigaGla = objRS("Cfg_RedirecionamentoCarteira")
+
+			End If
+
+		End if
+
+	End If
+
+
+	response.write "<script language=javascript>parent.document.Form2.hdnObrigaGla.value="""& Cstr(strObrigaGla) &"""</script>"
+
+
+	strPossuiAvaliador = 0
+
+	if not objRS.Eof and not objRS.Bof then
+
+		If (objRS("Cfg_Avaliador")) = 1 then
+			strPossuiAvaliador = objRS("Cfg_Avaliador")
+		End If
+
+		response.write "<script language=javascript>parent.document.Form1.hdnPossuiAvaliador.value="""& Cstr(strPossuiAvaliador) &"""</script>"
+
+	Else
+		strPossuiAvaliador = null
+	End if
+
+	objRS.Close
+	Set objRS = Nothing
+
+
+	VerificaRedir = strObrigaGla
+End Function
+
+
+
+
+'''Procura o GLA resposável pelo Cliente(Razão Social)
+Function ResgatarGLA()
+
+	Dim strHtmlGla
+
+
+	Dim ObjRsCtfc
+	Dim objRSp
+	Dim CidSigla
+	Dim intCtf_IDp
+	Dim Ctfc_IdPesq
+	Dim sqlPesq
+
+
+	'@@JKNUP: Alteração para tratar se tem redirecionamento.
+
+
+	if VerificaRedir = 0 then
+		Response.Write "<script language=javascript>parent.document.forms[1].hdntxtGLA.value = '';</script>"
+			response.end
+	end if
+
+
+	'-- @@Davif - Melhoria a realizar (usar Cidade para obter o CF principal do Endereço do Acesso como ref.)
+
+	CidSigla = Trim(request.form("hdnCNLCliente"))
+
+
+	sqlPesq = "CLA_sp_sel_cidadesubcef 0, '"
+	sqlPesq = sqlPesq & trim(CidSigla) & "', 'S'"
+
+	intCtf_IDp = ""
+
+
+	Set objRSp = db.execute(sqlPesq)
+
+
+	If not ObjRSp.Eof then
+
+			intCtf_IDp = Trim(objRSp("CTF_ID"))
+
+	End if
+
+
+	'-- Davif - Melhoria realizada (usar Cidade para obter o CF principal do Endereço do Acesso como ref.)
+
+
+
+
+	Vetor_Campos(1)="adWChar,1,adParamInput," & Left(Trim(Request.Form("hdnRazaoSocial")),1) 'Letra
+	Vetor_Campos(2)="adInteger,4,adParamInput,"     ''Request.Form("hdnCtfcId") 'Ctfc_Id
+	Vetor_Campos(3)="adInteger,4,adParamInput," & intCtf_IDp    'Request.Form("hdnCtfcId") 'Ctfc_Id
+
+	Call APENDA_PARAM("CLA_sp_check_usuario_redirsolicitacao",3,Vetor_Campos)
+
+
+
+	'-- @@Davif - Melhoria a realizar (usar Cidade do Endereço do Acesso como ref.)
+	'Dim CidSigla
+	'CidSigla = Trim(request.form("hdnCNLCliente"))
+	'Vetor_Campos(2)="adWChar,4,adParamInput," & CidSigla
+	'-- Davif - Melhoria a realizar (usar Cidade do Endereço do Acesso como ref.)
+
+
+	'Vetor_Campos(1)="adWChar,1,adParamInput," & Left(Trim(Request.Form("hdnRazaoSocial")),1) 'Letra
+	'Vetor_Campos(2)="adInteger,4,adParamInput," & Request.Form("hdnCtfcId") 'Ctfc_Id
+
+	'Call APENDA_PARAM("CLA_sp_check_usuario_redirsolicitacao",2,Vetor_Campos)
+
+
+
+	Set objRS = ObjCmd.Execute()
+
+
+	if not objRS.Eof and not objRS.Bof then
+
+		strHtmlGla	= "<table cellspacing=1 cellpadding=0 width=760px border=0><tr class=clsSilver >"
+		strHtmlGla	= strHtmlGla & "<td width=170px ><font class=clsObrig>:: </font>UserName GLA</td>"
+		strHtmlGla	= strHtmlGla & "<td colspan=5>"
+		strHtmlGla	= strHtmlGla & "<table rules=groups bgcolor=#eeeeee cellspacing=0 cellpadding=2 bordercolorlight=#003388 bordercolordark=#ffffff width=355 >"
+		strHtmlGla	= strHtmlGla & "<tr><td class=lightblue>&nbsp;"
+		strHtmlGla	= strHtmlGla & "<span id=spnUserNameGLA>" & Trim(objRS("Usu_UserName")) &  "</span>"
+		strHtmlGla	= strHtmlGla & "</td></tr>"
+		strHtmlGla	= strHtmlGla & "</table>"
+		strHtmlGla	= strHtmlGla & "</td>"
+		strHtmlGla	= strHtmlGla & "</tr>"
+		strHtmlGla	= strHtmlGla & "<tr class=clsSilver>"
+		strHtmlGla	= strHtmlGla & "<td width=170px>&nbsp;&nbsp;&nbsp;&nbsp;GLA</td>"
+		strHtmlGla	= strHtmlGla & "<td width=355px>"
+		strHtmlGla	= strHtmlGla & "<table rules=groups bgcolor=#eeeeee cellspacing=0 cellpadding=2 bordercolorlight=#003388 bordercolordark=#ffffff width=100% >"
+		strHtmlGla	= strHtmlGla & "<tr><td class=lightblue>&nbsp;"
+		strHtmlGla	= strHtmlGla & "<span id=spnNomeGLA>" & Trim(objRS("Usu_Nome")) &  "</span>"
+		strHtmlGla	= strHtmlGla & "</td></tr>"
+		strHtmlGla	= strHtmlGla & "</table>"
+		strHtmlGla	= strHtmlGla & "</td>"
+		strHtmlGla	= strHtmlGla & "<td align=right >Ramal&nbsp;</td>"
+		strHtmlGla	= strHtmlGla & "<td colspan=3 align=left >"
+		strHtmlGla	= strHtmlGla & "<table rules=groups bgcolor=#eeeeee cellspacing=0 cellpadding=2 bordercolorlight=#003388 bordercolordark=#ffffff width=100px >"
+		strHtmlGla	= strHtmlGla & "<tr><td class=lightblue>&nbsp;"
+		strHtmlGla	= strHtmlGla & "<span id=spnRamalGLA>" & Trim(objRS("Usu_Ramal")) & "</span>"
+		strHtmlGla	= strHtmlGla & "</td></tr>"
+		strHtmlGla	= strHtmlGla & "</table>"
+		strHtmlGla	= strHtmlGla & "</td>"
+		strHtmlGla	= strHtmlGla & "</tr></table>"
+
+		Response.Write "<script language=javascript>parent.spnGLA.innerHTML = """ & strHtmlGla  & """;" & _
+						"parent.document.forms[1].hdntxtGLA.value = """ & objRS("Usu_UserName") & """;</script>"
+		Set objRS = Nothing
+
+
+	Else
+
+		strHtmlGla	= "<table cellspacing=1 cellpadding=0 width=760px ><tr class=clsSilver >"
+		strHtmlGla	= strHtmlGla & "<td width=170px ><font class=clsObrig>:: </font>UserName GLA</td>"
+		strHtmlGla	= strHtmlGla & "<td colspan=5>"
+		strHtmlGla	= strHtmlGla & "<table rules=groups bgcolor=#eeeeee cellspacing=0 cellpadding=2 bordercolorlight=#003388 bordercolordark=#ffffff width=20% >"
+		strHtmlGla	= strHtmlGla & "<tr><td class=lightblue>&nbsp;"
+		strHtmlGla	= strHtmlGla & "<span id=spnUserNameGLA><font color=red>Não Encontrado teste </font></span>"
+		strHtmlGla	= strHtmlGla & "</td></tr>"
+		strHtmlGla	= strHtmlGla & "</table>"
+		strHtmlGla	= strHtmlGla & "</td>"
+		strHtmlGla	= strHtmlGla & "</tr>"
+		strHtmlGla	= strHtmlGla & "<tr class=clsSilver>"
+		strHtmlGla	= strHtmlGla & "<td width=170px>&nbsp;&nbsp;&nbsp;&nbsp;GLA</td>"
+		strHtmlGla	= strHtmlGla & "<td width=355px>"
+		strHtmlGla	= strHtmlGla & "<table rules=groups bgcolor=#eeeeee cellspacing=0 cellpadding=2 bordercolorlight=#003388 bordercolordark=#ffffff width=100% >"
+		strHtmlGla	= strHtmlGla & "<tr><td class=lightblue>&nbsp;"
+		strHtmlGla	= strHtmlGla & "<span id=spnNomeGLA><font color=red>**********************</font></span>"
+		strHtmlGla	= strHtmlGla & "</td></tr>"
+		strHtmlGla	= strHtmlGla & "</table>"
+		strHtmlGla	= strHtmlGla & "</td>"
+		strHtmlGla	= strHtmlGla & "<td align=right >Ramal&nbsp;</td>"
+		strHtmlGla	= strHtmlGla & "<td colspan=3 align=left >"
+		strHtmlGla	= strHtmlGla & "<table rules=groups bgcolor=#eeeeee cellspacing=0 cellpadding=2 bordercolorlight=#003388 bordercolordark=#ffffff width=100px >"
+		strHtmlGla	= strHtmlGla & "<tr><td class=lightblue>&nbsp;"
+		strHtmlGla	= strHtmlGla & "<span id=spnRamalGLA><font color=red>*******</font></span>"
+		strHtmlGla	= strHtmlGla & "</td></tr>"
+		strHtmlGla	= strHtmlGla & "</table>"
+		strHtmlGla	= strHtmlGla & "</td>"
+		strHtmlGla	= strHtmlGla & "</tr></table>"
+
+
+
+		Response.Write "<script language=javascript>parent.spnGLA.innerHTML = """ & strHtmlGla  & """;" & _
+						"parent.document.forms[1].hdntxtGLA.value = '';</script>"
+
+
+		response.write "<script language=javascript>parent.document.Form2.hdnObrigaGla.value="""& Cstr(0) &"""</script>"
+	End if
+
+End Function
+
+
+
+
+'Resgata a descrição da cidade pela UF,CNL,Perfil do usuário
+Function ResgatarCidadeCNL(strUF,strCNL,strUserName,strNomeCnl)
+
+	Dim strCboCid
+
+	Set objRS = db.execute("CLA_sp_sel_cidadesubcefFull '" & strUF & "','" & strUserName & "',null,'" & TratarAspasSQL(strCNL) & "',0")
+
+	if Not objRS.Eof then
+		ResgatarCidadeCNL = TratarAspasSQL(Trim(objRS("Cid_Desc")))
+	Else
+		Response.Write "<script language=javascript>alert('Cidade não pertence ao seu centro funcional.');" & _
+						"parent.document.forms[1]." & strNomeCnl & ".value = '';" & _
+						"parent.document.forms[1]." & strNomeCnl & ".focus();" & _
+						"</script>"
+		ResgatarCidadeCNL = ""
+	End if
+
+End Function
+
+'Resgata os dados de uma SEV no sistema SSA
+Function ResgatarSev(dblNroSev)
+	'consulta no banco de dados SSA
+	Dim StrConn
+
+	Dim ObjCmdSSA
+	Dim ObjParam
+	Dim objRSCli
+	Dim strCep
+	Dim strCidDescRet
+	Dim strSolSel
+	Dim blnAchou
+
+	Vetor_Campos(1)="adInteger,4,adParamInput," & dblNroSev
+	Vetor_Campos(2)="adInteger,4,adParamOutput,0"
+
+	Call APENDA_PARAM("CLA_sp_check_sev",2,Vetor_Campos)
+	ObjCmd.Execute'pega dbaction
+	DBAction = ObjCmd.Parameters("RET").value
+
+	if DBAction <> 0 then
+		Response.Write "<script language=javascript>parent.resposta(" & Cint("0" & DBAction) & ",'');</script>"
+		Response.End
+	End if
+
+	'Localiza informações da solução SSA
+	Vetor_Campos(1)="adInteger,2,adParamInput," & dblNroSev
+	Vetor_Campos(2)="adInteger,2,adParamOutput,0"
+	Call APENDA_PARAM("CLA_sp_sel_solucao_ssa",2,Vetor_Campos)
+	Set objRSCli = ObjCmd.Execute
+	DBAction = ObjCmd.Parameters("RET").value
+
+	if DBAction <> 0 then
+		Response.Write "<script language=javascript>parent.resposta(" & Cint("0" & DBAction) & ",'');</script>"
+	Else
+		If Not objRSCli.eof and  Not objRSCli.bof then
+
+			strCep = TratarAspasJS(Trim(objRSCli("Pre_Cod_Cep")))
+			if Trim(strCep) <> "" and len(strCep) = 8  then
+				strCep = Mid(strCep,1,5) & "-" & Mid(strCep,6,8)
+			End if
+
+			Response.Write "<script language=javascript>with (parent.document.forms[0]){" & _
+			"txtRazaoSocial.value = '" & Left(TratarAspasJS(Trim(objRSCli("Cli_des"))),55) & "';" & _
+			"txtContaSev.value = '" & TratarAspasJS(Trim(objRSCli("Cli_CC"))) & "';" & _
+			"txtNomeFantasia.value = '" & TratarAspasJS(Trim(objRSCli("Cli_NomeFantasia"))) & "';" & _
+			"}</script>"
+
+			Response.Write "<script language=javascript>with (parent.document.forms[1]){" & _
+			"cboLogrEnd.value = '" & TratarAspasJS(Trim(objRSCli("Tpl_Sigla"))) & "';" & _
+			"txtEnd.value = '" & TratarAspasJS(Trim(objRSCli("Pre_NomeLogr"))) & "';" & _
+			"txtNroEnd.value = '" & TratarAspasJS(Trim(objRSCli("Pre_NroLogr"))) & "';" & _
+			"cboUFEnd.value = '" & TratarAspasJS(Trim(objRSCli("Est_Sigla"))) & "';" & _
+			"txtEndCid.value = '" & TratarAspasJS(Trim(objRSCli("Cid_Sigla"))) & "';" & _
+			"txtCepEnd.value = '" & Trim(strCep) & "';" & _
+			"txtBairroEnd.value = '" & TratarAspasJS(Trim(objRSCli("Pre_Bairro"))) & "';" & _
+			"}</script>"
+
+			if isNumeric(objRSCli("Cli_CNPJ")) then Response.Write "<script language=javascript>parent.document.forms[1].txtCNPJ.value = '" & TratarAspasJS(Trim(objRSCli("Cli_CNPJ"))) & "';</script>"
+			if isNumeric(objRSCli("Cli_IE")) then	Response.Write "<script language=javascript>parent.document.forms[1].txtIE.value = '" & TratarAspasJS(Trim(objRSCli("Cli_IE"))) & "';</script>"
+			if isNumeric(objRSCli("Cli_IM")) then	Response.Write "<script language=javascript>parent.document.forms[1].txtIM.value = '" & TratarAspasJS(Trim(objRSCli("Cli_IM"))) & "';</script>"
+
+			'Seta o combo de cidade
+			strCidDescRet = ResgatarCidadeCNL(Trim(objRSCli("Est_Sigla")),Trim(objRSCli("Cid_Sigla")),Trim(Request.Form("hdnUserGICL")),"txtEndCid")
+			Response.Write "<script language=javascript>parent.document.forms[1].txtEndCidDesc.value='" & strCidDescRet  & "';try{parent.ResgatarGLA();}catch(e){};</script>"
+
+
+			strSolSel = "<table border=0 cellspacing=1 cellpadding=0 width=350 ><tr class=clsSilver2><td>Provedor</td><td>Facilidade</td><td>Prazo</td></tr>"
+			'Soluções indicadas pelo SSA
+			blnAchou = false
+			While Not objRSCli.eof
+				if Trim(objRSCli("Sol_Selecionada")) = 1 and Trim(objRSCli("For_Des")) <> "" then
+ 					strSolSel = strSolSel & "<tr class=clsSilver2><td>" & Trim(objRSCli("For_Des")) & "</td><td>" & Trim(objRSCli("Fac_Des")) & "</td><td>" & Trim(objRSCli("Sol_PrazoCompleto")) & "</td></tr>"
+ 					blnAchou = true
+				End if
+				objRSCli.MoveNext
+			Wend
+			strSolSel = strSolSel & "</table>"
+			if blnAchou then
+				Response.Write "<script language=javascript>parent.strProvedorSelSev.innerHTML = '" & strSolSel & "';</script>"
+			Else
+				Response.Write "<script language=javascript>parent.strProvedorSelSev.innerHTML = '<table border=0><tr class=clsSilver2><td>Resposta não encontrada</td></tr></table>';</script>"
+			End if
+
+		Else
+			Response.Write "<script language=javascript>alert('SEV não encontrada.');</script>"
+			Response.Write "<script language=javascript>with (parent.document.forms[0]){" & _
+			"txtRazaoSocial.value = '';" & _
+			"txtContaSev.value = '';" & _
+			"txtNomeFantasia.value = '';" & _
+			"txtNroSev.value = '';" & _
+			"}</script>"
+
+			Response.Write "<script language=javascript>with (parent.document.forms[1]){" & _
+			"cboLogrEnd.value = '';" & _
+			"txtEnd.value = '';" & _
+			"txtNroEnd.value = '';" & _
+			"cboUFEnd.value = '';" & _
+			"txtEndCid.value = '';" & _
+			"txtCepEnd.value = '';" & _
+			"txtBairroEnd.value = '';" & _
+			"txtCNPJ.value = '';" & _
+			"txtIE.value = '';" & _
+			"txtIM.value = '';" & _
+			"txtEndCid.value = '';" & _
+			"}</script>"
+			Response.Write "<script language=javascript>parent.strProvedorSelSev.innerHTML = '';</script>"
+			Response.Write "<script language=javascript>parent.spnEndCidInstala.innerHTML = '';try{parent.ResgatarGLA();}catch(e){};</script>"
+
+		End if
+	End if
+End Function
+
+'Procura um CEP e popula os campos da solicitação
+Function ProcurarCEP(strCep,intTipo,dblId)
+
+	Dim strCboRet
+	Dim intCount
+	Dim strNomeCboCid
+	Dim strNomespnCid
+	Dim strCidSel
+
+	if Cdbl("0" & dblId) <> 0 then
+		Set objRS = db.execute("CLA_SP_VIEW_CEP null," & dblId)
+	Else
+		Set objRS = db.execute("CLA_SP_VIEW_CEP '" & strCep & "'")
+	End if
+
+	If Not objRS.eof and  Not objRS.bof then
+		intCount = 0
+		strCboRet = "<Select name=cboCEPS onChange=""ProcurarCEP(" & intTipo & ",2)"">"
+		strCboRet = strCboRet & "<Option value="""">SELECIONE UM CEP</Option>"
+		While Not objRS.Eof
+			strCboRet = strCboRet & "<Option value=" & Trim(objRS("Cep_ID")) & ">" & TratarAspasJS(Trim(objRS("RuaCompleta"))) & " - " & TratarAspasJS(Trim(objRS("Cep"))) & "</Option>"
+			objRS.MoveNext
+			intCount = intCount + 1
+		Wend
+		strCboRet = strCboRet & "</Select>"
+
+		if intCount > 1 then 'Retorna um combo com os CEPS encontrados
+
+			Select Case intTipo
+				Case 1
+					Response.Write "<script language=javascript>parent.spnCEPSInstala.innerHTML = '" & strCboRet & "'</script>"
+				Case 2
+					Response.Write "<script language=javascript>parent.spnCEPSInstalaDest.innerHTML = '" & strCboRet & "'</script>"
+				Case else
+					Response.Write "<script language=javascript>parent.spnCEPS.innerHTML = '" & strCboRet & "'</script>"
+			End Select
+
+		Else
+			objRS.MoveFirst
+			Select Case intTipo
+				Case 1
+						Response.Write "<script language=javascript>with (parent.document.forms[1]){" & _
+						"cboLogrEnd.value ='" & TratarAspasJS(Trim(objRS("Logradouro"))) & "';" & _
+						"txtEnd.value ='" & Trim(TratarAspasJS(Trim(objRS("Titulo"))) & " " & Trim(TratarAspasJS(Trim(objRS("Preposicao"))) & " " & TratarAspasJS(Trim(objRS("Rua"))))) & "';" & _
+						"cboUFEnd.value ='" & TratarAspasJS(Trim(objRS("Est_Sigla"))) & "';" & _
+						"txtBairroEnd.value ='" & TratarAspasJS(Trim(objRS("BairroInicial"))) & "';" & _
+						"txtEndCid.value ='" & TratarAspasJS(Trim(objRS("Cid_Sigla"))) & "';" & _
+						"txtCepEnd.value ='" & TratarAspasJS(Trim(objRS("Cep"))) & "';" & _
+						"}</script>"
+
+						Response.Write "<script language=javascript>parent.spnCEPSInstala.innerHTML = ''</script>"
+
+						'Seta a desc de cidade
+						strCidDescRet = ResgatarCidadeCNL(Trim(objRS("Est_Sigla")),Trim(objRS("Cid_Sigla")),Trim(Request.Form("hdnUserGICL")),"txtEndCid")
+						Response.Write "<script language=javascript>parent.document.forms[1].txtEndCidDesc.value = '" & strCidDescRet  & "';</script>"
+
+				Case 2
+						Response.Write "<script language=javascript>with (parent.document.forms[1]){" & _
+						"cboLogrEndDest.value ='" & TratarAspasJS(Trim(objRS("Logradouro"))) & "';" & _
+						"txtEndDest.value ='" & Trim(TratarAspasJS(Trim(objRS("Titulo"))) & " " & Trim(TratarAspasJS(Trim(objRS("Preposicao"))) & " " & TratarAspasJS(Trim(objRS("Rua"))))) & "';" & _
+						"cboUFEndDest.value ='" & TratarAspasJS(Trim(objRS("Est_Sigla"))) & "';" & _
+						"txtBairroEndDest.value ='" & TratarAspasJS(Trim(objRS("BairroInicial"))) & "';" & _
+						"txtEndCidDest.value ='" & TratarAspasJS(Trim(objRS("Cid_Sigla"))) & "';" & _
+						"txtCepEndDest.value ='" & TratarAspasJS(Trim(objRS("Cep"))) & "';" & _
+						"}</script>"
+
+						Response.Write "<script language=javascript>parent.spnCEPSInstalaDest.innerHTML = ''</script>"
+
+						'Seta a desc de cidade
+						strCidDescRet = ResgatarCidadeCNL(Trim(objRS("Est_Sigla")),Trim(objRS("Cid_Sigla")),Trim(Request.Form("hdnUserGICL")),"txtEndCidDest")
+						Response.Write "<script language=javascript>parent.document.forms[1].txtEndCidDescDest.value = '" & strCidDescRet  & "';</script>"
+
+				Case else
+
+						Response.Write "<script language=javascript>with (parent.document.forms[0]){" & _
+						"cboLogr.value ='" & TratarAspasJS(Trim(objRS("Logradouro"))) & "';" & _
+						"txtEnd.value ='" & TratarAspasJS(Trim(objRS("Rua"))) & "';" & _
+						"cboUF.value ='" & TratarAspasJS(Trim(objRS("Est_Sigla"))) & "';" & _
+						"txtBairro.value ='" & TratarAspasJS(Trim(objRS("BairroInicial"))) & "';" & _
+						"}</script>"
+
+						Response.Write "<script language=javascript>parent.spnCEPS.innerHTML = ''</script>"
+
+						'Seta o combo de cidade
+						strNomeCboCid = "cboCid"
+						strNomespnCid = "spnCid"
+						strCidSel = Trim(objRS("Cid_Sigla"))
+
+						Response.Write "<script language=javascript>parent." & strNomespnCid & ".innerHTML = '" & ResgatarCidade(Trim(objRSCli("Est_Sigla")),strNomeCboCid,strCidSel,"")  & "';</script>"
+
+			End Select
+
+		End If
+
+	Else
+		Response.Write "<script language=javascript>alert('CEP não encontrado.')</script>"
+	End if
+
+End Function
+
+
+'Resgata o usuário a partir do perfil
+Function ResgatarUserCoordenacao(strNomeObj,strTipoUser)
+
+	Vetor_Campos(1)="adInteger,4,adParamInput," 'Id do usuário
+	Vetor_Campos(2)="adWChar,30,adParamInput," & Request.Form(strNomeObj) 'UserName
+	Vetor_Campos(3)="adWChar,10,adParamInput," & strTipoUser 'Tipo do Usuário
+
+	Vetor_Campos(4)="adInteger,4,adParamOutput,0"
+
+	Call APENDA_PARAM("CLA_sp_check_usuario",4,Vetor_Campos)
+	ObjCmd.Execute'pega dbaction
+	DBAction = ObjCmd.Parameters("RET").value
+
+	if DBAction <> 0 then
+		Response.Write "<script language=javascript>parent.resposta(" & Cint("0" & DBAction) & ",'');</script>"
+		Response.Write "<script language=javascript>parent.spnNome"& Right(strNomeObj,len(strNomeObj)-3) & ".innerHTML = """";</script>"
+		Response.Write "<script language=javascript>parent.spnRamal"& Right(strNomeObj,len(strNomeObj)-3) & ".innerHTML = """";</script>"
+		Response.Write "<script language=javascript>parent.document.forms[2].txt"& Right(strNomeObj,len(strNomeObj)-3) & ".value = """";</script>"
+		Response.Write "<script language=javascript>parent.document.forms[2].txt"& Right(strNomeObj,len(strNomeObj)-3) & ".focus();</script>"
+	Else
+		Set objRS = ObjCmd.Execute()
+		Response.Write "<script language=javascript>parent.spnNome"& Right(strNomeObj,len(strNomeObj)-3) & ".innerHTML = """ & objRS("Usu_Nome") & """</script>"
+		Response.Write "<script language=javascript>parent.spnRamal"& Right(strNomeObj,len(strNomeObj)-3) & ".innerHTML = """ & objRS("Usu_Ramal") & """</script>"
+	End if
+
+End Function
+
+'Procura um cliente no CLA
+Function ProcurarCliente()
+
+	Dim strCboRet
+	Dim strCliente
+	Dim strRetDados
+	Dim objRSCompl
+
+	if Trim(Request.Form("txtRazaoSocial")) <> "" and Trim(Request.Form("cboClienteSel")) = "" and Trim(Request.Form("cboEndCliSel")) = "" then
+
+		Vetor_Campos(1)="adInteger,4,adParamInput,"
+		Vetor_Campos(2)="adWChar,60,adParamInput," & Trim(Request.Form("txtRazaoSocial")) 'Razao social
+
+		Call APENDA_PARAM("CLA_sp_sel_cliente",2,Vetor_Campos)
+
+
+				Set objRS = ObjCmd.Execute() 'pega dbaction
+		'DBAction = ObjCmd.Parameters("RET").value
+		if Not objRS.Eof then
+
+			'Monta combo spnLabelCliente
+			if objRS("Tot_Cli") > 3000 then
+				Response.Write "<script language=javascript>parent.alert('Detalhe a razão social para localização do cliente.')</script>"
+				Response.end
+			end if
+
+
+			strCboRet = "<Select name=cboClienteSel onChange=""ProcurarCliente()"" >"
+			strCboRet = strCboRet & "<Option value=""""></Option>"
+			While Not objRS.Eof
+				'strCliente = objRS("Cli_Nome") & " • " & objRS("End_NomeLogr") & ", " & objRS("End_NroLogr") & " • " & objRS("End_CEP") & " • " & objRS("Cid_Desc") & " • " & objRS("Est_Desc")
+				strCliente = objRS("Cli_Nome") & " • Conta: " & objRS("Cli_CC") & " • Sub Conta: " & objRS("Cli_SubCC") '& " • " & objRS("End_CEP") & " • " & objRS("Cid_Desc") & " • " & objRS("Est_Desc")
+				strCboRet = strCboRet & "<Option value=""" & Trim(objRS("Cli_ID")) & """>" & TratarAspasJS(strCliente) & "</Option>"
+				objRS.MoveNext
+			Wend
+			strCboRet = strCboRet & "</Select>"
+
+			Response.Write "<script language=javascript>parent.spnLabelCliente.innerHTML = '&nbsp;&nbsp;&nbsp;&nbsp;Cliente(s)'</script>"
+			Response.Write "<script language=javascript>parent.spnCliente.innerHTML = '" & strCboRet & "'</script>"
+			Response.End
+
+		Else
+			Response.Write "<script language=javascript>alert('Cliente não encontrado.');</script>"
+			Response.Write "<script language=javascript>parent.spnLabelCliente.innerHTML = ''</script>"
+			Response.Write "<script language=javascript>parent.spnCliente.innerHTML = ''</script>"
+			Response.End
+
+		End if
+
+	End if
+
+	if Trim(Request.Form("cboClienteSel")) <> "" then  'Monta combo com endereços para o cliente atual
+
+
+		Vetor_Campos(1)="adInteger,4,adParamInput," & Request.Form("cboClienteSel") 'Cli_id
+
+		Call APENDA_PARAM("CLA_sp_sel_cliente",1,Vetor_Campos)
+		Set objRSCliente = ObjCmd.Execute() 'pega dbaction
+
+
+
+		Vetor_Campos(1)="adInteger,4,adParamInput,"
+		Vetor_Campos(2)="adInteger,4,adParamInput," & Request.Form("cboClienteSel") 'Cli_id
+		Call APENDA_PARAM("CLA_sp_sel_endereco",2,Vetor_Campos)
+
+		Set objRS = ObjCmd.Execute() 'pega dbaction
+
+		if Not objRS.Eof then
+			'Monta combo spnLabelCliente
+			strCboRet = "<Select name=cboEndCliSel onChange=""ProcurarCliente()"" >"
+			strCboRet = strCboRet & "<Option value=""""></Option>"
+
+
+			While Not objRS.Eof
+				'Complemento do endereco
+				Vetor_Campos(1)="adInteger,4,adParamInput,"	& Trim(objRS("End_ID")) 'End_id
+				Vetor_Campos(2)="adInteger,4,adParamInput," & Request.Form("cboClienteSel")
+
+				Call APENDA_PARAM("CLA_sp_sel_endComplemento",2,Vetor_Campos)
+				Set objRSCompl = ObjCmd.Execute() 'pega dbaction
+
+				'Montagem do combo
+				strCliente = objRS("Tpl_Sigla") & " " & objRS("End_NomeLogr") & ", "& objRS("End_NroLogr") &  " " & objRSCompl("Aec_Complemento") & " • Cep.: " & objRS("End_Cep") & " • Cid Sigla.: " & objRS("Cid_Sigla") & " • Uf: " & objRS("Est_Sigla")
+				strCboRet = strCboRet & "<Option value=""" & Trim(Request.Form("cboClienteSel")) & "," & Trim(objRS("End_ID")) & """>" & TratarAspasJS(strCliente) & "</Option>"
+				objRS.MoveNext
+			Wend
+			strCboRet = strCboRet & "</Select>"
+			Response.Write strCboRet
+
+			Response.Write "<script language=javascript>parent.spnLabelCliente.innerHTML = '&nbsp;&nbsp;&nbsp;&nbsp;Endereços(s)'</script>"
+			Response.Write "<script language=javascript>parent.spnCliente.innerHTML = '" & strCboRet & "'</script>"
+			Response.End
+
+		Else
+				'Exibe informacoes quando so existe o Cliente e nao existe Endereco
+				strRetDados = strRetDados & "<script language=javascript>with (parent.document.forms[0]){"
+				strRetDados = strRetDados & "txtRazaoSocial.value = '" & TratarAspasJS(Trim(objRSCliente("Cli_Nome"))) & "';"
+				strRetDados = strRetDados & "txtContaSev.value = '" & TratarAspasJS(Trim(objRSCliente("Cli_CC"))) & "';"
+				strRetDados = strRetDados & "txtSubContaSev.value = '" & TratarAspasJS(Trim(objRSCliente("Cli_SubCC"))) & "';"
+				strRetDados = strRetDados & "txtNomeFantasia.value = '" & TratarAspasJS(Trim(objRSCliente("Cli_NomeFantasia"))) & "';"
+				strRetDados = strRetDados & ";txtRazaoSocial.focus();}</script>"
+
+				Response.Write strRetDados
+
+				'Retira o Label e o Combo
+				Response.Write "<script language=javascript>parent.spnLabelCliente.innerHTML = ''</script>"
+				Response.Write "<script language=javascript>parent.spnCliente.innerHTML = ''</script>"
+				Response.End
+		End if
+
+	Else
+		'Seta o informações do Cliente e do Endereço esse se não tivermos SEV selecionada
+		if Trim(Request.Form("cboEndCliSel"))  <> "" then
+
+			Vetor_Campos(1)="adInteger,4,adParamInput," & split(Request.Form("cboEndCliSel"),",")(1) 'End_id
+			Vetor_Campos(2)="adInteger,4,adParamInput," & split(Request.Form("cboEndCliSel"),",")(0) 'Cli_id
+
+			Call APENDA_PARAM("CLA_sp_sel_endereco",2,Vetor_Campos)
+			Set objRS = ObjCmd.Execute() 'pega dbaction
+
+			Vetor_Campos(1)="adInteger,4,adParamInput,"	& split(Request.Form("cboEndCliSel"),",")(1) 'End_id
+			Vetor_Campos(2)="adInteger,4,adParamInput," & split(Request.Form("cboEndCliSel"),",")(0) 'Cli_id
+
+			Call APENDA_PARAM("CLA_sp_sel_endComplemento",2,Vetor_Campos)
+			Set objRSCompl = ObjCmd.Execute() 'pega dbaction
+
+			if Not objRS.Eof then
+
+				strRetDados = strRetDados & "<script language=javascript>with (parent.document.forms[0]){"
+				strRetDados = strRetDados & "txtRazaoSocial.value = '" & TratarAspasJS(Trim(objRS("Cli_Nome"))) & "';"
+				strRetDados = strRetDados & "txtContaSev.value = '" & TratarAspasJS(Trim(objRS("Cli_CC"))) & "';"
+				strRetDados = strRetDados & "txtSubContaSev.value = '" & TratarAspasJS(Trim(objRS("Cli_SubCC"))) & "';"
+				strRetDados = strRetDados & "txtNomeFantasia.value = '" & TratarAspasJS(Trim(objRS("Cli_NomeFantasia"))) & "';"
+				strRetDados = strRetDados & ";txtRazaoSocial.focus();}</script>"
+
+				if Request.Form("txtNroSev") = "" then
+					strRetDados = strRetDados & "<script language=javascript>with (parent.document.forms[1]){"
+					strRetDados = strRetDados & "txtCNPJ.value = '" & TratarAspasJS(Trim(objRSCompl("Aec_CNPJ"))) & "';"
+					strRetDados = strRetDados & "txtIE.value = '" & TratarAspasJS(Trim(objRSCompl("Aec_IE"))) & "';"
+					strRetDados = strRetDados & "txtIM.value = '" & TratarAspasJS(Trim(objRSCompl("Aec_IM"))) & "';"
+					strRetDados = strRetDados & "}</script>"
+				End if
+
+				'Response.Write strRetDados
+				if  Trim(Request.Form("txtNroSev")) = "" then
+					strRetDados = strRetDados & "<script language=javascript>with (parent.document.forms[1]){"
+					strRetDados = strRetDados & "txtComplEnd.value = '" & TratarAspasJS(Trim(objRSCompl("Aec_Complemento"))) & "';"
+					strRetDados = strRetDados & "txtContatoEnd.value = '" & TratarAspasJS(Trim(objRSCompl("Aec_Contato"))) & "';"
+					strRetDados = strRetDados & "txtTelEndArea.value = '" & left(TratarAspasJS(Trim(objRSCompl("Aec_Telefone"))),2) & "';"
+					strRetDados = strRetDados & "txtTelEnd.value = '" & mid(TratarAspasJS(Trim(objRSCompl("Aec_Telefone"))),2) & "';"
+					strRetDados = strRetDados & "cboLogrEnd.value = '" & TratarAspasJS(Trim(objRS("Tpl_Sigla"))) & "';"
+					strRetDados = strRetDados & "txtEnd.value = '" & TratarAspasJS(Trim(objRS("End_NomeLogr"))) & "';"
+					strRetDados = strRetDados & "txtNroEnd.value = '" & TratarAspasJS(Trim(objRS("End_NroLogr"))) & "';"
+					strRetDados = strRetDados & "cboUFEnd.value = '" & TratarAspasJS(Trim(objRS("Est_Sigla"))) & "';"
+					strRetDados = strRetDados & "txtCepEnd.value = '" & TratarAspasJS(Trim(objRS("End_CEP"))) & "';"
+					strRetDados = strRetDados & "txtBairroEnd.value = '" & TratarAspasJS(Trim(objRS("End_Bairro"))) & "';"
+					strRetDados = strRetDados & "txtEndCid.value = '" & TratarAspasJS(Trim(objRS("Cid_Sigla"))) & "';"
+					strRetDados = strRetDados & "}</script>"
+
+					'Seta a desc de cidade
+					strCidDescRet = ResgatarCidadeCNL(Trim(objRS("Est_Sigla")),Trim(objRS("Cid_Sigla")),Trim(Request.Form("hdnUserGICL")),"txtEndCid")
+					Response.Write "<script language=javascript>parent.document.forms[1].txtEndCidDesc.value='" & strCidDescRet  & "';</script>"
+				End if
+
+				Response.Write strRetDados
+
+				'Retira o Label e o Combo
+				Response.Write "<script language=javascript>parent.spnLabelCliente.innerHTML = ''</script>"
+				Response.Write "<script language=javascript>parent.spnCliente.innerHTML = ''</script>"
+
+			End if
+
+		Else
+			Response.Write "<script language=javascript>alert('Cliente não encontrado.');</script>"
+			Response.Write "<script language=javascript>parent.spnLabelCliente.innerHTML = ''</script>"
+			Response.Write "<script language=javascript>parent.spnCliente.innerHTML = ''</script>"
+		End if
+
+	End if
+
+	Set objRSCompl = Nothing
+
+End Function
+
+'Lista RS
+Function ListarRS(RS)
+
+	Dim str, fld, cor
+
+	str = str & "<TABLE cellspacing=0 rules=all bordercolorlight=#ffffff bordercolordark=#003399 width=500>" & vbCrLf
+
+	str = str & "<TR>" & vbCrLf
+	For Each fld In Rs.Fields
+		str = str & "<TH>&nbsp;" & fld.Name & "</TH>" & vbCrLf
+	Next
+	str = str & "</TR>" & vbCrLf
+
+	cor = "#dddddd"
+	Do Until RS.EOF
+
+		if cor = "#dddddd" then
+			cor = "#eeeeee"
+		else
+			cor = "#dddddd"
+		end if
+
+		str = str & "<TR>" & vbCrLf
+		For Each fld In Rs.Fields
+			str = str & "<TD bgcolor=" & cor & ">&nbsp;" & fld.Value & "</TD>" & vbCrLf
+		Next
+		str = str & "</TR>" & vbCrLf
+
+		RS.MoveNext
+	Loop
+
+	str = str & "</TABLE>" & vbCrLf
+
+	str = str & "<table width=415><tr><td align=right>" & RS.RecordCount & " rows</td></tr></table>"
+
+	ListarRS = str
+
+End Function
+
+Dim strCidDescRet
+Dim strEndereco
+dim objRSEsc
+Dim ObjRSAvaliacao
+
+Select Case Trim(Request.Form("hdnAcao"))
+
+	Case "GravarSolicitacao"
+
+		 Call GravarSolicitacao(1,"")
+
+	Case "AprovarAcesso"
+
+		Vetor_Campos(1)="adInteger,4,adParamInput," & Trim(Request.Form("hdnSolID"))
+		strSqlRet = APENDA_PARAMSTRSQL("CLA_sp_Sel_Avaliacao",1,Vetor_Campos)
+		Set objDicProp = Server.CreateObject("Scripting.Dictionary")
+
+		'Response.Write strSqlRet
+		Set ObjRSAvaliacao = db.Execute(strSqlRet)
+		if Not ObjRSAvaliacao.EOF and not ObjRSAvaliacao.BOF then
+
+			If not isnull(ObjRSAvaliacao("Sol_DtFimAvaliacao")) and ObjRSAvaliacao("Sol_DtFimAvaliacao") <> "" then
+					Response.Write "<script language=javascript>alert('Avaliação já Aprovada..');window.location.replace('gerenciamento_main.asp');</script>"
+
+				Response.End
+			End IF
+
+			If not isnull(ObjRSAvaliacao("Sol_DtDevolucaoGIC")) and ObjRSAvaliacao("Sol_DtDevolucaoGIC") <> "" then
+				Response.Write "<script language=javascript>alert('Solicitação não pode ser Aprovada. Foi Devolvida ao GIC...');window.location.replace('gerenciamento_main.asp');</script>"
+				Response.End
+			End IF
+
+			Call AprovarAcesso()
+
+		Else
+
+			Response.Write "<script language=javascript>alert('Solicitação não Encontrada..')</script>"
+
+		End if
+
+
+	Case "DevolverAcesso"
+
+		Vetor_Campos(1)="adInteger,4,adParamInput," & Trim(Request.Form("hdnSolID"))
+		strSqlRet = APENDA_PARAMSTRSQL("CLA_sp_Sel_Avaliacao",1,Vetor_Campos)
+		Set objDicProp = Server.CreateObject("Scripting.Dictionary")
+
+		Set ObjRSAvaliacao = db.Execute(strSqlRet)
+		if Not ObjRSAvaliacao.EOF and not ObjRSAvaliacao.BOF then
+
+			If not isnull(ObjRSAvaliacao("Sol_DtDevolucaoGIC")) AND ObjRSAvaliacao("Sol_DtDevolucaoGIC") <> "" then
+				Response.Write "<script language=javascript>alert('Avaliação já Devolvida ao GIC..');window.location.replace('gerenciamento_main.asp');</script>"
+				Response.End
+			End If
+
+			If not isnull(ObjRSAvaliacao("Sol_DtFimAvaliacao")) and ObjRSAvaliacao("Sol_DtFimAvaliacao") <> "" then
+				Response.Write "<script language=javascript>alert('Avaliação já Aprovada, não pode ser devolvida ao GIC.');window.location.replace('gerenciamento_main.asp');</script>"
+				Response.End
+			End IF
+
+			Call DevolverAcesso()
+		End IF
+
+
+	Case "AlterarInfoAcesso"
+
+		Vetor_Campos(1)="adInteger,4,adParamInput,"	& Trim(Request.Form("hdnSolID"))
+		strSqlRet =	APENDA_PARAMSTRSQL("CLA_sp_Sel_Avaliacao",1,Vetor_Campos)
+		Set	objDicProp = Server.CreateObject("Scripting.Dictionary")
+
+		Set	ObjRSAvaliacao = db.Execute(strSqlRet)
+		if Not ObjRSAvaliacao.EOF and not ObjRSAvaliacao.BOF then
+
+			'If	not	isnull(ObjRSAvaliacao("Sol_DtDevolucaoGIC")) and ObjRSAvaliacao("Sol_DtDevolucaoGIC") <> ""	then
+			'	Response.Write "<script	language=javascript>alert('Solicitação não pode	ser	Alterada, foi Devolvida	ao GIC..')</script>"
+			'	Response.End
+			'End If
+
+			If not isnull(ObjRSAvaliacao("Sol_DtFimAvaliacao"))	and	ObjRSAvaliacao("Sol_DtFimAvaliacao") <>	"" then
+				Response.Write "<script language=javascript>alert('Avaliação já Aprovada, não pode ser Alterada!');window.location.replace('gerenciamento_main.asp');</script>"
+				response.end
+			
+			End IF
+		
+		'Resgatar se é Alteração é cadastral ou não - INICIO
+		Set objXmlDadosForm = Server.CreateObject("Microsoft.XMLDOM")
+		Set objXmlDadosDB = Server.CreateObject("Microsoft.XMLDOM")
+		Set objXmlDadosRet = Server.CreateObject("Microsoft.XMLDOM")
+
+		'Recupera dados do xml da página anterior
+		If Trim(Request.Form("hdnXml")) <> "" Then
+			objXmlDadosForm.loadXML(Request.Form("hdnXml"))
+		Else
+			Response.Write "<script language=javascript>alert('Informações do Acesso são Obrigatórias');</script>"
+			Response.End
+		End If
+
+		Set objXmlDadosForm  = AdicionarNode("intTipoProc",objXmlDadosForm,3) 'Tipo de Processo Alteração/Ativação/Cancelamento
+		Set objXmlDadosForm  = AdicionarNode("hdnDesigAcessoPriDB",objXmlDadosForm,Request.Form("hdnDesigAcessoPriDB"))
+
+		dblSolId = Request.Form("hdnSolId")
+		Set objRSSolic =	db.execute("CLA_sp_view_solicitacaomin " & dblSolId)
+		dblIdLogico			= Request.Form("hdnIdAcessoLogico")
+
+		objXmlDadosDB.loadXml("<xDados/>")
+
+		Vetor_Campos(1)="adInteger,4,adParamInput,"
+		Vetor_Campos(2)="adInteger,4,adParamInput,"
+		Vetor_Campos(3)="adInteger,4,adParamInput," & dblIdLogico
+		strSqlRet = APENDA_PARAMSTRSQL("CLA_SP_VIEW_PONTO",3,Vetor_Campos)
+
+		Set objDicProp = Server.CreateObject("Scripting.Dictionary")
+
+		Set objRSFis = db.Execute(strSqlRet)
+		if Not objRSFis.EOF and not objRSFis.BOF then
+			Set objXmlDadosDB = MontarXmlAcesso(objXmlDadosDB,objRSFis,"")
+		End if
+		
+		'Corrigir: Os XMLs estão diferentes pois o que vem do Banco só possui os dados do Acesso e o que vem do Form está com mais dados.
+		'Criar uma cópia do inc/xmlAcessos.asp com os outros campos do form que este não possui.
+		
+		objXmlDadosDB.save(Server.MapPath("objXmlDadosDB.xml"))
+		objXmlDadosForm.save(Server.MapPath("objXmlDadosForm.xml"))
+
+		strXmlFormulario = "<?xml version='1.0' encoding='ISO-8859-1'?>" & objXmlDadosForm.xml
+		strXmlDataBase = "<?xml version='1.0' encoding='ISO-8859-1'?>" & objXmlDadosDB.xml
+
+		Vetor_Campos(1)="adlongvarchar," & len(strXmlDataBase)& ",adParamInput," & strXmlDataBase
+		Vetor_Campos(2)="adlongvarchar," & len(strXmlFormulario)& ",adParamInput," & strXmlFormulario
+		Vetor_Campos(3)="adInteger,2,adParamOutput,0"
+
+		strSqlRet = APENDA_PARAMSTR("CLA_sp_check_tipoalteracao",3,Vetor_Campos)
+		strXml =  ForXMLAutoQuery(strSqlRet)
+
+		objXmlDadosRet.loadXml(strXml)
+		Set objNode = objXmlDadosRet.selectNodes("//TableControle")
+		intTipoProcAlt = 0
+		if objNode.length > 0 then
+			for intIndex = 0 to objNode.length - 1
+				intOrdem = objNode(intIndex).attributes(0).value
+				DBAction = objNode(intIndex).attributes(1).value
+				
+				if DBAction = 1 then intTipoProcAlt = 1
+				if DBAction <> 0 and DBAction <> 1 then
+					Response.Write "<script language=javascript>parent.resposta(" & DBAction & ",'')</script>"
+					Response.End
+				End if
+
+				Set objNodeAcesso = objXmlDadosForm.selectSingleNode("//xDados/Acesso[intOrdem="& intOrdem &"]")
+				Set objNodeListAtual = objNodeAcesso.getElementsByTagName("hdnNovoPedido")
+				if (objNodeListAtual.length = 0) then 'Cria
+					Set objNodeFilho = objXmlDadosForm.createNode("element", "hdnNovoPedido", "")
+					objNodeFilho.text = DBAction
+					objNodeAcesso.appendChild (objNodeFilho)
+				Else 'Atualiza
+					objNodeListAtual.item(0).text = DBAction
+				End if
+			Next
+		End if
+		'Resgatar se é Alteração é cadastral ou não - FIM
+
+			Call AlterarInfoAcesso(1,intTipoProcAlt)
+
+		Else
+
+			Response.Write "<script	language=javascript>alert('Solicitação não Encontrada..')</script>"
+
+		End	if
+
+
+	Case "Alteracao"
+
+		Dim objXmlDadosDB
+		Dim objXmlDadosRet
+
+		DBAction = ValidarProcesso()
+		if DBAction <> 0 then
+			Response.Write "<script language=javascript>parent.resposta(" & DBAction & ",'')</script>"
+			Response.End
+		End if
+
+		Set objXmlDadosForm = Server.CreateObject("Microsoft.XMLDOM")
+		Set objXmlDadosDB = Server.CreateObject("Microsoft.XMLDOM")
+		Set objXmlDadosRet = Server.CreateObject("Microsoft.XMLDOM")
+
+		'Recupera dados do xml da página anterior
+		If Trim(Request.Form("hdnXml")) <> "" Then
+			objXmlDadosForm.loadXML(Request.Form("hdnXml"))
+		Else
+			Response.Write "<script language=javascript>alert('Informações do Acesso são Obrigatórias');</script>"
+			Response.End
+		End If
+
+
+		Set objXmlDadosForm  = AdicionarNode("intTipoProc",objXmlDadosForm,3) 'Tipo de Processo Alteração/Ativação/Cancelamento
+		'Set objXmlDadosForm  = AdicionarNode("intTipoProcAlt",objXmlDadosForm,2)
+		Set objXmlDadosForm  = AdicionarNode("hdnDesigAcessoPriDB",objXmlDadosForm,Request.Form("hdnDesigAcessoPriDB"))
+
+''		Set objXmlDadosForm  = AdicionarNode("hdnPossuiGeren",objXmlDadosForm,Request.Form("hdnPossuiGeren"))
+
+
+		dblSolId = Request.Form("hdnSolId")
+		Set objRSSolic =	db.execute("CLA_sp_view_solicitacaomin " & dblSolId)
+		dblIdLogico			= Request.Form("hdnIdAcessoLogico")
+
+		objXmlDadosDB.loadXml("<xDados/>")
+
+		Vetor_Campos(1)="adInteger,4,adParamInput,"
+		Vetor_Campos(2)="adInteger,4,adParamInput,"
+		Vetor_Campos(3)="adInteger,4,adParamInput," & dblIdLogico
+		strSqlRet = APENDA_PARAMSTRSQL("CLA_SP_VIEW_PONTO",3,Vetor_Campos)
+
+		Set objDicProp = Server.CreateObject("Scripting.Dictionary")
+
+		Set objRSFis = db.Execute(strSqlRet)
+		if Not objRSFis.EOF and not objRSFis.BOF then
+			Set objXmlDadosDB = MontarXmlAcesso(objXmlDadosDB,objRSFis,"")
+		End if
+
+		objXmlDadosDB.save(Server.MapPath("objXmlDadosDB.xml"))
+		objXmlDadosForm.save(Server.MapPath("objXmlDadosForm.xml"))
+
+		strXmlFormulario = "<?xml version='1.0' encoding='ISO-8859-1'?>" & objXmlDadosForm.xml
+		strXmlDataBase = "<?xml version='1.0' encoding='ISO-8859-1'?>" & objXmlDadosDB.xml
+
+		Vetor_Campos(1)="adlongvarchar," & len(strXmlDataBase)& ",adParamInput," & strXmlDataBase
+		Vetor_Campos(2)="adlongvarchar," & len(strXmlFormulario)& ",adParamInput," & strXmlFormulario
+		Vetor_Campos(3)="adInteger,2,adParamOutput,0"
+
+		strSqlRet = APENDA_PARAMSTR("CLA_sp_check_tipoalteracao",3,Vetor_Campos)
+		strXml =  ForXMLAutoQuery(strSqlRet)
+
+		objXmlDadosRet.loadXml(strXml)
+		Set objNode = objXmlDadosRet.selectNodes("//TableControle")
+		intTipoProcAlt = 0
+		if objNode.length > 0 then
+			for intIndex = 0 to objNode.length - 1
+				intOrdem = objNode(intIndex).attributes(0).value
+				DBAction = objNode(intIndex).attributes(1).value
+				
+				if DBAction = 1 then intTipoProcAlt = 1
+				if DBAction <> 0 and DBAction <> 1 then
+					Response.Write "<script language=javascript>parent.resposta(" & DBAction & ",'')</script>"
+					Response.End
+				End if
+
+				Set objNodeAcesso = objXmlDadosForm.selectSingleNode("//xDados/Acesso[intOrdem="& intOrdem &"]")
+				Set objNodeListAtual = objNodeAcesso.getElementsByTagName("hdnNovoPedido")
+				if (objNodeListAtual.length = 0) then 'Cria
+					Set objNodeFilho = objXmlDadosForm.createNode("element", "hdnNovoPedido", "")
+					objNodeFilho.text = DBAction
+					objNodeAcesso.appendChild (objNodeFilho)
+				Else 'Atualiza
+					objNodeListAtual.item(0).text = DBAction
+				End if
+			Next
+		End if
+
+		Call GravarSolicitacao(3,intTipoProcAlt)
+
+	Case "ResgatarGLA"
+		Call ResgatarGLA()
+
+	Case "ResgatarGLA&Gravar"
+		Call ResgatarGLA()
+		Response.Write "<script language=javascript>parent.ContinuarGravacao();</script>"
+
+	Case "ResgatarCidadeCNL"
+
+		strCidDescRet = ResgatarCidadeCNL(Trim(Request.Form("hdnUFAtual")),Trim(Request.Form("hdnCNLAtual")),Trim(Request.Form("hdnUserGICL")),Trim(Request.Form("hdnCNLNome")))
+		Response.Write "<script language=javascript>parent.document.forms[1]." & Request.Form("hdnNomeTxtCidDesc") & ".value = '" & strCidDescRet  & "'</script>"
+
+	Case "ResgatarSev"
+
+		Call ResgatarSev(Trim(Request.Form("txtNroSev")))
+
+	Case "ResgatarUserCoordenacao"
+
+		Call ResgatarUserCoordenacao(Trim(Request.Form("hdnCoordenacaoAtual")),Right(Trim(Request.Form("hdnCoordenacaoAtual")),len(Trim(Request.Form("hdnCoordenacaoAtual")))-3))
+
+	Case "ProcurarCEP"
+
+		Call ProcurarCEP(Trim(Request.Form("hdnCEP")),Trim(Request.Form("hdnTipoCEP")),Trim(Request.Form("cboCEPS")))
+
+	Case "ResgatarEnderecoEstacao"
+		'Endereço do local de instalação
+		Set objRS = db.execute("CLA_sp_sel_estacao " & Trim(Request.Form("hdnEstacaoAtual")))
+
+		if Not objRS.Eof And Not objRS.Bof then
+			strEndereco = Trim(Cstr("" & objRS("Tpl_Sigla"))) & " " &  Trim(Cstr("" & objRS("Esc_NomeLogr"))) & " nº " & Trim(Cstr("" & objRS("Esc_NroLogr"))) & " - " & Trim(Cstr("" & objRS("Est_Sigla"))) & " - " & Trim(Cstr("" & objRS("Cid_Sigla")))
+			Response.Write "<script language=javascript>parent.spnContEndLocalInstala.innerHTML = '"	& Replace(Trim(Cstr("" & objRS("Esc_Contato"))),"'","´")	& "'</script>"
+			Response.Write "<script language=javascript>parent.spnTelEndLocalInstala.innerHTML = '"		& Replace(Trim(Cstr("" & objRS("Esc_Telefone"))),"'","´")	& "'</script>"
+		End if
+
+	Case "ResgatarEstacaoOrigem"
+
+		'Endereço do local de instalação
+		Set objRS = db.execute("CLA_sp_sel_estacao null,'" & Trim(Request.Form("txtCNLSiglaCentroCli")) & "','" & Trim(Request.Form("txtComplSiglaCentroCli")) & "'")
+		if Not objRS.Eof And Not objRS.Bof then
+
+			Response.Write "<script language=javascript>with (parent.document.forms[1]){" & _
+			"cboLogrEnd.value = '" & TratarAspasJS(Trim(objRS("Tpl_Sigla"))) & "';" & _
+			"txtEnd.value = '" & TratarAspasJS(Trim(objRS("Esc_NomeLogr"))) & "';" & _
+			"txtNroEnd.value = '" & TratarAspasJS(Trim(objRS("Esc_NroLogr"))) & "';" & _
+			"txtComplEnd.value = '" & TratarAspasJS(Trim(objRS("Esc_Complemento"))) & "';" & _
+			"cboUFEnd.value = '" & TratarAspasJS(Trim(objRS("Est_Sigla"))) & "';" & _
+			"txtEndCid.value = '" & TratarAspasJS(Trim(objRS("Cid_Sigla"))) & "';" & _
+			"txtCepEnd.value = '" &	TratarAspasJS(Trim(objRS("Esc_Cod_Cep")))	& "';" & _
+			"txtBairroEnd.value = '" & TratarAspasJS(Trim(objRS("Esc_Bairro"))) & "';" & _
+			"}</script>"
+
+			'Seta o combo de cidade
+			strCidDescRet = ResgatarCidadeCNL(Trim(objRS("Est_Sigla")),Trim(objRS("Cid_Sigla")),Trim(Request.Form("hdnUserGICL")),"txtEndCid")
+			Response.Write "<script language=javascript>parent.document.forms[1].txtEndCidDesc.value='" & strCidDescRet  & "';</script>"
+
+		Else
+			Response.Write "<script language=javascript>alert('Estação não encontrada.');</script>"
+			Response.Write "<script language=javascript>with (parent.document.forms[1]){" & _
+			"cboLogrEnd.value = '';" & _
+			"txtEnd.value = '';" & _
+			"txtNroEnd.value = '';" & _
+			"txtComplEnd.value = '';" & _
+			"cboUFEnd.value = '';" & _
+			"txtEndCid.value = '';" & _
+			"txtEndCidDesc.value = '';" & _
+			"txtCepEnd.value = '';" & _
+			"txtBairroEnd.value = '';" & _
+			"}</script>"
+		End if
+
+	Case "ResgatarEstacaoDestino"
+
+		'Endereço do local de instalação
+		Set objRS = db.execute("CLA_sp_sel_estacao null,'" & Trim(Request.Form("txtCNLSiglaCentroCliDest")) & "','" & Trim(Request.Form("txtComplSiglaCentroCliDest")) & "'")
+		'Response.Write ("CLA_sp_sel_estacao null,'" & Trim(Request.Form("txtCNLSiglaCentroCliDest")) & "','" & Trim(Request.Form("txtComplSiglaCentroCliDest")) & "'")
+		if Not objRS.Eof And Not objRS.Bof then		
+			
+			set objRSEsc  =  db.execute("CLA_sp_sel_UsuarioEscCtf " & Request.Form("hdnUsuID") & ",'"  & Trim(Request.Form("txtCNLSiglaCentroCliDest")) & "','"& Trim(Request.Form("txtComplSiglaCentroCliDest")) & "', 1")
+			
+			if Not objRSEsc.Eof And Not objRSEsc.Bof then
+				
+					Response.Write "<script language=javascript>with (parent.document.forms[1]){" & _
+					"txtEndEstacaoEntrega.value = '" & TratarAspasJS(Trim(objRS("Tpl_Sigla"))) & " " & _
+					TratarAspasJS(Trim(objRS("Esc_NomeLogr"))) & ", " & _
+					TratarAspasJS(Trim(objRS("Esc_NroLogr"))) & " " & _
+					TratarAspasJS(Trim(objRS("Esc_Complemento"))) & " " & _
+					TratarAspasJS(Trim(objRS("Esc_Bairro"))) & " " & _
+					TratarAspasJS(Trim(objRS("Esc_Cod_Cep"))) & "';" & _
+					"}</script>"
+			else
+			
+				 	Response.Write "<script language=javascript>alert('Usuário não possui acesso a esta estação.');</script>"
+					Response.Write "<script language=javascript>with (parent.document.forms[1]){" & _
+						"txtEndEstacaoEntrega.value = '' " & _
+						"}</script>"
+			
+			end if 
+		
+		Else
+			Response.Write "<script language=javascript>alert('Estação não encontrada.');</script>"
+			Response.Write "<script language=javascript>with (parent.document.forms[1]){" & _
+			"txtEndEstacaoEntrega.value = '' " & _
+			"}</script>"
+		End if
+
+	Case "CheckEstacaoUsu"
+
+		Vetor_Campos(1)="adWChar,4,adParamInput," & Trim(Request.Form("hdnCNLEstUsu"))
+		Vetor_Campos(2)="adWChar,3,adParamInput," & Trim(Request.Form("hdnComplEstUsu"))
+		Vetor_Campos(3)="adInteger,4,adParamInput," & Trim(Request.Form("hdnUsuario"))
+		Vetor_Campos(4)="adInteger,4,adParamOutput,0"
+		Vetor_Campos(5)="adInteger,4,adParamOutput,0"
+
+		Call APENDA_PARAM("CLA_sp_check_estacaousu",5,Vetor_Campos)
+		ObjCmd.Execute'pega dbaction
+		DBAction = ObjCmd.Parameters("RET").value
+		strEsc_ID = ObjCmd.Parameters("RET2").value
+
+		if DBAction <> 0 then
+			Response.Write "<script language=javascript>parent.resposta(" & Cint("0" & DBAction) & ",'');</script>"
+			if Trim(Request.Form("hdnOrigemEst")) = 1 then
+				Response.Write "<script language=javascript>with (parent.document.forms[2]){" & _
+						"cboLocalEntrega.value = ''" & _
+						"}</script>"
+				Response.Write "<script language=javascript>with (parent.document.forms[2]){" & _
+						"txtCNLLocalEntrega.value = '' " & _
+						"}</script>"
+				Response.Write "<script language=javascript>with (parent.document.forms[2]){" & _
+						"txtComplLocalEntrega.value = '' " & _
+						"}</script>"
+			else
+				Response.Write "<script language=javascript>with (parent.document.forms[2]){" & _
+						"cboLocalConfig.value = ''" & _
+						"}</script>"
+				Response.Write "<script language=javascript>with (parent.document.forms[2]){" & _
+						"txtCNLLocalConfig.value = '' " & _
+						"}</script>"
+				Response.Write "<script language=javascript>with (parent.document.forms[2]){" & _
+						"txtComplLocalConfig.value = '' " & _
+						"}</script>"
+			end if
+			Response.End
+		else
+			if Trim(Request.Form("hdnOrigemEst")) = 1 then
+				Response.Write "<script language=javascript>with (parent.document.forms[2]){" & _
+						"cboLocalEntrega.value = "&strEsc_ID&" " & _
+						"}</script>"
+				Response.Write "<script language=javascript>with (parent.document.forms[2]){" & _
+						"cboLocalConfig.value = "&strEsc_ID&" " & _
+						"}</script>"
+				Response.Write "<script language=javascript>with (parent.document.forms[2]){" & _
+						"txtCNLLocalConfig.value = '"&Trim(Request.Form("hdnCNLEstUsu"))&"' " & _
+						"}</script>"
+				Response.Write "<script language=javascript>with (parent.document.forms[2]){" & _
+						"txtComplLocalConfig.value = '"&Trim(Request.Form("hdnComplEstUsu"))&"' " & _
+						"}</script>"
+			else
+				Response.Write "<script language=javascript>with (parent.document.forms[2]){" & _
+						"cboLocalConfig.value = "&strEsc_ID&" " & _
+						"}</script>"
+			end if
+			
+			'Endereço do local de instalação
+			Set objRS = db.execute("CLA_sp_sel_estacao " & strEsc_ID)
+
+			if Not objRS.Eof And Not objRS.Bof then
+				strEndereco = Trim(Cstr("" & objRS("Tpl_Sigla"))) & " " &  Trim(Cstr("" & objRS("Esc_NomeLogr"))) & " nº " & Trim(Cstr("" & objRS("Esc_NroLogr"))) & " - " & Trim(Cstr("" & objRS("Est_Sigla"))) & " - " & Trim(Cstr("" & objRS("Cid_Sigla")))
+				Response.Write "<script language=javascript>parent.spnContEndLocalInstala.innerHTML = '"	& Replace(Trim(Cstr("" & objRS("Esc_Contato"))),"'","´")	& "'</script>"
+				Response.Write "<script language=javascript>parent.spnTelEndLocalInstala.innerHTML = '"		& Replace(Trim(Cstr("" & objRS("Esc_Telefone"))),"'","´")	& "'</script>"
+			End if
+		End if
+	Case "CheckEstacaoUsuFac"
+
+		Vetor_Campos(1)="adWChar,4,adParamInput," & Trim(Request.Form("hdnCNLEstUsu"))
+		Vetor_Campos(2)="adWChar,3,adParamInput," & Trim(Request.Form("hdnComplEstUsu"))
+		Vetor_Campos(3)="adInteger,4,adParamInput," & Trim(Request.Form("hdnUsuario"))
+		Vetor_Campos(4)="adInteger,4,adParamOutput,0"
+		Vetor_Campos(5)="adInteger,4,adParamOutput,0"
+
+		Call APENDA_PARAM("CLA_sp_check_estacaousu",5,Vetor_Campos)
+		ObjCmd.Execute'pega dbaction
+		DBAction = ObjCmd.Parameters("RET").value
+		strEsc_ID = ObjCmd.Parameters("RET2").value
+
+		if DBAction <> 0 then
+			Response.Write "<script language=javascript>parent.resposta(" & Cint("0" & DBAction) & ",'');</script>"
+			if Trim(Request.Form("hdnOrigemEst")) = 1 then
+				Response.Write "<script language=javascript>with (parent.document.Form2){" & _
+						"cboLocalInstala.value = ''" & _
+						"}</script>"
+				Response.Write "<script language=javascript>with (parent.document.Form2){" & _
+						"txtCNLLocalEntrega.value = '' " & _
+						"}</script>"
+				Response.Write "<script language=javascript>with (parent.document.Form2){" & _
+						"txtComplLocalEntrega.value = '' " & _
+						"}</script>"
+			else
+				Response.Write "<script language=javascript>with (parent.document.Form2){" & _
+						"cboLocalConfig.value = ''" & _
+						"}</script>"
+				Response.Write "<script language=javascript>with (parent.document.Form2){" & _
+						"txtCNLLocalConfig.value = '' " & _
+						"}</script>"
+				Response.Write "<script language=javascript>with (parent.document.Form2){" & _
+						"txtComplLocalConfig.value = '' " & _
+						"}</script>"
+			end if
+			Response.End
+		else
+			if Trim(Request.Form("hdnOrigemEst")) = 1 then
+				Response.Write "<script language=javascript>with (parent.document.Form2){" & _
+						"cboLocalInstala.value = "&strEsc_ID&" " & _
+						"}</script>"
+				Response.Write "<script language=javascript>with (parent.document.Form2){" & _
+						"cboLocalConfig.value = "&strEsc_ID&" " & _
+						"}</script>"
+				Response.Write "<script language=javascript>with (parent.document.Form2){" & _
+						"txtCNLLocalConfig.value = '"&Trim(Request.Form("hdnCNLEstUsu"))&"' " & _
+						"}</script>"
+				Response.Write "<script language=javascript>with (parent.document.Form2){" & _
+						"txtComplLocalConfig.value = '"&Trim(Request.Form("hdnComplEstUsu"))&"' " & _
+						"}</script>"
+			else
+				Response.Write "<script language=javascript>with (parent.document.Form2){" & _
+						"cboLocalConfig.value = "&strEsc_ID&" " & _
+						"}</script>"
+			end if
+		End if
+		
+	Case "CheckEstacaoInstala"
+		Vetor_Campos(1)="adWChar,4,adParamInput," & Trim(Request.Form("txtCNLLocalInstala"))
+		Vetor_Campos(2)="adWChar,3,adParamInput," & Trim(Request.Form("txtComplLocalInstala"))
+		Vetor_Campos(3)="adInteger,4,adParamInput," & Trim(Request.Form("hdnUsuario"))
+		Vetor_Campos(4)="adInteger,4,adParamOutput,0"
+		Vetor_Campos(5)="adInteger,4,adParamOutput,0"
+
+		Call APENDA_PARAM("CLA_sp_check_estacaousu",5,Vetor_Campos)
+		ObjCmd.Execute'pega dbaction
+		DBAction = ObjCmd.Parameters("RET").value
+		strEsc_ID = ObjCmd.Parameters("RET2").value
+
+		if DBAction <> 0 then
+			Response.Write "<script language=javascript>parent.resposta(" & Cint("0" & DBAction) & ",'');</script>"
+				Response.Write "<script language=javascript>with (parent.document.forms[0]){" & _
+						"cboLocalInstala.value = ''" & _
+						"}</script>"
+				Response.Write "<script language=javascript>with (parent.document.forms[0]){" & _
+						"txtCNLLocalInstala.value = '' " & _
+						"}</script>"
+				Response.Write "<script language=javascript>with (parent.document.forms[0]){" & _
+						"txtComplLocalInstala.value = '' " & _
+						"}</script>"
+				Response.End
+		else
+				Response.Write "<script language=javascript>with (parent.document.forms[0]){" & _
+						"cboLocalInstala.value = "&strEsc_ID&" " & _
+						"}</script>"
+				Response.Write "<script language=javascript>parent.ResgatarDistribuicao(parent.document.forms[0].cboLocalInstala,1)</script>"
+		End if
+
+	Case "CheckEstacaoFac"
+		Vetor_Campos(1)="adWChar,4,adParamInput," & Trim(Request.Form("txtCNLEstacaoFac"))
+		Vetor_Campos(2)="adWChar,3,adParamInput," & Trim(Request.Form("txtComplEstacaoFac"))
+		Vetor_Campos(3)="adInteger,4,adParamInput," & Trim(Request.Form("hdnUsuario"))
+		Vetor_Campos(4)="adInteger,4,adParamOutput,0"
+		Vetor_Campos(5)="adInteger,4,adParamOutput,0"
+
+		Call APENDA_PARAM("CLA_sp_check_estacaousu",5,Vetor_Campos)
+		ObjCmd.Execute'pega dbaction
+		DBAction = ObjCmd.Parameters("RET").value
+		strEsc_ID = ObjCmd.Parameters("RET2").value
+
+		if DBAction <> 0 then
+			Response.Write "<script language=javascript>parent.resposta(" & Cint("0" & DBAction) & ",'');</script>"
+				Response.Write "<script language=javascript>with (parent.document.forms[0]){" & _
+						"cboEstacao.value = ''" & _
+						"}</script>"
+				Response.Write "<script language=javascript>with (parent.document.forms[0]){" & _
+						"txtCNLEstacaoFac.value = '' " & _
+						"}</script>"
+				Response.Write "<script language=javascript>with (parent.document.forms[0]){" & _
+						"txtComplEstacaoFac.value = '' " & _
+						"}</script>"
+				Response.End
+		else
+				Response.Write "<script language=javascript>with (parent.document.forms[0]){" & _
+						"cboEstacao.value = "&strEsc_ID&" " & _
+						"}</script>"
+		End if
+		
+	Case "ProcurarCliente"
+		Call ProcurarCliente()
+
+	Case "ResgatarAcessoFisComp"
+
+		Set objXmlAcessoFisComp = Server.CreateObject("Microsoft.XMLDOM")
+
+		objXmlAcessoFisComp.loadXml("<xDados/>")
+		dblAecId = Request.Form("hdnAecIdFis")
+		dblAcfIdacessofisico = Trim(Request.Form("hdnIdAcessoFisico"))
+
+		Vetor_Campos(1)="adInteger,4,adParamInput, "
+		Vetor_Campos(2)="adInteger,4,adParamInput,"
+		Vetor_Campos(3)="adInteger,4,adParamInput,"
+		Vetor_Campos(4)="adInteger,4,adParamInput,"
+		Vetor_Campos(5)="adWChar,4,adParamInput,"
+		Vetor_Campos(6)="adInteger,4,adParamInput,"
+		Vetor_Campos(7)="adWChar,20,adParamInput, " & dblAcfIdacessofisico
+		
+		strSqlRet = APENDA_PARAMSTRSQL("CLA_SP_VIEW_PONTO",7,Vetor_Campos)
+
+		Set objDicProp = Server.CreateObject("Scripting.Dictionary")
+
+		Set objRSFis = db.Execute(strSqlRet)
+		if Not objRSFis.EOF and not objRSFis.BOF then
+			Set objXmlAcessoFisComp = MontarXmlAcesso(objXmlAcessoFisComp,objRSFis,"")
+		End if
+
+		'Itens que foram populados no compartilhamento do acesso físico e dever estar com seus valores atualizados
+		Set objXmlAcessoFisComp  = UpdNodeAcesso("hdnIdAcessoFisico",objXmlAcessoFisComp,Request.Form("hdnIdAcessoFisico"))
+		Set objXmlAcessoFisComp  = UpdNodeAcesso("hdnPropIdFisico",objXmlAcessoFisComp,Request.Form("hdnPropIdFisico"))
+		Set objXmlAcessoFisComp  = UpdNodeAcesso("hdnCompartilhamento",objXmlAcessoFisComp,Request.Form("hdnCompartilhamento"))
+		Set objXmlAcessoFisComp  = UpdNodeAcesso("hdnAecIdFis",objXmlAcessoFisComp,Request.Form("hdnAecIdFis"))
+		Set objXmlAcessoFisComp  = UpdNodeAcesso("hdnAcfId",objXmlAcessoFisComp,Request.Form("hdnAcfId"))
+
+		strXml = FormatarXml(objXmlAcessoFisComp)
+		
+
+		Response.Write "<script language=javascript>parent.objXmlAcessoFisComp.loadXML('" & strXml &"');parent.ResgatarAcessoFisComp(1,parent.objXmlAcessoFisComp);</script>"
+
+End Select
+
+'Adiciona um Node a um objeto XML se existir atualiza
+Function UpdNodeAcesso(strNomeNode,objXML,varValorNode)
+
+	Dim objNodeFilho
+	Dim objNodeList
+
+    If objXML.xml = "" Then
+	   objXML.loadXML "<xmlDados></xmlDados>"
+	End If
+
+	'Verifica se já existe
+	Set objNodeList = objXml.selectNodes("//Acesso/" & strNomeNode)
+
+	if objNodeList.Length = 0 then
+		'Cria
+		Set objNodeList = objXml.selectNodes("//Acesso")
+		Set objNodeFilho = objXML.createNode("element", strNomeNode, "")
+		objNodeFilho.text = varValorNode
+		objNodeList(0).appendChild (objNodeFilho)
+	Else
+		'Atualiza
+		objNodeList.Item(0).Text = varValorNode
+	End If
+
+	Set UpdNodeAcesso = objXML
+
+End Function
+
+%>

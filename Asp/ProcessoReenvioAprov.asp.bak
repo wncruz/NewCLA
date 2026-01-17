@@ -1,0 +1,20 @@
+<!--#include file="../inc/data.asp"-->
+<!--#include file="../inc/EnviarReenvioAprov.asp"-->
+<!--#include file="../inc/EnviarReenvioAprov_ASMS.asp"-->
+<%
+strAprovisiID = request.form("hdnAprovisiID")
+strAcao = request.form("hdnAcao")
+strOrisol_id = request.form("hdnOrisol_ID")
+if strOrisol_id = 7 then
+EnviarReenvioAprov strAprovisiID,strAcao 
+end if 
+if strOrisol_id = 9 then
+	EnviarReenvioAprovAsms strAprovisiID,strAcao 
+end if 
+%>
+<script language="VBScript">
+  	parent.parent.form_confirma.proc_SN.value = "N"   
+</script>
+<script language="JavaScript">
+	parent.parent.ConsultarPedidosPend()
+</script>

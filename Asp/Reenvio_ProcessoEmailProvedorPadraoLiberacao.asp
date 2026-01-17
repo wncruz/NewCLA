@@ -1,0 +1,633 @@
+<!--#include file="../inc/data.asp"-->
+<%
+'Response.ContentType = "text/HTML;charset=ISO-8859-1"
+'•IMPLEMENT SOFT - IMPLEMENTAÇÕES E SOLUÇÕES EM INFORMÁTICA
+'	- Sistema			: CLA
+'	- Arquivo			: ProcessoEmailProvedorPadrao.asp
+'	- Descrição			: Monta Email que vai para o provedor
+
+
+dim dblSolId 
+dim dblPedId 
+dim dblProId
+dim dblEscEntrega 
+dim intTipoProcesso
+dim objRSPro
+dim strRet
+dim strButton
+
+dim ndPed 
+dim ndSol 
+dim ndProv
+dim ndEsc 
+dim ndTipo
+dim strContatoEBT
+dim NdAcfid
+dim DbAcfid
+
+dim strProEmail
+dim ASSUNTO
+
+set objXmlDoc = server.CreateObject("Microsoft.XMLDOM") 
+	
+'Atribuição de valores para as variáveis 	
+	
+ndPed =  request("Ped_id")
+ndSol  =  request("Sol_id")
+ndProv =  request("Pro_id")
+ndTipo =  request("Tipo")
+ndRede =  request("Sis_id")
+NdAcfid = request("Acf_id")
+
+'response.write "<b>Ped_id</b>: " & ndPed & "<br>"
+'response.write "<b>Sol_id</b>: " & ndSol & "<br>"
+'response.write "<b>Pro_id</b>: " & ndProv & "<br>"
+'response.write "<b>Tipo</b>: " & ndTipo & "<br>"
+'response.write "<b>Sis_id</b>: " & ndRede & "<br>"
+'response.write "<b>Acf_id</b>: " & NdAcfid & "<br>"
+'response.end
+
+dblPedId  = ndPed
+dblSolId  = ndSol
+dblProId = ndProv
+intTipoProcesso = ndTipo
+statusPedido = "T"
+dblSisId = ndRede
+DbAcfid = NdAcfid
+Set objRSPro =  nothing 
+
+	Dim textohtml
+	Dim objDic
+
+	textohtml = ""
+	if dblPedId <> "" then
+
+		Set ped = db.execute("CLA_sp_view_solicitacaomin " & dblSolId)
+		'Response.Write ("EXEC CLA_sp_view_pedido null,null,null,null,null,null," & dblPedId & ",null,null,'" & statusPedido & "'")
+		Set ped1 = db.execute("CLA_sp_view_pedido null,null,null,null,null,null," & dblPedId & ",null,null,'" & statusPedido & "'")
+		if Not ped1.Eof and Not ped1.Bof then		
+			if dblSisId = "3" then
+					'Response.Write ("EXEC CLA_sp_sel_estacao " & ped1("esc_identrega"))
+					Set objRSPro = db.execute("CLA_sp_sel_estacao " & ped1("esc_identrega"))
+					strProEmail = Trim(objRSPro("Esc_Email"))  
+					strProNome	= Trim(objRSPro("Esc_Contato"))
+					'strFromEmail = "acessos@embratel.com.br"
+					strFromEmail = "prss@embratel.com.br"
+					
+					if strProEmail = "" or isnull (strProEmail) or isempty(strProEmail) then
+					  Response.ContentType = "text/HTML;charset=ISO-8859-1"
+					  %>
+					  <script language="VBScript">
+					    msgbox "Não há e-mail cadastrado para esta estação: <%=objRSPro("Cid_Sigla") & " "%> <%=objRSPro("Esc_Sigla")%> - Utilize TABELAS/ESTAÇÃO para associar.",64,"CLA - Informação"
+					    msgbox "O e-mail não pode ser enviado. Clique em OK para fechar esta janela.",48,"CLA - Alerta"
+					    window.close()
+					  </script>
+					  <%
+					  Response.end
+					end if  
+			Else
+				Set objRSPro = db.execute("CLA_sp_sel_provedoremail " & dblProId & ",null,'" & ped1("Est_Sigla") &"','"& ped1("Cid_Sigla") &"'") 
+				'Response.write ("CLA_sp_sel_provedoremail " & dblProId & ",null,'" & ped1("Est_Sigla") &"','"& ped1("Cid_Sigla") &"'") 
+				if Not objRSPro.Eof and Not objRSPro.bof then
+					if not isnull(Trim(objRSPro("Cpro_Contratadaemail"))) then 
+						strProEmail = Trim(objRSPro("Cpro_Contratadaemail"))
+					else
+						strProEmail = ""
+					end if 
+					strProNome	= Trim(objRSPro("Pro_Nome"))
+					
+					If not isnull(Trim(objRSPro("cPRo_ContratanteContato"))) Then
+						strContatoEBT = Trim(objRSPro("cPRo_ContratanteContato"))
+					Else 
+						strContatoEBT = ""
+					End If
+					
+
+					if not isnull(Trim(objRSPro("Cpro_Contratanteemail"))) then 
+						strFromEmail = Trim(objRSPro("Cpro_Contratanteemail"))
+					else
+						'strFromEmail = "acessos@embratel.com.br"
+						strFromEmail = "prss@embratel.com.br"
+					end if 
+				else
+					'strFromEmail = "acessos@embratel.com.br"
+					strFromEmail = "prss@embratel.com.br"
+				End if
+			End if
+			
+			ASSUNTO = AcaoPedidoEmail(intTipoProcesso) & "  -  " & trim(ped("Cli_nome")) & "  -  " & ucase(ped1("Ped_Prefixo")) & "-" & right("00000" & ped1("Ped_Numero"),5) & "/" & ped1("Ped_Ano")
+			
+				
+			' ALTERADO PSOUTO 31/08/2005
+			'Set ObjMail	= Server.CreateObject("CDONTS.NewMail")
+		    ''Response.Write "<script>alert('ProcessoEmailProvedorPadrao.asp(PRSS):strFromEmail "& strFromEmail &" ')</script>"
+			''Response.Write "<script>alert('ProcessoEmailProvedorPadrao.asp(PRSS):strProEmail "&strProEmail&" ')</script>"
+			'ObjMail.From = strFromEmail '"acessos@embratel.com.br"
+			'ObjMail.To	 = strProEmail  'impleme@embratel.com.br
+			'ObjMail.Subject = AcaoPedidoEmail(ucase(ped1("tprc_id"))) & "  -  " & trim(ped("Cli_nome")) & "  -  " & ucase(ped1("Ped_Prefixo")) & "-" & right("00000" & ped1("Ped_Numero"),5) & "/" & ped1("Ped_Ano")
+			'ObjMail.BodyFormat = 0
+			'ObjMail.MailFormat = 0
+			
+			' / PSOUTO
+			 'StrIniHhml
+			 
+			
+			
+			textohtml = "<html><META HTTP-EQUIV=""Content-Type"" CONTENT=""text/html; charset=ISO-8859-1"">"
+			textohtml = textohtml & "<body align=center><form name=""Form1"" id=""Form1"">"
+			textohtml = textohtml & "<Head>"
+			textohtml = textohtml & "<title> Pedido: "& ucase(ped1("Ped_Prefixo")) & "-" & right("00000" & ped1("Ped_Numero"),5) & "/" & ped1("Ped_Ano") &  "</title>"
+			textohtml = textohtml & "<Style>"
+			textohtml = textohtml & "TD"
+			textohtml = textohtml & "{"
+			'textohtml = textohtml & "FONT-WEIGHT: bold;"
+			textohtml = textohtml & "FONT-SIZE: 8pt;"
+			'textohtml = textohtml & "COLOR: #003388;"
+			textohtml = textohtml & "FONT-FAMILY: Arial"
+			textohtml = textohtml & "} "
+			textohtml = textohtml & "TR.clsSilver2"
+			textohtml = textohtml & "{"
+			textohtml = textohtml & "    BACKGROUND-COLOR: #dcdcdc"
+			textohtml = textohtml & "} "
+			textohtml = textohtml & "TH"
+			textohtml = textohtml & "{"
+			textohtml = textohtml & "	font-family: Arial, Helvetica, sans-serif;"
+			textohtml = textohtml & "	font-size: 11px;"
+			textohtml = textohtml & "	font-weight: bold;"
+			textohtml = textohtml & "	color: #ffffff;"
+			textohtml = textohtml & "    BACKGROUND-COLOR: #31659c;"
+			textohtml = textohtml & "    TEXT-ALIGN: left"
+			textohtml = textohtml & "} "
+			textohtml = textohtml & "INPUT.button"
+			textohtml = textohtml & "{"
+			textohtml = textohtml & "	font-family: Verdana, Arial, Helvetica, sans-serif;"
+			textohtml = textohtml & "	font-size: 9px;"
+			textohtml = textohtml & "	font-weight: normal;"
+			textohtml = textohtml & "	TEXT-ALIGN: center"
+			textohtml = textohtml & "	color: #000000;"
+			textohtml = textohtml & "	text-decoration: none;"
+			textohtml = textohtml & "	background-color: #f1f1f1;"
+			textohtml = textohtml & "	border-top: 1px solid #0F1F5F;"
+			textohtml = textohtml & "	border-right: 1px solid #0F1F5F;"
+			textohtml = textohtml & "	border-bottom: 1px solid #0F1F5F;"
+			textohtml = textohtml & "	border-left: 1px solid #0F1F5F;"
+			textohtml = textohtml & "	width:100px"
+			textohtml = textohtml & "	}"
+			textohtml = textohtml & "</style>"
+			textohtml = textohtml & "<title>Carta enviada ao provedor</title>"
+			textohtml = textohtml & "<script>"
+			textohtml = textohtml & "	function Imprimir()"
+			textohtml = textohtml & "	{"
+			textohtml = textohtml & "		window.print();"
+			textohtml = textohtml & "	}"
+			textohtml = textohtml & "</script>"
+			textohtml = textohtml & "</Head>"
+			textohtml = textohtml & "<table align=center rules=groups bgcolor=#eeeeee cellspacing=0 cellpadding=5 bordercolorlight=#003388 bordercolordark=#ffffff width=680>"
+			textohtml = textohtml & "<tr><td><br>EMBRATEL"
+			textohtml = textohtml & "<div align=center>"
+			textohtml = textohtml & ped("Cid_Desc") & ", " & day(date) & " de "
+		
+			   select case month(date)
+			   case "1"
+				   textohtml = textohtml & "Janeiro"
+			   case "2"
+				   textohtml = textohtml & "Fevereiro"
+			   case "3"
+				   textohtml = textohtml & "Março"
+			   case "4"
+				   textohtml = textohtml & "Abril"
+			   case "5"
+				   textohtml = textohtml & "Maio"
+			   case "6"
+				   textohtml = textohtml & "Junho"
+			   case "7"
+				   textohtml = textohtml & "Julho"
+			   case "8"
+				   textohtml = textohtml & "Agosto"
+			   case "9"
+				   textohtml = textohtml & "Setembro"
+			   case "10"
+				   textohtml = textohtml & "Outubro"
+			   case "11"
+				   textohtml = textohtml & "Novembro"
+			   case else
+				   textohtml = textohtml & "Dezembro"
+			   end select
+			textohtml = textohtml & " de "& year(date) & ".</div>"
+				
+			textohtml = textohtml & "<br>À</br>"
+
+
+			textohtml = textohtml & strProNome
+			textohtml = textohtml & "<br><br>"
+			textohtml = textohtml & "Assunto: Solicitação de Serviço" & "<br>"
+			textohtml = textohtml & "Ação   : <u>Retirar Acesso</u>"
+			
+			
+			
+			Vetor_Campos(1)="adInteger,4,adParamInput,"
+			Vetor_Campos(2)="adInteger,4,adParamInput," & dblPedId
+			Vetor_Campos(3)="adInteger,4,adParamInput,"
+			Vetor_Campos(4)="adInteger,4,adParamInput,"
+			Vetor_Campos(5)="adInteger,4,adParamInput,"
+			Vetor_Campos(6)="adInteger,4,adParamInput,"
+			Vetor_Campos(7)="adWChar,2,adParamInput,"
+			Vetor_Campos(8)="adWChar,1,adParamInput,"
+			Vetor_Campos(9)="adWChar,1,adParamInput,T"
+						
+			strSqlRet = APENDA_PARAMSTRSQL("CLA_SP_VIEW_ACESSOFISICO",9,Vetor_Campos)
+			
+			
+
+			Set objRSFis = db.Execute(strSqlRet)
+			strInterfacePto = ""
+			strInterfaceEbt = ""
+			if Not objRSFis.EOF and not objRSFis.BOF then
+				strInterfacePto		= objRSFis("Acf_Interface")
+				strInterfaceEbt		= objRSFis("Acf_InterfaceEstEntregaFisico")
+				strNroAcessoPtaEbt	= objRSFis("Acf_NroAcessoPtaEbt")
+				strTipoVel			= objRSFis("Acf_TipoVel")
+				strVelFis			= objRSFis("Vel_Desc")
+				strCctoProvedor		= Trim(objRSFis("Acf_NroAcessoCCTOProvedor"))
+			End if
+			
+			if not isNull(ped1("Acl_DtIniAcessoTemp")) then
+				textohtml = textohtml & "&nbsp;&nbsp;<font color=red>TEMPORÁRIO Período&nbsp;de&nbsp;" & ped1("Acl_DtIniAcessoTemp") & "&nbsp;à&nbsp;" & ped1("Acl_DtFimAcessoTemp") & "</font>"
+			End if
+			textohtml = textohtml & "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Quantidade: 01"
+			if trim(strNroAcessoPtaEbt) <> "" and not isnull(strNroAcessoPtaEbt) then
+				textohtml = textohtml & "<br>Nº de Acesso: " & strNroAcessoPtaEbt
+				if Trim(strCctoProvedor) <> "" then
+					textohtml = textohtml & "<br>CCTO Provedor: " & strCctoProvedor
+				End if 
+			end if
+			textohtml = textohtml & "<br><br>"
+			textohtml = textohtml & "<font size=2 face=Arial color=#FF0000>Nº Pedido:"& ucase(ped1("Ped_Prefixo")) & "-" & right("00000" & ped1("Ped_Numero"),5) & "/" & ped1("Ped_Ano") & "</font><br><br>"
+
+			Set objRSFac = db.Execute("CLA_SP_Sel_Facilidade " & dblPedId)
+			
+			if Not objRSFac.Eof and Not objRSFac.Bof then
+				intCount = 1
+				dblSisId = objRSFac("Sis_Id")
+				
+				Set objDic = Server.CreateObject("Scripting.Dictionary") 
+	
+				While not objRSFac.Eof 
+
+					Select Case dblSisId
+						Case 1
+							strChave = objRSFac("Fac_TimeSlot")
+							strRepresentacao = objRSFac("Fac_TimeSlot")
+						Case Else	
+							strChave = objRSFac("Fac_Par")
+							strRepresentacao = objRSFac("Fac_Par")
+					End Select		
+
+					if not isNull(objRSFac("Fac_Representacao")) then
+						strRepresentacao = objRSFac("Fac_Representacao")
+					End if
+					Select Case dblSisId
+						Case 1
+							if  Not objDic.Exists(Cstr(strRepresentacao)) then
+								Call objDic.Add(Cstr(strRepresentacao),Cstr(objRSFac("Fac_Id"))) 
+								if intCount = 1 then
+									strHtmlFac = ""
+									strHtmlFac = strHtmlFac & "<table border=0 cellspacing=1 cellpadding=1 width=100% >"
+									strHtmlFac = strHtmlFac & "<tr>"
+									strHtmlFac = strHtmlFac & "<th colspan=7>&nbsp;•&nbsp;Informações da Facilidade</th>"
+									strHtmlFac = strHtmlFac & "</tr>"
+									strHtmlFac = strHtmlFac & "<tr class=clsSilver2>"
+									strHtmlFac = strHtmlFac & "<td>&nbsp;Link</td>"
+									strHtmlFac = strHtmlFac & "<td>&nbsp;Timeslot</td>"
+									strHtmlFac = strHtmlFac & "	</tr>"
+								End if
+								strHtmlFac = strHtmlFac & "<tr class=clsSilver2>"
+								strHtmlFac = strHtmlFac & "	<td >&nbsp;" & objRSFac("Fac_Link") & "</td>"
+								strHtmlFac = strHtmlFac & "	<td >&nbsp;" & strRepresentacao & "</td>"
+								strHtmlFac = strHtmlFac & "</tr>"
+							End if
+						Case 2	
+							'NÃO DETERMINISTICO
+							if  Not objDic.Exists(Cstr(strRepresentacao)) then
+								Call objDic.Add(Cstr(strRepresentacao),Cstr(objRSFac("Fac_Id"))) 
+								if intCount = 1 then
+									strHtmlFac = ""
+									strHtmlFac = strHtmlFac & "<table border=0 cellspacing=1 cellpadding=1 width=100% >"
+									strHtmlFac = strHtmlFac & "	<tr >"
+									strHtmlFac = strHtmlFac & "		<th colspan=5>&nbsp;•&nbsp;Informações da Facilidade</th>"
+									strHtmlFac = strHtmlFac & "	</tr>"
+									strHtmlFac = strHtmlFac & "	<tr class=clsSilver2>"
+									strHtmlFac = strHtmlFac & "		<td nowrap>&nbsp;Tronco</td>"
+									strHtmlFac = strHtmlFac & "		<td nowrap>&nbsp;Par</td>"
+									strHtmlFac = strHtmlFac & "	</tr>"
+								End if
+
+								strHtmlFac = strHtmlFac & "<tr class=clsSilver2>"
+								strHtmlFac = strHtmlFac & "<td>&nbsp;" & objRSFac("Fac_Tronco") & "</td>"
+								strHtmlFac = strHtmlFac & "<td>&nbsp;" & strRepresentacao & "</td>"
+								strHtmlFac = strHtmlFac & "</tr>"
+							End if						
+						Case 3	
+							'ADE
+							if  Not objDic.Exists(Cstr(strRepresentacao)) then
+								Call objDic.Add(Cstr(strRepresentacao),Cstr(objRSFac("Fac_Id"))) 
+								if intCount = 1 then
+									strHtmlFac = ""
+									strHtmlFac = strHtmlFac & "<table border=0 cellspacing=1 cellpadding=1 width=100% >"
+									strHtmlFac = strHtmlFac & "	<tr>"
+									strHtmlFac = strHtmlFac & "		<th colspan=6>&nbsp;•&nbsp;Informações da Facilidade</td>"
+									strHtmlFac = strHtmlFac & "	</tr>"
+									strHtmlFac = strHtmlFac & "	<tr class=clsSilver2>"
+									strHtmlFac = strHtmlFac & "		<td width=100>&nbsp;Cabo</td>"
+									strHtmlFac = strHtmlFac & "		<td width=120>&nbsp;Par</td>"
+									strHtmlFac = strHtmlFac & "		<td width=100>&nbsp;Derivação</td>"
+									strHtmlFac = strHtmlFac & "		<td nowrap width=100>&nbsp;T. Cabo</td>"
+									strHtmlFac = strHtmlFac & "		<td nowrap>&nbsp;PADE</td>"
+									strHtmlFac = strHtmlFac & "	</tr>"
+								End if
+								strHtmlFac = strHtmlFac & "<tr class=clsSilver2>"
+								strHtmlFac = strHtmlFac & "<td>&nbsp;" & objRSFac("Fac_Tronco") & "</td>"
+								strHtmlFac = strHtmlFac & "<td>&nbsp;" & strRepresentacao & "</td>"
+								strHtmlFac = strHtmlFac & "<td>&nbsp;" & objRSFac("Fac_Lateral") & "</td>"
+								strHtmlFac = strHtmlFac & "<td>&nbsp;" & objRSFac("Fac_TipoCabo") & "</td>"
+								strHtmlFac = strHtmlFac & "<td>&nbsp;" & objRSFac("Fac_CxEmenda") & "</td>"
+								strHtmlFac = strHtmlFac & "</tr>"
+							End if	
+					End Select
+					intCount = intCount + 1
+					objRSFac.MoveNext
+				Wend	
+				if Trim(strHtmlFac) <> "" then strHtmlFac = strHtmlFac & "</table>"
+			
+			End if
+			textohtml = textohtml & strHtmlFac
+			
+			textohtml = textohtml & "<br>Solicitamos providenciar as medidas cabíveis conforme ação acima."
+			textohtml = textohtml & "<br><br>"
+			textohtml = textohtml & "<table><tr>"
+			textohtml = textohtml & "<td width=180>Cliente</td><td>" & ped("CLI_nome")&"</td></tr>"
+			textohtml = textohtml & "<tr><td>CNPJ</td><td>" & ped("Aec_CNPJ") & "</td></tr>"
+			textohtml = textohtml & "<tr><td>Inscrição Estadual</td><td>" & ped("Aec_IE") & "</td></tr>"
+			textohtml = textohtml & "<tr><td>Velocidade</td><td>" & strVelFis & " " & TipoVel(strTipoVel) &  "</td></tr>"
+		
+			'Response.Write ("CLA_sp_sel_regimecontrato 0," & dblProId)
+			Set objRS = db.execute("CLA_sp_sel_regimecontrato 0," & dblProId)
+			if not isNull(ped1("Reg_Id")) then
+				Set objRSReg = db.execute("CLA_sp_sel_regimecontrato " & ped1("Reg_Id"))
+				Set objRS = db.execute("CLA_sp_sel_tipocontrato " & objRSReg("Tct_Id"))
+
+				if not objRS.Eof and Not objRS.Bof then
+					textohtml = textohtml & "<tr><td>Regime de Contratação</td><td>" & objRS("Tct_Desc") & "</td></tr>"
+				Else
+					textohtml = textohtml & "<tr><td>Regime de Contratação</td><td></td></tr>"	
+				End if		
+			Else	
+				textohtml = textohtml & "<tr><td>Regime de Contratação</td><td></td></tr>"	
+			End if
+
+			textohtml = textohtml & "<tr><td>Prazo de Entrega</td><td>" & Ped1("Ped_DtPrevistaAtendProv") & "</td></tr>"
+			textohtml = textohtml & "</table><br><br>"
+			textohtml = textohtml & "<center><u><b>LOCAL DE INSTALAÇÃO</b></u></center><br>"
+
+
+			Set objRSConfig = db.execute("CLA_sp_sel_estacao " & Trim(ped("Esc_IDConfiguracao")))
+
+			textohtml = textohtml & "<center><u><b>PONTA A - EMBRATEL</b></u></center><br>"
+			textohtml = textohtml & "<table><tr>"
+			set cid = db.execute("CLA_sp_sel_cidade2 '" & objRSConfig("Cid_Sigla") & "'")
+			strEndereco = Trim(Cstr("" & objRSConfig("Tpl_Sigla"))) & " " &  Trim(Cstr("" & objRSConfig("Esc_NomeLogr"))) & " nº " & Trim(Cstr("" & objRSConfig("Esc_NroLogr"))) & " " & Trim(Cstr("" & objRSConfig("Esc_Complemento")))
+			textohtml = textohtml & "<td width=180>Endereço</td><td>" & strEndereco & "</td></tr>"
+			textohtml = textohtml & "<tr><td>Cep</td><td>" & objRSConfig("Esc_Cod_Cep")& " </td></tr>"
+			textohtml = textohtml & "<tr><td>Cidade</td><td>" & cid("Cid_Desc")& "</td></tr>"
+			set cid = nothing
+			textohtml = textohtml & "<tr><td>Contato</td><td>" & objRSConfig("Esc_Contato")& "</td></tr>"
+			textohtml = textohtml & "<tr><td>Telefone</td><td>" & objRSConfig("Esc_Telefone") & "</td></tr>"
+			textohtml = textohtml & "<tr><td>Interface</td><td>" & strInterfaceEbt & "</td></tr>"
+			textohtml = textohtml & "</table>"
+
+			Set objRSEndPto = db.execute("CLA_sp_view_Ponto null," & dblPedId & ",null," & ped1("Sol_ID"))
+			if not objRSEndPto.Eof and not objRSEndPto.bof then
+				'strEndereco		= objRSEndPto("Tpl_Sigla") & " " & objRSEndPto("End_NomeLogr") & ", " & objRSEndPto("End_NroLogr") & " " & objRSEndPto("Aec_Complemento") & " • " & objRSEndPto("End_Bairro") & " • " & objRSEndPto("End_Cep") & " • " & objRSEndPto("Cid_Desc") & " • " & objRSEndPto("Est_Sigla")
+				textohtml = textohtml & "<center><u><b>PONTA B<br><br></b></u></center>"
+				textohtml = textohtml & "<table><tr>"
+				textohtml = textohtml & "<td width=180>Endereço</td><td>" & objRSEndPto("Tpl_Sigla") & " " & objRSEndPto("End_NomeLogr") & " nº " & objRSEndPto("End_NroLogr") & " " & objRSEndPto("Aec_Complemento") & "</td></tr>"
+				textohtml = textohtml & "<tr><td>Cep</td><td> " & objRSEndPto("End_Cep") & "</td></tr>"
+				textohtml = textohtml & "<tr><td>Cidade</td><td> " & objRSEndPto("Cid_Desc") & " - " & objRSEndPto("Est_Sigla") & "</td></tr>"
+				textohtml = textohtml & "<tr><td>Contato</td><td>" & objRSEndPto("Aec_Contato")&"</td></tr>"
+				textohtml = textohtml & "<tr><td>Telefone</td><td>"& objRSEndPto("Aec_Telefone")&"</td></tr>"
+				textohtml = textohtml & "<tr><td>Interface</td><td>" & strInterfacePto & "</td></tr>"
+				textohtml = textohtml & "</table><br>"
+
+			End if	
+			Set objRSEndPto = Nothing
+			
+			textohtml = textohtml & "<table><tr><td colspan=2>Observação</td></tr>"
+			textohtml = textohtml & "<tr><td colspan=2><strong>"
+			textohtml = textohtml & Trim(ped1("SOL_Obs")) & "<BR>" &Trim(ped1("Ped_Obs")) & "</strong></font></td></tr>"
+			textohtml = textohtml & "</table><br><br><br>Atenciosamente,<br><br>"
+
+			'Usuario de coordenação embratel
+			Set objRS = db.execute("CLA_sp_view_agentesolicitacao " & dblSolId)
+				
+			if Not objRS.Eof then
+				While Not objRS.Eof
+					Select Case Trim(Ucase(objRS("Age_Sigla")))
+						Case "GAT"
+							strGLA = Trim(objRS("Usu_Username")) 
+							strNomeGLA = Trim(objRS("Usu_Nome")) 
+							strRamalGLA = Trim(objRS("Usu_Ramal")) 
+						Case "C"
+							strGICN = Trim(objRS("Usu_Username")) 
+							strNomeGICN = Trim(objRS("Usu_Nome")) 
+							strRamalGICN = Trim(objRS("Usu_Ramal")) 
+						Case "E"
+							strGICL = Trim(objRS("Usu_Username")) 
+							strNomeGICL = Trim(objRS("Usu_Nome")) 
+							strRamalGICL = Trim(objRS("Usu_Ramal"))
+							if Trim(objRS("Agp_Origem")) = "P" then
+								strUserGICL = strGICL
+							End if
+						Case "GAE"
+							strGLAE = Trim(objRS("Usu_Username"))
+							strNomeGLAE = Trim(objRS("Usu_Nome")) 
+							strRamalGLAE = Trim(objRS("Usu_Ramal")) 
+						
+					End Select
+					objRS.MoveNext
+				Wend	
+			End if
+
+			textohtml = textohtml & "Elaborado por " & strNomeGLA
+			
+			if dblSisId <> "3" then
+				textohtml = textohtml & "<br><br>" & strContatoEBT
+			else
+				Set objRSResp = db.execute("CLA_sp_sel_provedoremail " & dblProId & ",null,'" & ped1("Est_Sigla") &"','"& ped1("Cid_Sigla") &"'") 
+				If Not objRSResp.Eof and Not objRSResp.bof then
+					textohtml = textohtml & "<br><br>" & Trim(objRSResp("cPRo_ContratanteContato"))
+				Else
+					textohtml = textohtml & "<br><br>" & " Ruben Nalin Filho"
+				End if
+			End if
+			
+			
+			
+			textohtml = textohtml & "<br>Gerente de Implantação de Acessos.<br><br>"
+			textohtml = textohtml & "<hr>Embratel - Empresa Brasileira de Telecomunicações S.A."
+			textohtml = textohtml & "</td></tr></table></form>"
+			
+			
+			
+			textohtml = textohtml & "<iframe	id = ""IFrmEmail"" name = ""IFrmEmail"""
+			textohtml = textohtml & "name        = ""IFrmProcesso"""
+			textohtml = textohtml & "width       = ""0"""
+			textohtml = textohtml & "height      = ""0"""
+			textohtml = textohtml & "frameborder = ""0"""
+			textohtml = textohtml & "scrolling   = ""no"""
+			textohtml = textohtml & "align       = ""left"">"
+			textohtml = textohtml & "</iFrame>"
+		
+			textohtml = textohtml & "</body></html>"
+			
+			
+			
+			
+			
+			
+			response.write textohtml
+			response.end
+			
+			
+			
+			
+			
+			
+			'Set objFSO = CreateObject("Scripting.FileSystemObject")
+			'Set objFile = objFSO.CreateTextFile(strCaminho & "\CartasProvedor\emailprovedor.htm",  true)
+			'objFile.WriteLine(textohtml)
+			'objFile.Close
+			'ObjMail.AttachFile ( strCaminho & "\CartasProvedor\emailprovedor.htm") 
+			'ObjMail.Body = "segue em anexo carta de solicitação de serviço referente: " &  AcaoPedidoEmail(ucase(ped1("tprc_id"))) & "  -  " & trim(ped("Cli_nome")) & "  -  " & ucase(ped1("Ped_Prefixo")) & "-" & right("00000" & ped1("Ped_Numero"),5) & "/" & ped1("Ped_Ano")
+			'ObjMail.Send
+			'		
+			'
+			'Set objFile = objFSO.GetFile(strCaminho & "\CartasProvedor\emailprovedor.htm")
+			'objFile.Delete
+			
+			
+			'Set ObjMail = Nothing
+			'Set objFSO = Nothing 
+			'Set objFile = Nothing 
+			
+			' PSOUTO
+			
+
+		End if 'if Not ped1.Eof and Not ped1.Bof then
+		
+	End if
+
+		
+	'strRet = "<table width=100% ><tr><td style=""text-align:center""><font color = red>E-Mail enviado com sucesso. "  & strProEmail & "</font></td></tr></table>"  
+	
+	
+	' ALTERADO PSOUTO 31/08/2005
+	
+	strButton = "<form name = ""Envio"" action=""enviaemailpadraoLiberacao.asp"" method=""post"" target=""IFrmEmail""> <table width=100% border=0>" & chr(10)
+	'strButton = "<form name = ""Envio"" action=""http://ntspo904/newcla/asp/enviaemailpadraoLiberacao.asp"" method=""post"" target=""IFrmEmail""> <table width=100% border=0>" & chr(10)
+	strButton = strButton &	"<tr>" & chr(10)
+	strButton = strButton &	"	<td style=""text-align:center"">" & chr(10)
+	strButton = strButton &	"		<input  center type=button class=button name=btnImprimir value= Imprimir onClick=""Imprimir()"">&nbsp;" & chr(10)
+	strButton = strButton &	"		<input  center type=button class=button name=btnEnviar value= 'Enviar Email' onClick=""PreenviaMail()"">&nbsp;" & chr(10)
+	strButton = strButton &	"		<input  center type=button class=button name=btnSair value=Sair onClick=""javascript:window.returnValue=0;window.close()""><br><br>" & chr(10)
+	strButton = strButton &	"	</td>" & chr(10)
+	strButton = strButton &	"</tr></table>" & chr(10)
+	strButton = strButton &	"<input type=""hidden"" name=""hdnstrXML"" value="""">" & chr(10)
+	strButton = strButton &	"<input type=""hidden"" name=""strProEmail"" value=""" & strProEmail & """>" & chr(10)
+	strButton = strButton &	"<input type=""hidden"" name=""ASSUNTO"" value=""" & ASSUNTO & """>" & chr(10)
+	strButton = strButton &	"<input type=""hidden"" name=""strFromEmail"" value=""" & strFromEmail & """>" & chr(10)
+	
+	strButton = strButton &	"<input type=""hidden"" name=""NdAcfid"" value=""" & DbAcfid & """>" & chr(10)
+	strButton = strButton &	"<input type=""hidden"" name=""dblProId"" value=""" & dblProId & """>" & chr(10)
+	strButton = strButton &	"<input type=""hidden"" name=""dblPedId"" value=""" & dblPedId & """>" & chr(10)
+	strButton = strButton &	"<input type=""hidden"" name=""intTipoProcesso"" value=""" & intTipoProcesso  & """>"& chr(10)
+	strButton = strButton &	"<input type=""hidden"" name=""strUserName"" value=""" & strUserName & """>" & chr(10)
+	
+	
+	
+	
+	
+	
+	
+	'strButton = strButton &	"<input type=""hidden"" name=""hdnstrXML"" value=" & replace(replace(textohtml,"&","&amp;"),"'"," ") & " >" & chr(10)
+	
+	
+	
+	strButton = strButton &	"</form>"  & chr(10)
+	
+	strfunction = "<script language=""VBScript"">" & chr(10)
+	strfunction = strfunction & "	function PreenviaMail()" & chr(10)
+	strfunction = strfunction & "		dim retorno" & chr(10)
+	strfunction = strfunction & "		document.Envio.hdnstrXML.value = form1.InnerHTML" & chr(10)
+	strfunction = strfunction & "		retorno = msgbox(""Confirma envio de E-mail ao provedor?"",68,""Envio de E-mail para Provedor"")" & chr(10)
+	strfunction = strfunction & "	if retorno = 6 then" & chr(10)
+	strfunction = strfunction & "		Envio.submit()" & chr(10)
+	strfunction = strfunction & "	else " & chr(10)
+	strfunction = strfunction & "	window.close() " & chr(10)
+	strfunction = strfunction & "	end if " & chr(10)
+	strfunction = strfunction & "	end function" & chr(10)
+	strfunction = strfunction & "</script>" & chr(10)
+	
+	
+	
+	'strfunction = strfunction &  "<script>"
+	'strfunction = strfunction &  "function SendMail() " & chr(10)
+	'strfunction = strfunction &  "with(document.forms[0]){" & chr(10)
+	'strfunction = strfunction &  "action = 'enviaemailpadrao.asp'" & chr(10)
+	'strfunction = strfunction &  "method = 'post'" & chr(10)
+	'strfunction = strfunction &  "submit()" & chr(10)
+	'	strfunction = strfunction &  "{ " & chr(10)
+	'strfunction = strfunction &  " } " & chr(10)
+	'strfunction = strfunction &  "</script>"
+	
+	
+	
+	'strButton = "<table width=100% border=0>"
+	'strButton = strButton &	"<tr>"
+	'strButton = strButton &	"<td style=""text-align:center"">"
+	'strButton = strButton &	"<input  center type=button class=button name=btnImprimir value= Imprimir onClick=""Imprimir()"">&nbsp;"
+	'strButton = strButton &	"<input  center type=button class=button name=btnSair value=Sair onClick=""javascript:window.returnValue=0;window.close()""><br><br>"
+	'strButton = strButton &	"</td>"
+	'strButton = strButton &	"</tr></table>"
+
+
+	' /PSOUTO
+
+	
+	Response.ContentType = "text/HTML;charset=ISO-8859-1"
+	Response.Write (strRet & textohtml &  strButton & strfunction)
+	'Response.Write dblSolId & "<BR>"
+	'Response.Write "CLA_sp_view_pedido null,null,null,null,null,null," & dblPedId & ",null,null,'" & statusPedido & "'" & "<BR>"
+	'Response.Write "CLA_sp_sel_provedoremail " & dblProId & ",null,'" & ped1("Est_Sigla") &"','"& ped1("Cid_Sigla") &"'" & "<BR>"
+	
+	'Response.Write strProEmail & "<BR>"
+	
+	
+	
+' PSOUTO 31/08/2005
+	
+Function AcaoPedidoEmail(intTipo)
+	Select case intTipo
+		case 1
+			AcaoPedidoEmail = "Instalar Acesso"
+		case 2			
+			AcaoPedidoEmail = "Retirar Acesso"
+		case 3		
+			AcaoPedidoEmail = "Alterar Acesso"
+		case 4
+			AcaoPedidoEmail = "Cancelar Acesso"
+	End Select
+End Function
+
+
+	
+%>
