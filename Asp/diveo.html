@@ -1,0 +1,471 @@
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Pedido: DM-44270/2024</title>
+<style>
+				TD
+				{
+				    FONT-SIZE: 7pt;
+				    FONT-FAMILY: Tahoma;
+				}
+				.TD_RESPOSTA
+				{
+				    FONT-SIZE: 7pt;
+				    FONT-FAMILY: Tahoma;
+				    border-top: 1px solid ;
+				    border-right: 1px solid ;
+				    border-bottom: 1px solid ;
+				    border-left: 1px solid;
+				}
+				INPUT
+				{
+				    FONT-SIZE: 7pt;
+				    FONT-FAMILY: Tahoma;
+				}
+				.TD_CAMPO
+				{
+				    FONT-WEIGHT: bold;
+				    FONT-SIZE: 7pt;
+				    FONT-FAMILY: Tahoma;
+				    BACKGROUND-COLOR: #c2c3d2
+				}
+				.td_btn
+				{
+				    FONT-WEIGHT: bold;
+				    FONT-SIZE: 7pt;
+				    CURSOR: hand;
+				    COLOR: white;
+				    BORDER-LEFT: thin groove;
+				    BORDER-BOTTOM: thin groove;
+				    BORDER-RIGHT: thin groove;
+				    BORDER-TOP: thin groove;
+				    FONT-FAMILY: Tahoma;
+				    BACKGROUND-COLOR: steelblue;
+				    TEXT-ALIGN: center
+				}
+				.TD_NEGRITO
+				{
+				    FONT-WEIGHT: bold;
+				    FONT-FAMILY: Arial
+				}
+				.TD_CAMPO_CLARO
+				{
+				    FONT-WEIGHT: bold;
+				    FONT-SIZE: 7pt;
+				    FONT-FAMILY: Tahoma;
+				    BACKGROUND-COLOR: #edebeb
+				}
+				.TD_SUBTIT
+				{
+				    FONT-WEIGHT: bold;
+				    FONT-SIZE: 7pt;
+				    FONT-FAMILY: Tahoma;
+				    BACKGROUND-COLOR: #b2e6f7;
+				    TEXT-DECORATION: underline
+				}
+				.TD_EMBRATEL
+				{
+				    FONT-WEIGHT: normal;
+				    COLOR: darkblue;
+				    FONT-STYLE: oblique;
+				    FONT-FAMILY: 'Arial Black';
+				    BACKGROUND-COLOR: #eeeeea;
+				    border-top: 1px solid ;
+				    border-right: 1px solid ;
+				    border-bottom: 1px solid ;
+				    border-left: 1px solid;
+				}
+				INPUT.button
+				{
+					font-family: Verdana, Arial, Helvetica, sans-serif;
+					font-size: 9px;
+					font-weight: normal;
+					TEXT-ALIGN: center
+					color: #000000;
+					text-decoration: none;
+					background-color: #f1f1f1;
+					border-top: 1px solid #0F1F5F;
+					border-right: 1px solid #0F1F5F;
+					border-bottom: 1px solid #0F1F5F;
+					border-left: 1px solid #0F1F5F;
+					width:100px
+				}
+				.table_interno
+				{
+				    border-top: 1px solid ;
+				    border-right: 1px solid ;
+				    border-bottom: 1px solid ;
+				    border-left: 1px solid;
+				}
+			</style><script>
+				function Imprimir()
+				{
+					window.print();
+					//alert("teste");
+				}
+				function SendMail()
+				{
+
+					var xmlDoc = new ActiveXObject("Microsoft.XMLDOM");
+					var xmlhttp = new ActiveXObject("Msxml2.XMLHTTP");
+					var strXML
+
+					xmlDoc.loadXML(Envio.hdnstrXML.value);
+					xmlhttp.Open("POST", "EnviaEmail.asp", false);
+					xmlhttp.Send(xmlDoc.xml);
+
+					strXML = xmlhttp.responseText;
+					objWindow = window.open("About:blank", null, "status=no,toolbar=no,menubar=no,location=no,resizable=Yes,scrollbars = Yes");
+					objWindow.document.write(strXML);		
+					objWindow.document.close();
+					document.close();
+								
+				}
+			</script></head>
+<BODY leftMargin="0" topMargin="0" marginheight="0" marginwidth="0" align="center">
+<TABLE align="center" class="table_interno" cellPadding="0" cellSpacing="0" width="80%">
+<TR><TD>
+<TABLE align="center" border="0" cellPadding="0" cellSpacing="1" width="100%">
+<TR>
+<TD ROWSPAN="3" STYLE="FONT-SIZE:14PT" CLASS="TD_EMBRATEL" ALIGN="CENTER" VALIGN="CENTER">Embratel</TD>
+<TD ROWSPAN="3" VALIGN="CENTER" ALIGN="CENTER" STYLE="FONT-SIZE:10PT" width="40%" CLASS="TD_RESPOSTA"><B>PEDIDO DE ACESSO DIVEO DO BRASIL </B></TD>
+<TD STYLE="FONT-SIZE:10PT" CLASS="TD_RESPOSTA"><B>Nº:</B>DM-44270/2024</TD>
+</TR>
+<TR>
+<TD STYLE="FONT-SIZE:10PT" CLASS="TD_RESPOSTA"><B>Data:</B>30/06/2006</TD>
+</TR>
+<TR>
+<TD STYLE="FONT-SIZE:10PT" CLASS="TD_RESPOSTA"><B>Contrato:</B>DIVEO                                   </TD>
+</TR>
+</TABLE><BR><BR><TABLE align="center" cellPadding="0" border="0" cellSpacing="1" width="100%">
+<TR>
+<TD CLASS="TD_CAMPO" width="20%"> CONTRATANTE </TD>
+<TD COLSPAN="5" CLASS="TD_RESPOSTA"><font color="white">.</font>EMBRATEL EMPRESA BRASILEIRA DE TELECOMUNICAÇÕES S/A                             </TD>
+</TR>
+<TR>
+<TD CLASS="TD_CAMPO_CLARO" width="15%"> ENDEREÇO </TD>
+<TD COLSPAN="5" CLASS="TD_RESPOSTA">
+<font color="white">.</font>RUA DOS INGLESES, 600                                                           </TD>
+</TR>
+<TR>
+<TD CLASS="TD_CAMPO_CLARO"> CIDADE </TD>
+<TD width="30%" CLASS="TD_RESPOSTA">
+<font color="white">.</font>SAO PAULO</TD>
+<TD CLASS="TD_CAMPO_CLARO" width="5%"> UF </TD>
+<TD CLASS="TD_RESPOSTA" width="15%">
+<font color="white">.</font>SP</TD>
+<TD CLASS="TD_CAMPO_CLARO" width="5%"> CEP </TD>
+<TD CLASS="TD_RESPOSTA">
+<font color="white">.</font>09324-904</TD>
+</TR>
+<TR>
+<TD CLASS="TD_CAMPO_CLARO"> TELEFONE </TD>
+<TD width="25%" CLASS="TD_RESPOSTA"><font color="white">.</font>11-2121-2283        </TD>
+<TD CLASS="TD_CAMPO_CLARO" width="5%"> FAX </TD>
+<TD COLSPAN="3" CLASS="TD_RESPOSTA"><font color="white">.</font></TD>
+</TR>
+</TABLE><BR><BR><TABLE align="center" cellPadding="0" border="0" cellSpacing="1" width="100%">
+<TR>
+<TD CLASS="TD_CAMPO" width="20%"> CONTRATADA </TD>
+<TD COLSPAN="5" CLASS="TD_RESPOSTA">
+<font color="white">.</font> DIVEO DO BRASIL TELECOMUNICAÇÕES LTDA.                                          </TD>
+</TR>
+<TR>
+<TD CLASS="TD_CAMPO_CLARO" width="15%"> ENDEREÇO </TD>
+<TD COLSPAN="5" CLASS="TD_RESPOSTA"><font color="white">.</font>RUA TENENTE NEGRÃO, 166                                                         </TD>
+</TR>
+<TR>
+<TD CLASS="TD_CAMPO_CLARO"> CIDADE </TD>
+<TD width="30%" CLASS="TD_RESPOSTA">
+<font color="white">.</font>SAO PAULO</TD>
+<TD CLASS="TD_CAMPO_CLARO" width="5%"> UF </TD>
+<TD CLASS="TD_RESPOSTA" width="15%">
+<font color="white">.</font>SP</TD>
+<TD CLASS="TD_CAMPO_CLARO" width="5%"> CEP </TD>
+<TD CLASS="TD_RESPOSTA">
+<font color="white">.</font>04530-030</TD>
+</TR>
+<TR>
+<TD CLASS="TD_CAMPO_CLARO"> TELEFONE </TD>
+<TD width="25%" CLASS="TD_RESPOSTA">
+<font color="white">.</font>11-3048-2475        </TD>
+<TD CLASS="TD_CAMPO_CLARO" width="5%"> FAX </TD>
+<TD COLSPAN="3" CLASS="TD_RESPOSTA">
+<font color="white">.</font>11-3048-2460        </TD>
+</TR>
+</TABLE><BR><BR><TABLE cellSpacing="0" cellPadding="0" width="100%" align="center" border="0">
+<TBODY>
+<TR>
+<TD width="30%"><B>Ação:</B></TD>
+</TR>
+</TBODY>
+</TABLE>
+<TABLE cellSpacing="0" cellPadding="0" width="100%" align="center" border="0">
+<TBODY>
+<TR>
+<TD>
+						( 
+						
+							
+						
+						) Instalar 
+					</TD>
+<TD>
+						( 
+							
+							
+						) Alterar Endereço 
+					</TD>
+<TD>
+						( 
+							
+
+						) Alterar Velocidade 
+					</TD>
+<TD>
+						( 
+
+							<span style="font-family:'verdana'"><B>x</B></span>
+
+						) Desinstalar 
+					</TD>
+<TD>
+						( 
+							
+
+						) Cancelar 
+					</TD>
+</TR>
+</TBODY>
+</TABLE><BR><BR><TABLE align="center" border="0" cellPadding="0" cellSpacing="0" width="100%">
+<TR>
+<TD width="30%"><B>NÚMERO DO ACESSO: 5511060260</B></TD>
+</TR>
+</TABLE><BR><BR><TABLE align="center" border="0" cellPadding="0" cellSpacing="0" width="100%">
+<TR>
+<TD width="30%"><B>PRAZO DE VIGÊNCIA DA CONTRATAÇÃO DO ACESSO:</B></TD>
+</TR>
+</TABLE>
+<TABLE align="center" border="0" cellPadding="0" cellSpacing="0" width="100%">
+<TR>
+<TD>
+										
+						(	
+						
+						)
+						Indeterminado
+					</TD>
+<TD>
+					
+						(	
+						<span style="font-family:'verdana'"><B>x</B></span>
+						)
+						12 Meses
+					</TD>
+<TD>
+						(	
+						
+						)
+						24 Meses
+					</TD>
+<TD>
+						(	
+						
+						)
+						36 Meses
+					</TD>
+<TD>
+						(	
+						
+						)
+						48 Meses
+					</TD>
+<TD>
+						(	
+						
+						)
+						60 Meses
+					</TD>
+</TR>
+<TR>
+<TD colspan="3">
+						(	
+						
+						)
+						<b>Temporário:</b></TD>
+</TR>
+</TABLE><BR><BR><TABLE cellSpacing="0" cellPadding="0" width="100%" align="center" border="0">
+<TBODY>
+<TR>
+<TD class="TD_RESPOSTA" width="16%"><B>Velocidade</B></TD>
+<TD class="TD_RESPOSTA" width="16%"><FONT color="white">.</FONT>384K</TD>
+<TD class="TD_RESPOSTA" width="16%"><B>Valor Instalação</B></TD>
+<TD class="TD_RESPOSTA" width="16%"><FONT color="white">.</FONT></TD>
+<TD class="TD_RESPOSTA" width="16%"><B>Valor Mensalidade</B></TD>
+<TD class="TD_RESPOSTA" width="16%"><FONT color="white">.</FONT></TD>
+</TR>
+</TBODY>
+</TABLE><BR><BR><TABLE align="center" border="0" cellPadding="0" cellSpacing="0" width="100%">
+<TR>
+<TD><B>DADOS DE INSTALAÇÃO DO ACESSO(PONTA A = CLIENTE)</B></TD>
+</TR>
+</TABLE><BR><TABLE align="center" border="0" cellPadding="0" cellSpacing="1" width="100%">
+<TR>
+<TD CLASS="TD_CAMPO" width="20%"> NOME DO CLIENTE </TD>
+<TD COLSPAN="5" CLASS="TD_RESPOSTA"><font color="white">.</font>RTM - REDE DE TELECOMUNICACOES PARA O MERCADO LTDA</TD>
+</TR>
+<TR>
+<TD CLASS="TD_CAMPO_CLARO"> ENDEREÇO </TD>
+<TD COLSPAN="5" CLASS="TD_RESPOSTA"><font color="white">.</font>AV PAULISTA 2300 9 AN BELA VISTA</TD>
+</TR>
+<TR>
+<TD CLASS="TD_CAMPO_CLARO"> CIDADE </TD>
+<TD CLASS="TD_RESPOSTA" width="30%">
+<font color="white">.</font>SAO PAULO</TD>
+<TD CLASS="TD_CAMPO_CLARO" width="5%"> UF </TD>
+<TD CLASS="TD_RESPOSTA" width="15%">
+<font color="white">.</font>SP</TD>
+<TD CLASS="TD_CAMPO_CLARO" width="5%"> CEP </TD>
+<TD CLASS="TD_RESPOSTA">
+<font color="white">.</font>01310300</TD>
+</TR>
+<TR>
+<TD CLASS="TD_CAMPO_CLARO"> CONTA CORRENTE </TD>
+<TD COLSPAN="5" CLASS="TD_RESPOSTA">
+<font color="white">.</font>00008733832</TD>
+</TR>
+<TR>
+<TD CLASS="TD_CAMPO_CLARO"> CGC ou CNPJ </TD>
+<TD CLASS="TD_RESPOSTA">
+<font color="white">.</font>03341541000171</TD>
+<TD CLASS="TD_CAMPO_CLARO" COLSPAN="3"> CÓDIGO TRIBUTÁRIO </TD>
+<TD CLASS="TD_RESPOSTA">
+<font color="white">.</font></TD>
+</TR>
+<TR>
+<TD CLASS="TD_CAMPO_CLARO"> INSCRIÇÃO ESTADUAL </TD>
+<TD CLASS="TD_RESPOSTA">
+<font color="white">.</font></TD>
+<TD CLASS="TD_CAMPO_CLARO" COLSPAN="3"> INSCRIÇÃO MUNICIPAL </TD>
+<TD CLASS="TD_RESPOSTA">
+<font color="white">.</font></TD>
+</TR>
+<TR>
+<TD CLASS="TD_CAMPO_CLARO"> TELEFONE CONTATO</TD>
+<TD CLASS="TD_RESPOSTA">
+<font color="white">.</font>( 11 ) 32178179</TD>
+<TD CLASS="TD_CAMPO_CLARO" COLSPAN="3"> PESSOA DE CONTATO </TD>
+<TD CLASS="TD_RESPOSTA">
+<font color="white">.</font>ANTONIO SAJO</TD>
+</TR>
+<TR>
+<TD CLASS="TD_CAMPO_CLARO"> VELOCIDADE</TD>
+<TD CLASS="TD_RESPOSTA">
+<font color="white">.</font>384K</TD>
+<TD CLASS="TD_CAMPO_CLARO" COLSPAN="3"> INTERFACE </TD>
+<TD CLASS="TD_RESPOSTA">
+<font color="white">.</font>V35</TD>
+</TR>
+<TR>
+<TD CLASS="TD_CAMPO_CLARO"> NÚMERO DA SEV</TD>
+<TD CLASS="TD_RESPOSTA">
+<font color="white">.</font>473526</TD>
+<TD CLASS="TD_CAMPO_CLARO" COLSPAN="3"> PRAZO DE ENTREGA SEV </TD>
+<TD CLASS="TD_RESPOSTA">
+<font color="white">.</font></TD>
+</TR>
+</TABLE><BR><BR><TABLE align="center" border="0" cellPadding="0" cellSpacing="0" width="100%">
+<TR>
+<TD><B>DADOS DE INSTALAÇÃO DO ACESSO(PONTA B = EMBRATEL)</B></TD>
+</TR>
+</TABLE><BR><TABLE align="center" border="0" cellPadding="0" cellSpacing="1" width="100%">
+<TR>
+<TD CLASS="TD_CAMPO" width="20%"> NOME  </TD>
+<TD CLASS="TD_RESPOSTA" COLSPAN="5">
+<font color="white">.</font>EMPRESA BRASILEIRA DE TELECOMUNICAÇÔES S/A - EMBRATEL</TD>
+</TR>
+<TR>
+<TD CLASS="TD_CAMPO_CLARO"> ENDEREÇO </TD>
+<TD CLASS="TD_RESPOSTA" COLSPAN="5">
+<font color="white">.</font>R DOS INGLESES 600  MORRO DOS INGLESES</TD>
+</TR>
+<TR>
+<TD CLASS="TD_CAMPO_CLARO"> CIDADE </TD>
+<TD CLASS="TD_RESPOSTA" width="30%">
+<font color="white">.</font>SAO PAULO</TD>
+<TD CLASS="TD_CAMPO_CLARO" width="5%"> UF </TD>
+<TD CLASS="TD_RESPOSTA" width="15%">
+<font color="white">.</font>SP</TD>
+<TD CLASS="TD_CAMPO_CLARO" width="5%"> CEP </TD>
+<TD CLASS="TD_RESPOSTA">
+<font color="white">.</font>01329904</TD>
+</TR>
+<TR>
+<TD CLASS="TD_CAMPO_CLARO"> CGC ou CNPJ </TD>
+<TD CLASS="TD_RESPOSTA">
+<font color="white">.</font>40432544082950</TD>
+<TD CLASS="TD_CAMPO_CLARO" COLSPAN="3"> INSCRIÇÃO MUNICIPAL </TD>
+<TD CLASS="TD_RESPOSTA">
+<font color="white">.</font></TD>
+</TR>
+<TR>
+<TD CLASS="TD_CAMPO_CLARO"> INSCRIÇÃO ESTADUAL </TD>
+<TD CLASS="TD_RESPOSTA">
+<font color="white">.</font></TD>
+<TD CLASS="TD_CAMPO_CLARO" COLSPAN="3"> PESSOA DE CONTATO </TD>
+<TD CLASS="TD_RESPOSTA">
+<font color="white">.</font></TD>
+</TR>
+<TR>
+<TD CLASS="TD_CAMPO_CLARO" width="20%"> CÓDIGO TRIBUTÁRIO </TD>
+<TD CLASS="TD_RESPOSTA" COLSPAN="5">
+<font color="white">.</font>
+</TD>
+</TR>
+</TABLE><BR><BR><TABLE cellSpacing="1" cellPadding="0" width="100%" align="center" border="0">
+<TBODY>
+<TR>
+<TD class="TD_CAMPO" align="middle" width="15%" rowSpan="4">Autorização do Serviço </TD>
+<TD class="TD_CAMPO_CLARO" align="middle" colSpan="2">Representante da Embratel </TD>
+<TD class="TD_CAMPO_CLARO" align="middle" colSpan="2">Representante da Contratada </TD>
+</TR>
+<TR>
+<TD class="TD_RESPOSTA" width="15%">Assinatura </TD>
+<TD class="TD_RESPOSTA"><FONT color="white">.</FONT></TD>
+<TD class="TD_RESPOSTA" width="15%">Assinatura </TD>
+<TD class="TD_RESPOSTA"><FONT color="white">.</FONT></TD>
+</TR>
+<TR>
+<TD class="TD_RESPOSTA">Nome </TD>
+<TD class="TD_RESPOSTA"><FONT color="white">.</FONT>ALESSANDRA LAZZARINI                                                            </TD>
+<TD class="TD_RESPOSTA">Nome </TD>
+<TD class="TD_RESPOSTA"><FONT color="white">.</FONT></TD>
+</TR>
+<TR>
+<TD class="TD_RESPOSTA">Local/Data </TD>
+<TD class="TD_RESPOSTA"><FONT color="white">.</FONT>SAO PAULO, 30 de Junho de 2006 </TD>
+<TD class="TD_RESPOSTA">Local/Data </TD>
+<TD class="TD_RESPOSTA"><FONT color="white">.</FONT> SAO PAULO, 30 de Junho de 2006 </TD>
+</TR>
+</TBODY>
+</TABLE><BR><BR><TABLE align="center" border="0" cellPadding="0" cellSpacing="1" width="100%">
+<TR>
+<TD class="TD_CAMPO_CLARO" width="20%" height="50px" ALIGN="LEFT" VALIGN="TOP"><B>OBSERVAÇÕES:</B></TD>
+<TD CLASS="TD_RESPOSTA" width="80%" height="50px" STYLE="height:80px" valign="top"><span style="FONT-WEIGHT:normal"><font color="white">.</font>CLIENTE NO LOCAL: BCO SOCIETE GENERALE
+ALTER.VELOCIDADE DE 64K PARA 384K                                                                                                                                                                                                                                   <br><font color="white">.</font>CLIENTE NO LOCAL: BCO SOCIETE GENERALE
+ALTER.VELOCIDADE DE 64K PARA 384K</span></TD>
+</TR>
+</TABLE>
+<p></p>
+<p></p>
+<TABLE align="left" border="0" cellPadding="0" cellSpacing="1" width="100%">
+<TR>
+<TD ALIGN="LEFT" VALIGN="TOP"><B>Elaborado por: </B><br><B>Responsável: </B>ALESSANDRA LAZZARINI                                                            <br></TD>
+</TR>
+</TABLE>
+</TD></TR>
+</TABLE>
+<P></P>
+</BODY>
+</html>
+

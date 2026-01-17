@@ -1,0 +1,368 @@
+﻿<%
+'•IMPLEMENT SOFT - IMPLEMENTAÇÕES E SOLUÇÕES EM INFORMÁTICA
+'	- Sistema			: CLA
+'	- Arquivo			: AssocTeecnologiaFacilidade_main.asp
+'	- Responsável		: Vital
+'	- Descrição			: Associação de Tecnologia com Facilidade
+%>
+<!--#include file="../inc/data.asp"-->
+<%
+	Dim dblID
+	Dim objRSVel
+	Dim strSel
+	Dim dblIDAtual
+
+	dblID = Request.QueryString("ID")
+	'dblID = Request.QueryString("ID")
+	'response.write "<script>alert('"&dblID&"')</script>"
+
+	if Trim(dblID) = "" then
+		dblID = Request.Form("hdnId")
+	End if	
+
+	If Request.Form("hdnAcao")="Gravar" then
+
+		If dblID="" then
+			Vetor_Campos(1)="adInteger,2,adParamInput,"
+		Else
+			Vetor_Campos(1)="adInteger,2,adParamInput,"& dblID
+		End if
+
+		Vetor_Campos(2)="adInteger,2,adParamInput,"& Request.Form("cboEstruturaTecnologia") 
+		Vetor_Campos(3)="adWChar,60,adParamInput," & Request.Form("txtLabel") 
+		Vetor_Campos(4)="adWChar,5,adParamInput,"& Request.Form("cboFormato") 
+		Vetor_Campos(5)="adWChar,5,adParamInput," & Request.Form("txtTamanho") 
+		Vetor_Campos(6)="adWChar,5,adParamInput,"& Request.Form("rdoCompartilha") 
+		Vetor_Campos(7)="adWChar,5,adParamInput," & Request.Form("rdoObrigatorio") 
+		Vetor_Campos(8)="adWChar,5,adParamInput," & Request.Form("rdoStatus") 
+		Vetor_Campos(9)="adWChar,10,adParamInput," & strloginrede 
+		Vetor_Campos(10)="adInteger,2,adParamOutput,0"  
+	
+		Call APENDA_PARAM("CLA_sp_ins_EstruturaTecnologia",10,Vetor_Campos)
+		ObjCmd.Execute'pega dbaction
+		DBAction = ObjCmd.Parameters("RET").value
+
+	End if
+	If dblID <> "" then
+		
+		Set objRS = db.execute("CLA_sp_sel_assocTecnologiaFacilidade " & dblID)
+	
+		newtec_nome = Trim(objRS("newtec_nome"))  
+		newfac_nome = Trim(objRS("newfac_nome"))
+		Set objRS  = Nothing
+
+		'Set objRSAssocTecFac = db.execute("CLA_sp_sel_EstruturaTecnologiaFacilidade null, " & dblID)
+	
+		Set objRSAssocTecFac  = Nothing
+		Set objRSAssocTecFac = Server.CreateObject("ADODB.Recordset")
+		objRSAssocTecFac.Open "CLA_sp_sel_EstruturaTecnologiaFacilidade null, " & dblID, db, 3, 3 ' adOpenKeyset, adLockOptimis		
+		
+	End if
+
+	if objRSAssocTecFac("estrutura_tec_fac_id") <> "" then
+	' Obter o número total de registros
+	objRSAssocTecFac.MoveFirst
+	totalRows=0 
+	Do While Not objRSAssocTecFac.EOF
+		totalRows = totalRows + 1
+		objRSAssocTecFac.MoveNext
+	Loop
+
+	dim k 
+	dim ordena ,sql 
+	Dim currentRow, totalRows
+	dim keyalt
+	keyalt=false
+	k = 0
+	ordena =""
+	objRSAssocTecFac.MoveFirst
+	do while not objRSAssocTecFac.eof 
+		 k =  k +1
+	 	 
+		if isnull(objRSAssocTecFac("ordenacao")) then	
+			 sql ="update [dbo].[cla_estrutura_tecnologiaFacilidade] set [ordenacao]=" & k & " where [estrutura_tec_fac_id]=" & objRSAssocTecFac("estrutura_tec_fac_id")		 		
+			 db.Execute sql
+			 keyalt =true
+		Else					 
+		   if (objRSAssocTecFac("ordenacao"))<> k then
+				sql ="update [dbo].[cla_estrutura_tecnologiaFacilidade] set [ordenacao]=" & k & " where [estrutura_tec_fac_id]=" & objRSAssocTecFac("estrutura_tec_fac_id")
+				ObjCmd.Execute sql
+				keyalt =true
+				Response.Write ("sql 2: " & sql & "</br>")
+		   end if					
+		end if 				
+		objRSAssocTecFac.movenext
+	loop 
+	' Obter o número total de registros
+	totalRows = k
+	if keyalt  then
+		Set objRSAssocTecFac  = Nothing
+		objRSAssocTecFac.Open "CLA_sp_sel_EstruturaTecnologiaFacilidade null, " & dblID, db, 3, 3 ' adOpenKeyset, adLockOptimis		
+	end if 
+
+	' Simulando dados para o grid
+	dim dados()
+
+	' Redimensionar o array para o número de registros
+	ReDim dados(totalRows - 1)
+
+	' Preencher o array com os dados do Recordset
+	i = 0
+	objRSAssocTecFac.MoveFirst
+	Dim tempArray()
+	Do While Not objRSAssocTecFac.EOF
+		' Criar um array temporário para armazenar os campos do registro atual    
+		ReDim tempArray(objRSAssocTecFac.Fields.Count - 1)
+
+		' Preencher o array temporário com os valores dos campos
+		For j = 0 To objRSAssocTecFac.Fields.Count - 1
+			tempArray(j) = objRSAssocTecFac.Fields(j).Value
+		Next
+
+		' Atribuir o array temporário ao array principal
+		dados(i) = tempArray
+
+		' Mover para o próximo registro
+		objRSAssocTecFac.MoveNext
+		i = i + 1
+	Loop
+	
+	End if
+		
+	' Verifica se um botão foi pressionado
+	If Request("acao") = "cima" Then
+		MoverParaCima(CInt(Request("index")))
+	ElseIf Request("acao") = "baixo" Then
+		MoverParaBaixo(CInt(Request("index")))
+	End If
+
+	' Função para mover a linha para cima
+	Function MoverParaCima(index)
+		If index > 0 Then
+			' Troca os elementos
+			temp = dados(index)
+			dados(index) = dados(index - 1)
+			dados(index - 1) = temp
+		End If
+	End Function
+ 
+	' Função para mover a linha para baixo
+	Function MoverParaBaixo(index)
+		If index < UBound(dados) Then
+			' Troca os elementos
+			temp = dados(index)
+			dados(index) = dados(index + 1)
+			dados(index + 1) = temp
+		End If
+	End Function
+ 
+	function atualiza()
+		response.write("<script language='JavaScript'>alert('entrei')</script>")
+		Dim tabela, tds, td
+		' Obtém a tabela pelo ID
+		Set tabela = Document.getElementById("estrtec")
+
+		' Obtém todos os elementos <td> da tabela específica
+		Set tds = tabela.getElementsByTagName("td")
+
+		' Itera sobre todos os <td> e exibe seu conteúdo
+		For Each td In tds
+	   		response.write("<script language='JavaScript'>alert('nome:" & td.id & " valor:" & td.innerText &"')</script>") ' Exibe o texto de cada <td>
+		Next
+	
+	end Function
+	'response.write("<script language='JavaScript'>alert('-----> OK <------')</script>")
+%>
+<!--#include file="../inc/header.asp"-->
+<form action="consultaestruturaTecnologiaFacilidade.asp" method="post" >
+<SCRIPT LANGUAGE="JavaScript">
+
+	function EstruturaTecnologia(){
+
+		with (document.forms[0])
+		{
+			action = "cst_estruturaTecnologia.asp?ID=<%=dblID%>"
+			submit()
+		}
+	}
+
+
+	function GravarEstruturaTecnologia()
+	{
+		//if (!checa(document.forms[0])) return
+		with (document.forms[0])
+		{
+			action = "estruturaTecnologia.asp?ID=<%=dblID%>"
+			//hdnAcao.value = "Gravar"
+			submit()
+		}
+	}
+
+	function atualizarServidor(idAntigo, idNovo, direcao, chave, chaveNovo ) {
+
+		var xhr = new XMLHttpRequest();
+		xhr.open("POST", "atualizaOrdenaEstruturaTec.asp", true); // URL do seu script ASP
+		xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+		xhr.onreadystatechange = function() {
+			if (xhr.readyState === 4 && xhr.status === 200) {
+				//console.log("Atualização realizada com sucesso: " + xhr.responseText);
+				//alert("aqui")
+				EstruturaTecnologia();
+			}
+		};
+		xhr.send("idAntigo=" + idAntigo + "&idNovo=" + idNovo + "&direcao=" + direcao + "&chave=" + chave + "&chaveNovo=" + chaveNovo); // Envia os dados para o servidor
+	}
+
+	function moverLinha(id, direcao, totrows,chave) {
+
+		var tag = 'ord' + id
+
+		var atual = document.getElementById(tag);
+		var acima = 'acima' 
+		var abaixo = 'abaixo' 
+	
+		if (direcao === 'cima') 
+		{	
+			var ant = 'ord' + (parseInt(id) - 1);				
+			var anterior = document.getElementById(ant);
+			anterior.innerText =id
+			atual.innerText = (parseInt(id) - 1); 	
+			var chaveant = 'chave' + (parseInt(id) - 1);
+			var vchave = document.getElementById(chaveant)
+			var vchaveant = vchave.value
+  	
+			atualizarServidor(id, parseInt(id) - 1, 'acima', chave,vchaveant );
+				
+		} else if (direcao === 'baixo') 
+		{
+			var prox = 'ord' + (parseInt(id) + 1);
+			var proximo = document.getElementById(prox);
+			proximo.innerText = id
+			atual.innerText = (parseInt(id) + 1);
+			var chavepos = 'chave' + (parseInt(id) + 1);
+			var vchavep = document.getElementById(chavepos)
+			var vchavepos = vchavep.value
+		
+			atualizarServidor(id, parseInt(id) + 1, 'abaixo', chave, vchavepos);		
+					
+		}
+
+	}
+</script>
+<input type=hidden name=hdnAcao>
+<input type=hidden name=hdnUFAtual>
+<input type=hidden name=hdnId value="<%=dblID%>" >
+<tr>
+	<td>
+		<table border="0" cellspacing="1" cellpadding=0 width="760">		
+			<tr>
+				<th colspan=2><p align="center">Estrutura de Tecnologia com Facilidade</p></th>
+			</tr>
+			<tr class=clsSilver>
+				<td>
+					<font class="clsObrig">:: </font>Tecnologia + Facilidade </font>
+				</td>
+				
+				<td>
+					<%= newtec_nome  + " - " + newfac_nome %>									
+				</td>
+			</tr>
+			<tr>
+				<td colspan=2 align="center"><br>
+					<input type="button" class="button" name="btnGravar" value="ADICIONAR" onClick="GravarEstruturaTecnologia()" accesskey="I" onmouseover="showtip(this,event,'Incluir (Alt+I)');"> 
+					<input type="button" class="button" name="Voltar" value="Voltar" onClick="javascript:window.location.replace('estruturaTecnologia_main.asp')" accesskey="B" onmouseover="showtip(this,event,'Voltar (Alt+B)');" >
+					<input type="button" class="button" name="btnSair" value=" Sair " onClick="javascript:window.location.replace('main.asp')" style="width:100px" accesskey="X" onmouseover="showtip(this,event,'Sair (Alt+X)');">
+				</td>
+			</tr>
+		</table>
+		<div class="table-responsive">          
+			<table  id ="estrtec" border="0" cellspacing="1" cellpadding=0 width="760">
+				<thead>
+					<tr>
+						<th>ID</th>
+						<th>Editar</th>
+						<th>Label</th>
+						<th>Formato</th>
+						<th>Tamanho</th>
+						<th>Compartilha</th>
+						<th>Obrigatorio</th>
+						<th>Status</th>
+						<th>Ordenação</th>
+						<th>Excluir</th>
+					</tr>
+				</thead>
+				<tbody>
+				<%
+					if objRSAssocTecFac("estrutura_tec_fac_id") <> "" then
+					'AQUI COMEÇA O DO WHILE ONDE TRARÁ AS LINHAS DE ACORDO COM O SELECT FEITO
+					objRSAssocTecFac.MoveFirst
+					k=0
+					do while not objRSAssocTecFac.eof 								
+						k=objRSAssocTecFac("ordenacao")				   
+						ordena = "ord" & k				  
+						chave ="chave" & k				   
+						%>					
+							<tr>
+							   <td id="<%=ordena%>"><%=k%></td>					   
+								<td>
+									<a href="estruturaTecnologia.asp?assoc=<%=objRSAssocTecFac("estrutura_tec_fac_id")%>">
+										<center>Alterar</center>
+									</a>		
+								</td>
+								<td><%=objRSAssocTecFac("Label")%></td>
+								<td><%=objRSAssocTecFac("Formato")%></td>
+								<td><%=objRSAssocTecFac("Tamanho")%></td>
+								<td><%=objRSAssocTecFac("Compartilhamento")%></td>
+								<td><%=objRSAssocTecFac("Obrigatorio")%></td>
+								<td><%=objRSAssocTecFac("Status")%></td>	                       					
+								<td align="center">
+									<% if k <> 1 then 
+										var acima= "cima" & k
+										var acimades ="cimades" & k
+										var abaixo = "abaixo" & k
+										var abaixodes ="abiaxodes" & k						   
+									%>
+										<button id="<%=acima%>" title="Clique aqui para mover para cima" onclick="moverLinha( <%=k%>, 'cima',<%=totalRows%>, <%=objRSAssocTecFac("estrutura_tec_fac_id")%>)">↑</button>
+									<% else %>	
+										<button id="<%=acima%> "disabled="disabled" title="Clique aqui para mover para cima" onclick="moverLinha(<%=k%>, 'cima',<%=totalRows%>,<%=objRSAssocTecFac("estrutura_tec_fac_id")%>)">↑</button>
+									<% end if %>	
+									&nbsp;
+									<% if k <> totalRows then %>
+										<button id="<%=abaixo%>" title="Clique aqui para mover para baixo" onclick="moverLinha(<%=k%>, 'baixo',<%=totalRows%>,<%=objRSAssocTecFac("estrutura_tec_fac_id")%>)">↓</button>				
+									<% else %>
+										<button id="<%=abaixo%>" disabled="disabled" title="Clique aqui para mover para baixo" onclick="moverLinha(<%=k%>, 'baixo',<%=totalRows%>,<%=objRSAssocTecFac("estrutura_tec_fac_id")%>)">↓</button>										
+									<% end if %>	
+								</td> 
+								<td>						
+									<a href="javascript:Excluir(<%=objRSAssocTecFac("estrutura_tec_fac_id")%>)">
+										<center>inativar</center>
+									</a>		
+								</td>
+								<td  id ="<%=chave%>" style="visibility:hidden" value='<%=objRSAssocTecFac("estrutura_tec_fac_id")%>'> </td>
+							</tr>
+						<%
+						'LOOP DEPOIS DA LINHA PARA QUE SE REPITA ENQUANTO TIVER REGISTROS NO SELECT FEITO
+						objRSAssocTecFac.movenext
+					loop
+					End if
+					%>	  
+				</tbody>
+			</table>
+		</div>
+	</td>
+</tr>
+<!--</table>
+</body>-->
+<!--<SCRIPT LANGUAGE=javascript>
+
+setarFocus('cbonewTecnologia');
+//
+</SCRIPT>
+-->
+</html>
+<%
+Set objRSAssocTecFac = Nothing
+DesconectarCla()
+'Response.Write ("<script language='JavaScript'>alert('aqui:')</script>")
+' response.end
+%>

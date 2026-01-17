@@ -1,0 +1,376 @@
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Pedido: DM-12362/2008</title>
+<style>
+				TD
+				{
+				    FONT-SIZE: 7pt;
+				    FONT-FAMILY: Tahoma;
+				}
+				.TD_RESPOSTA
+				{
+				    FONT-SIZE: 7pt;
+				    FONT-FAMILY: Tahoma;
+				    border-top: 1px solid ;
+				    border-right: 1px solid ;
+				    border-bottom: 1px solid ;
+				    border-left: 1px solid;
+				}
+				INPUT
+				{
+				    FONT-SIZE: 7pt;
+				    FONT-FAMILY: Tahoma;
+				}
+				.TD_CAMPO
+				{
+				    FONT-WEIGHT: bold;
+				    FONT-SIZE: 7pt;
+				    FONT-FAMILY: Tahoma;
+				    BACKGROUND-COLOR: #c2c3d2
+				}
+				.td_btn
+				{
+				    FONT-WEIGHT: bold;
+				    FONT-SIZE: 7pt;
+				    CURSOR: hand;
+				    COLOR: white;
+				    BORDER-LEFT: thin groove;
+				    BORDER-BOTTOM: thin groove;
+				    BORDER-RIGHT: thin groove;
+				    BORDER-TOP: thin groove;
+				    FONT-FAMILY: Tahoma;
+				    BACKGROUND-COLOR: steelblue;
+				    TEXT-ALIGN: center
+				}
+				.TD_NEGRITO
+				{
+				    FONT-WEIGHT: bold;
+				    FONT-FAMILY: Arial
+				}
+				.TD_CAMPO_CLARO
+				{
+				    FONT-WEIGHT: bold;
+				    FONT-SIZE: 7pt;
+				    FONT-FAMILY: Tahoma;
+				    BACKGROUND-COLOR: #edebeb
+				}
+				.TD_SUBTIT
+				{
+				    FONT-WEIGHT: bold;
+				    FONT-SIZE: 7pt;
+				    FONT-FAMILY: Tahoma;
+				    BACKGROUND-COLOR: #b2e6f7;
+				    TEXT-DECORATION: underline
+				}
+				.TD_EMBRATEL
+				{
+				    FONT-WEIGHT: normal;
+				    COLOR: darkblue;
+				    FONT-STYLE: oblique;
+				    FONT-FAMILY: 'Arial Black';
+				    BACKGROUND-COLOR: #eeeeea;
+				    border-top: 1px solid ;
+				    border-right: 1px solid ;
+				    border-bottom: 1px solid ;
+				    border-left: 1px solid;
+				}
+				INPUT.button
+				{
+					font-family: Verdana, Arial, Helvetica, sans-serif;
+					font-size: 9px;
+					font-weight: normal;
+					TEXT-ALIGN: center
+					color: #000000;
+					text-decoration: none;
+					background-color: #f1f1f1;
+					border-top: 1px solid #0F1F5F;
+					border-right: 1px solid #0F1F5F;
+					border-bottom: 1px solid #0F1F5F;
+					border-left: 1px solid #0F1F5F;
+					width:100px
+				}
+				.table_interno
+				{
+				    border-top: 1px solid ;
+				    border-right: 1px solid ;
+				    border-bottom: 1px solid ;
+				    border-left: 1px solid;
+				}
+			</style><script>
+				function Imprimir()
+				{
+					window.print();
+					//alert("teste");
+				}
+				function SendMail()
+				{
+
+					var xmlDoc = new ActiveXObject("Microsoft.XMLDOM");
+					var xmlhttp = new ActiveXObject("Msxml2.XMLHTTP");
+					var strXML
+
+					xmlDoc.loadXML(Envio.hdnstrXML.value);
+					xmlhttp.Open("POST", "EnviaEmail.asp", false);
+					xmlhttp.Send(xmlDoc.xml);
+
+					strXML = xmlhttp.responseText;
+					objWindow = window.open("About:blank", null, "status=no,toolbar=no,menubar=no,location=no,resizable=Yes,scrollbars = Yes");
+					objWindow.document.write(strXML);		
+					objWindow.document.close();
+					document.close();
+								
+				}
+			</script></head>
+<BODY leftMargin="0" topMargin="0" marginheight="0" marginwidth="0" align="center">
+<form name="form1">
+<TABLE BORDER="0" cellSpacing="0" cellPadding="1" width="100%">
+<TR>
+<TD>
+<FONT face="Arial" SIZE="2">À</FONT>
+</TD>
+</TR>
+<TR>
+<TD>
+<FONT face="Arial" SIZE="2">CTBC TELECOM-URA</FONT>
+</TD>
+</TR>
+</TABLE><BR><BR><TABLE BORDER="1" CELLSPACING="0" BORDERCOLOR="#000000" CELLPADDING="2" WIDTH="100%">
+<TR>
+<TD VALIGN="TOP" ALIGN="CENTER" COLSPAN="14" BGCOLOR="#ffffff" HEIGHT="13">
+<FONT FACE="Arial" SIZE="3"><B>FORMULÁRIO DE SOLICITAÇÃO DE SERVIÇO - EILD (FSS - EILD)</B></FONT><BR><FONT FACE="Arial" SIZE="2"><B>DM-12362/2008   DATA PEDIDO: 19/03/2008 DATA EXECUÇÃO: ____/____/____</B></FONT>
+</TD>
+</TR>
+</TABLE><BR><TABLE BORDER="0" CELLSPACING="0" BORDERCOLOR="#000000" CELLPADDING="2" WIDTH="100%">
+<TR>
+<TD VALIGN="TOP" COLSPAN="14" BGCOLOR="#ffffff" HEIGHT="12"><B><FONT FACE="Arial" SIZE="2">EMPRESA CONTRATANTE: </FONT></B></TD>
+</TR>
+</TABLE>
+<TABLE BORDER="1" CELLSPACING="0" BORDERCOLOR="#000000" CELLPADDING="2" WIDTH="100%">
+<TR>
+<TD VALIGN="TOP" COLSPAN="14" BGCOLOR="#ffffff" HEIGHT="12">
+<FONT FACE="Arial" SIZE="1">EMPRESA/RAZÃO SOCIAL:</FONT><BR><FONT FACE="Arial" SIZE="2">EMPRESA BRASILEIRA DE TELECOMUNICAÇÕES - EMBRATEL - S/A                         </FONT>
+</TD>
+</TR>
+<TR>
+<TD WIDTH="63%" VALIGN="TOP" COLSPAN="8" BGCOLOR="#ffffff" HEIGHT="12">
+<FONT FACE="Arial" SIZE="1">ENDEREÇO (RUA, AVENIDA, No, BAIRRO): </FONT><BR><FONT FACE="Arial" SIZE="2">R.ESPÍRITO SANTO 1000 - 8º ANDAR - BELO HORIZONTE                               </FONT>
+</TD>
+<TD WIDTH="37%" VALIGN="TOP" COLSPAN="6" BGCOLOR="#ffffff" HEIGHT="12">
+<FONT FACE="Arial" SIZE="1">.</FONT>
+<FONT FACE="Arial" SIZE="2"></FONT>
+</TD>
+</TR>
+<TR>
+<TD WIDTH="27%" VALIGN="TOP" BGCOLOR="#ffffff" HEIGHT="12">
+<FONT FACE="Arial" SIZE="1"> CGC: </FONT><BR><FONT FACE="Arial" SIZE="2">33530486013883      </FONT>
+</TD>
+<TD WIDTH="27%" VALIGN="TOP" COLSPAN="5" BGCOLOR="#ffffff" HEIGHT="12">
+<FONT FACE="Arial" SIZE="1">	CIDADE </FONT><BR><FONT FACE="Arial" SIZE="2">BELO HORIZONTE</FONT>
+</TD>
+<TD WIDTH="20%" VALIGN="TOP" COLSPAN="6" BGCOLOR="#ffffff" HEIGHT="12">
+<FONT FACE="Arial" SIZE="1"> UF: </FONT><BR><FONT FACE="Arial" SIZE="2">MG</FONT>
+</TD>
+<TD WIDTH="27%" VALIGN="TOP" COLSPAN="2" BGCOLOR="#ffffff" HEIGHT="12">
+<FONT FACE="Arial" SIZE="1"> CEP: </FONT><BR><FONT FACE="Arial" SIZE="2">30160-031</FONT>
+</TD>
+</TR>
+<TR>
+<TD WIDTH="53%" VALIGN="TOP" COLSPAN="6" BGCOLOR="#ffffff" HEIGHT="12">
+<FONT FACE="Arial" SIZE="1"> CONTATO: <BR></FONT>
+<FONT FACE="Arial" SIZE="2">JOANA/IRIO                                                                      </FONT>
+</TD>
+<TD WIDTH="20%" VALIGN="TOP" COLSPAN="6" BGCOLOR="#ffffff" HEIGHT="12">
+<FONT FACE="Arial" SIZE="1"> TELEFONE: <BR></FONT>
+<FONT FACE="Arial" SIZE="2">31-2121 3178 / 3155 </FONT>
+</TD>
+<TD WIDTH="27%" VALIGN="TOP" COLSPAN="2" BGCOLOR="#ffffff" HEIGHT="12">
+<FONT FACE="Arial" SIZE="1"> FAX/TELEX: <BR></FONT>
+<FONT FACE="Arial" SIZE="2">31-21213130         </FONT>
+</TD>
+</TR>
+</TABLE><BR><TABLE BORDER="0" CELLSPACING="0" BORDERCOLOR="#000000" CELLPADDING="2" WIDTH="100%">
+<TR>
+<TD VALIGN="TOP" COLSPAN="14" BGCOLOR="#ffffff" HEIGHT="12">
+<FONT FACE="Arial" SIZE="2"><B>DADOS DO PEDIDO</B></FONT>
+</TD>
+</TR>
+</TABLE>
+<TABLE BORDER="1" CELLSPACING="0" BORDERCOLOR="#000000" CELLPADDING="2" WIDTH="100%">
+<TR>
+<TD VALIGN="TOP" COLSPAN="14" BGCOLOR="#ffffff" HEIGHT="12">
+<FONT FACE="Arial" SIZE="1">CLIENTE / USUÁRIO: </FONT><BR><FONT FACE="Arial" SIZE="2" COLOR="#ff0000"><B>ELETROZEMA LTDA</B></FONT>
+</TD>
+</TR>
+<TR>
+<TD WIDTH="34%" VALIGN="TOP" COLSPAN="4" BGCOLOR="#ffffff" HEIGHT="33">
+<FONT FACE="Arial" SIZE="2"><B>( <span style="font-family:'verdana'"> x </span>
+						)
+					</B></FONT>
+<FONT FACE="Arial" SIZE="2" COLOR="#ff0000"><B> INSTALAÇÃO </B></FONT><BR><BR><FONT FACE="Arial" SIZE="1">( )ALT. DE  CARACTERISTICA TÉCNICA </FONT><BR><BR><FONT FACE="Arial" SIZE="1">( )ALT. DE MEIO</FONT><BR><BR><FONT FACE="Arial" SIZE="1">( )ALT.  DE RAZÃO SOCIAL</FONT>
+</TD>
+<TD WIDTH="35%" VALIGN="TOP" COLSPAN="7" BGCOLOR="#ffffff" HEIGHT="33">
+<FONT FACE="Arial" SIZE="1">( )AUMENTO VELOCIDADE</FONT><BR><FONT FACE="Arial" SIZE="1">DE: ______ </FONT>
+<FONT FACE="Arial" SIZE="1">PARA: _____</FONT><BR><BR><FONT FACE="Arial" SIZE="1">( )REDUÇÃO VELOCIDADE</FONT><BR><FONT FACE="Arial" SIZE="1">DE: ______ </FONT>
+<FONT FACE="Arial" SIZE="1">PARA: _____</FONT><BR><BR><FONT FACE="Arial" SIZE="1">MUD. END. PONTA:  A( )    B( )  </FONT><BR><BR><FONT FACE="Arial" SIZE="1">( )MUDANÇA DE LOCALIDADE</FONT><BR></TD>
+<TD WIDTH="31%" VALIGN="TOP" COLSPAN="3" BGCOLOR="#ffffff" HEIGHT="33">
+<FONT FACE="Arial" SIZE="1"><B>( 
+						
+					)</B> CANCELAMENTO</FONT><BR><FONT FACE="Arial" SIZE="1"><B>(
+						
+					)</B> RETIRADA DE ACESSO </FONT><BR><FONT FACE="Arial" SIZE="1">( ) OUTROS <BR><BR>
+					DATA DESIG. FACILIDADES:  </FONT><BR><BR><FONT FACE="Arial" SIZE="1">DATA PREVISÃO DE ATENDIMENTO:  </FONT>
+</TD>
+</TR>
+<TR>
+<TD WIDTH="65%" VALIGN="TOP" COLSPAN="10" BGCOLOR="#ffffff" HEIGHT="12">
+<FONT FACE="Arial" SIZE="1">ENDEREÇO  PONTA A (RUA, AVENIDA, No, BAIRRO):</FONT><BR><FONT FACE="Arial" SIZE="2" COLOR="#ff0000"><B>RUA PREFEITO JOSE BARBOSA LEAO 318  CENTRO</B></FONT>
+</TD>
+<TD WIDTH="35%" VALIGN="TOP" COLSPAN="4" BGCOLOR="#ffffff" HEIGHT="12">
+<FONT FACE="Arial" SIZE="1">CGC: </FONT><BR><FONT FACE="Arial" SIZE="2" COLOR="#ff0000"><B>26404731000196</B></FONT>
+</TD>
+</TR>
+<TR>
+<TD WIDTH="53%" VALIGN="TOP" COLSPAN="6" BGCOLOR="#ffffff" HEIGHT="12">
+<FONT FACE="Arial" SIZE="1">CIDADE:</FONT><BR><FONT FACE="Arial" SIZE="2" COLOR="#ff0000"><B>CORREGO DANTA</B></FONT>
+</TD>
+<TD WIDTH="20%" VALIGN="TOP" COLSPAN="6" BGCOLOR="#ffffff" HEIGHT="12">
+<FONT FACE="Arial" SIZE="1">UF:</FONT><BR><FONT FACE="Arial" SIZE="2" COLOR="#ff0000"><B>MG</B></FONT>
+</TD>
+<TD WIDTH="27%" VALIGN="TOP" COLSPAN="2" BGCOLOR="#ffffff" HEIGHT="12">
+<FONT FACE="Arial" SIZE="1">CEP:</FONT><BR><FONT FACE="Arial" SIZE="2" COLOR="#ff0000"><B>38990-000</B></FONT>
+</TD>
+</TR>
+<TR>
+<TD WIDTH="32%" VALIGN="TOP" COLSPAN="2" BGCOLOR="#ffffff" HEIGHT="12">
+<FONT FACE="Arial" SIZE="1">TELEFONE:</FONT><BR><FONT FACE="Arial" SIZE="2" COLOR="#ff0000"><B>( 37 ) 34241320</B></FONT>
+</TD>
+<TD WIDTH="32%" VALIGN="TOP" COLSPAN="7" BGCOLOR="#ffffff" HEIGHT="12">
+<FONT FACE="Arial" SIZE="1">PESSOA P/ CONTACTO:</FONT><BR><FONT FACE="Arial" SIZE="2" COLOR="#ff0000"><B>GC LJ/SITE CTRL34 36691823</B></FONT>
+</TD>
+<TD WIDTH="36%" VALIGN="TOP" COLSPAN="5" BGCOLOR="#ffffff" HEIGHT="12">
+<FONT FACE="Arial" SIZE="1">ROTA:</FONT><BR><FONT FACE="Arial" SIZE="2"><b> . </b></FONT>
+</TD>
+</TR>
+<TR>
+<TD VALIGN="TOP" COLSPAN="14" BGCOLOR="#ffffff" HEIGHT="12">
+<FONT FACE="Arial" SIZE="1">ENDEREÇO  PONTA B (RUA, AVENIDA, No, BAIRRO):</FONT><BR><FONT FACE="Arial" SIZE="2">RUA MACHADO DE ASSIS 114         CENTRO                                  </FONT>
+</TD>
+</TR>
+<TR>
+<TD WIDTH="53%" VALIGN="TOP" COLSPAN="6" BGCOLOR="#ffffff" HEIGHT="12">
+<FONT FACE="Arial" SIZE="1">CIDADE:</FONT><BR><FONT FACE="Arial" SIZE="2">UBERLANDIA                                                  </FONT>
+</TD>
+<TD WIDTH="20%" VALIGN="TOP" COLSPAN="6" BGCOLOR="#ffffff" HEIGHT="12">
+<FONT FACE="Arial" SIZE="1">UF:</FONT><BR><FONT FACE="Arial" SIZE="2">MG</FONT>
+</TD>
+<TD WIDTH="27%" VALIGN="TOP" COLSPAN="2" BGCOLOR="#ffffff" HEIGHT="12">
+<FONT FACE="Arial" SIZE="1">CEP:</FONT><BR><FONT FACE="Arial" SIZE="2">38400-112</FONT>
+</TD>
+</TR>
+<TR>
+<TD WIDTH="32%" VALIGN="TOP" COLSPAN="2" BGCOLOR="#ffffff" HEIGHT="12">
+<FONT FACE="Arial" SIZE="1">TELEFONE:</FONT><BR><FONT FACE="Arial" SIZE="2">3421019931                    </FONT>
+</TD>
+<TD WIDTH="32%" VALIGN="TOP" COLSPAN="7" BGCOLOR="#ffffff" HEIGHT="12">
+<FONT FACE="Arial" SIZE="1">PESSOA P/ CONTACTO:</FONT><BR><FONT FACE="Arial" SIZE="2">TÉCNICO DA ESTAÇÃO            </FONT>
+</TD>
+<TD WIDTH="36%" VALIGN="TOP" COLSPAN="5" BGCOLOR="#ffffff" HEIGHT="12">
+<FONT FACE="Arial" SIZE="1">ESTAÇÃO SMC: </FONT>
+<FONT FACE="Arial" SIZE="2"></FONT>
+</TD>
+</TR>
+</TABLE><BR><TABLE BORDER="0" CELLSPACING="0" BORDERCOLOR="#000000" CELLPADDING="2" WIDTH="100%">
+<TR>
+<TD VALIGN="TOP" COLSPAN="14" BGCOLOR="#ffffff" HEIGHT="12">
+<FONT FACE="Arial" SIZE="2"><B> MODALIDADE/CARACTERÍSTICAS DA LINHA DEDICADA: </B></FONT>
+</TD>
+</TR>
+</TABLE>
+<TABLE BORDER="1" CELLSPACING="0" BORDERCOLOR="#000000" CELLPADDING="2" WIDTH="100%">
+<TR>
+<TD WIDTH="50%" VALIGN="TOP" COLSPAN="5" BGCOLOR="#ffffff" HEIGHT="12">
+<FONT FACE="Arial" SIZE="2" COLOR="#ff0000"><B>VELOCIDADE ( 128K  ) </B></FONT><BR><BR><FONT FACE="Arial" SIZE="1">QUANTIDADE DE LINHA:  </FONT>
+<FONT FACE="Arial" SIZE="1"> DEDICADA(  )  </FONT>
+<FONT FACE="Arial" SIZE="2" COLOR="#ffffff"> .... </FONT>
+<FONT FACE="Arial" SIZE="1"> CANAL   (  ) </FONT><BR><BR><FONT FACE="Arial" SIZE="1">TIPO DE INTERLIGAÇÃO (  )</FONT><BR><BR><FONT FACE="Arial" SIZE="2"><B>CLASSE/OPERAÇÃO:</B></FONT><BR><FONT FACE="Arial" SIZE="1"> (  )SÍNCRONO </FONT>
+<FONT FACE="Arial" SIZE="2" COLOR="#ffffff"> .... </FONT>
+<FONT FACE="Arial" SIZE="1"> (  )ASSÍNCRONO</FONT><BR><BR><FONT FACE="Arial" SIZE="2"><B>INTERFACE:</B></FONT><BR><FONT FACE="Arial" SIZE="2" COLOR="#000000"> 
+					( 
+					
+						
+										
+					 )V24 </FONT>
+<FONT FACE="Arial" SIZE="2" COLOR="#ffffff"> .... </FONT>
+<FONT FACE="Arial" SIZE="2" COLOR="#000000"> 
+					(  
+						<span style="font-family:'verdana'">x</span>
+					
+					)V35 </FONT>
+<FONT FACE="Arial" SIZE="2" COLOR="#ffffff"> .... </FONT>
+<FONT FACE="Arial" SIZE="2" COLOR="#000000"> 
+					(  
+						
+					)V36 </FONT>
+<FONT FACE="Arial" SIZE="2" COLOR="#ffffff"> .... </FONT>
+<FONT FACE="Arial" SIZE="2" COLOR="#000000"> 
+					(
+						
+						
+					)G703 </FONT>
+</TD>
+<TD WIDTH="50%" VALIGN="TOP" COLSPAN="9" BGCOLOR="#ffffff" HEIGHT="12">
+<FONT FACE="Arial" SIZE="1">QUANTIDADE MODEM's	(  )</FONT><BR><BR><FONT FACE="Arial" SIZE="1">ACESSO LOCAL (  ) </FONT><BR><BR><FONT FACE="Arial" SIZE="1">DEGRAU TARIFÁRIO (  )</FONT><BR><BR><FONT FACE="Arial" SIZE="2">DESIGNAÇÃO<B> CTBC: 
+					
+					</B></FONT><BR><FONT FACE="Arial" SIZE="1">ROTA (  ) </FONT>
+<FONT FACE="Arial" SIZE="2" COLOR="#ffffff"> .... </FONT>
+<FONT FACE="Arial" SIZE="1">NÚMERO (  )</FONT>
+<FONT FACE="Arial" SIZE="2" COLOR="#ffffff"> .... </FONT>
+<FONT FACE="Arial" SIZE="1">CANAL (  )   </FONT><BR><BR><FONT FACE="Arial" SIZE="2">DESIGNAÇÃO <B>OUTRA EMPRESA: </B></FONT><BR><FONT FACE="Arial" SIZE="1">ROTA (  )</FONT>
+<FONT FACE="Arial" SIZE="2" COLOR="#ffffff"> .... </FONT>
+<FONT FACE="Arial" SIZE="1">NÚMERO(  ) </FONT>
+</TD>
+</TR>
+<TR>
+<TD VALIGN="TOP" COLSPAN="14" BGCOLOR="#ffffff" HEIGHT="11">
+<FONT FACE="Arial" SIZE="1"> INFORMAÇÕES COMPLEMENTARES: </FONT>
+<FONT FACE="Arial" SIZE="2">TRATA-SE DE ATIVAÇÃO DE CIRCUITO INTERNET 128K. MEV 747256<BR>TRATA-SE DE ATIVAÇÃO DE CIRCUITO INTERNET 128K. MEV 747256 CC ULA 01004562 TS 27 E 28                                                                                                                                                                                                                       </FONT><BR><BR><BR><FONT FACE="Arial" SIZE="1">OCORRÊNCIAS IMPEDITIVAS:</FONT><BR><BR></TD>
+</TR>
+<TR>
+<TD>
+</TD>
+</TR>
+<TR>
+<TD VALIGN="TOP" COLSPAN="14" BGCOLOR="#ffffff" HEIGHT="12">
+<FONT FACE="Arial" SIZE="1">ENDEREÇO:</FONT><BR><FONT FACE="Arial" SIZE="2">R.ESPÍRITO SANTO 1000 - 8º ANDAR - BELO HORIZONTE                               </FONT>
+</TD>
+</TR>
+<TR>
+<TD WIDTH="74%" VALIGN="TOP" COLSPAN="13" BGCOLOR="#ffffff" HEIGHT="12">
+<FONT FACE="Arial" SIZE="1">CIDADE:</FONT><BR><FONT FACE="Arial" SIZE="2">BELO HORIZONTE</FONT>
+</TD>
+<TD WIDTH="26%" VALIGN="TOP" BGCOLOR="#ffffff" HEIGHT="12">
+<FONT FACE="Arial" SIZE="1">UF:</FONT><BR><FONT FACE="Arial" SIZE="2">MG</FONT>
+</TD>
+</TR>
+<TR>
+<TD VALIGN="TOP" COLSPAN="14" BGCOLOR="#ffffff" HEIGHT="13">
+<FONT FACE="Arial" SIZE="1">CONSULTOR:</FONT><BR><FONT FACE="Arial" SIZE="2">JOANA/IRIO                                                                      </FONT>
+</TD>
+</TR>
+<TR>
+<TD WIDTH="34%" VALIGN="TOP" COLSPAN="3" BGCOLOR="#ffffff" HEIGHT="13">
+<FONT FACE="Arial" SIZE="1">FONE: </FONT><BR><FONT FACE="Arial" SIZE="2">31-2121 3178 / 3155 </FONT>
+</TD>
+<TD WIDTH="27%" VALIGN="TOP" COLSPAN="4" BGCOLOR="#ffffff" HEIGHT="13">
+<FONT FACE="Arial" SIZE="1">FAX:	</FONT><BR><FONT FACE="Arial" SIZE="2">31-21213130         </FONT>
+</TD>
+<TD WIDTH="39%" VALIGN="TOP" COLSPAN="7" BGCOLOR="#ffffff" HEIGHT="13">
+<FONT FACE="Arial" SIZE="1">E-MAIL:</FONT><BR><FONT FACE="Arial" SIZE="2">joadarc@embratel.com.br,t3pauce@brasilcenter.com.br                              </FONT>
+</TD>
+</TR>
+</TABLE>
+</form>
+</BODY>
+</html>
+

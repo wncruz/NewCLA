@@ -1,0 +1,117 @@
+<!--#include file="../inc/data.asp"-->
+<%
+	dblNroSev 		= ""
+	pro_id    		= ""
+	origemSol 		= ""
+	AcaoAPG   		= ""
+	Segmento		= ""
+	Porte			= ""
+	Tecnologia		= ""
+	
+	
+	dblNroSev 		= Request.Form("hdnNroSev")
+	pro_id 	  		= Request.Form("hdnCboProvedor")
+	origemSol 	  	= Request.Form("hdnOrigemSol")
+	AcaoAPG   		= Request.Form("hdnTipoAcaoAPG")
+	Segmento		= Request.Form("hdnSegmento")
+	Porte			= Request.Form("hdnPorte")
+	Tecnologia		= Request.Form("hdnTecnologia")
+	Prop			= Request.Form("hdnPropIdFisico")
+	
+	CNLSiglaCentroCliDest		= Trim(Request.Form("txtCNLSiglaCentroCliDest"))
+	ComplSiglaCentroCliDest		= Trim(Request.Form("txtComplSiglaCentroCliDest"))
+	
+	'Response.Write "<script language=javascript>alert('"&CNLSiglaCentroCliDest&"')</script>"
+	'Response.Write "<script language=javascript>alert('"&ComplSiglaCentroCliDest&"')</script>"
+	'Response.Write "<script language=javascript>alert('"&origemSol&"')</script>"
+	'Response.Write "<script language=javascript>alert('"&Prop&"')</script>"
+	
+	
+	'RAIO X
+	'if ( ltrim(rtrim(origemSol)) <> "3" or ltrim(rtrim(origemSol)) = "" ) then
+	
+		if (ltrim(rtrim(origemSol)) = "" ) then
+			origemSol = 0
+		end if
+				
+		Vetor_Campos(1)="adInteger,4,adParamInput," & dblNroSev
+		Vetor_Campos(2)="adInteger,4,adParamInput," & pro_id
+		Vetor_Campos(3)="adInteger,4,adParamOutput,0"
+		Vetor_Campos(4)="adWChar,20,adParamInput,"	& Segmento
+		Vetor_Campos(5)="adWChar,20,adParamInput,"	& Porte
+		Vetor_Campos(6)="adInteger,4,adParamInput," & Tecnologia
+		Vetor_Campos(7)="adWChar,20,adParamInput,"	& Prop
+	
+		Vetor_Campos(8)="adInteger,4,adParamInput," & origemSol
+		Vetor_Campos(9) ="adWChar,20,adParamInput,"	& CNLSiglaCentroCliDest
+		Vetor_Campos(10)="adWChar,20,adParamInput,"	& ComplSiglaCentroCliDest
+	
+		Call APENDA_PARAM("CLA_sp_check_sevMestra",10,Vetor_Campos)
+		ObjCmd.Execute'pega dbaction
+		DBAction = ObjCmd.Parameters("RET").value
+			
+		'Response.Write "<script language=javascript>parent.resposta(711,'');</script>"
+		
+		
+		if DBAction <> 0 and  DBAction <> 711 then
+			Response.Write "<script language=javascript>parent.resposta(" & Cint("0" & DBAction) & ",'');</script>"
+			Response.End
+		else
+		  %>
+		  <script language="JavaScript">
+		  	<%
+				if ( origemSol = 4 and AcaoAPG = "ALT" ) then
+				%>
+		  			parent.AdicionarAcessoListaAPG()
+				<%
+				elseIf (origemSol = 6 or origemSol = 7 ) then
+				
+					IF DBAction = 711 then				
+				%>
+						//if (confirm(parent.resposta(711,''))){
+						//if (confirm('Esta não é a solução indicada como resposta da SEV pelo processo de viabilidade.\nClique OK para prosseguir com a escolha deste acesso – seu login será registrado para auditoria futura de uso em não conformidade com a viabilidade.')){
+						//	parent.AdicionarAcessoListaAprov()
+						//}
+						parent.resposta(711,'')
+					
+				<%
+					ELSE
+				
+				%>
+				
+					parent.AdicionarAcessoListaAprov()
+				<%
+					END IF
+					
+				else
+					IF DBAction = 711 then
+				%>					
+						//if (confirm(parent.resposta(711,''))){
+						//if (confirm('Esta não é a solução indicada como resposta da SEV pelo processo de viabilidade.\nClique OK para prosseguir com a escolha deste acesso – seu login será registrado para auditoria futura de uso em não conformidade com a viabilidade.')){
+						//	parent.AdicionarAcessoLista()						
+						//}
+						parent.resposta(711,'')
+				<%
+					ELSE
+				%>
+					parent.AdicionarAcessoLista()
+				<%
+					END IF
+				end if 
+				%>
+		  </script>
+		  <%
+		end if
+		
+	'else
+		
+		%>
+		 <script language="JavaScript">
+				//RAIO X
+			    //parent.AdicionarAcessoLista()
+			
+		 </script>
+		  <%
+		
+	'end if
+%>
