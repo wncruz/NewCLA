@@ -1,0 +1,2 @@
+As consultas gravadas neste diretório permanecem arquivadas por no máximo 3 dias.
+Decorrido esse prazo a primeira consulta feita por qualquer usuário apagará as consultas que estão com seus prazos vencidos.

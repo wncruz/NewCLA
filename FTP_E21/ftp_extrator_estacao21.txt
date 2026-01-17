@@ -1,0 +1,10 @@
+open UXE21DH1
+ftp_e21
+siste21
+put \\XPRJO132\FTP_E21\rel_acesso_fisico_logico.txt rel_acesso_fisico_logico.txt
+put \\XPRJO132\FTP_E21\rel_acesso_fisico_tronco_mux.txt rel_acesso_fisico_tronco_mux.txt
+put \\XPRJO132\FTP_E21\rel_acesso_estacao.txt rel_acesso_estacao.txt
+put \\XPRJO132\FTP_E21\acesso_fisico.txt acesso_fisico.txt
+put \\XPRJO132\FTP_E21\acesso_logico.txt acesso_logico.txt
+put \\XPRJO132\FTP_E21\rel_acesso_logico_circuito.txt rel_acesso_logico_circuito.txt
+quit
