@@ -1,0 +1,237 @@
+A
+{
+    FONT-WEIGHT: normal;
+    FONT-SIZE: 11px;
+    COLOR: #003388;
+    FONT-FAMILY: Arial, Helvetica, sans-serif;
+    TEXT-DECORATION: none
+}
+A:hover
+{
+    TEXT-DECORATION: underline
+}
+A.white
+{
+    FONT-WEIGHT: bold;
+    COLOR: #ffffff
+}
+P
+{
+    FONT-SIZE: 8pt;
+    FONT-STYLE: normal;
+    FONT-FAMILY: Arial
+}
+H1
+{
+}
+H2
+{
+}
+H3
+{
+}
+BODY
+{
+}
+TD
+{
+    FONT-WEIGHT: normal;
+    FONT-SIZE: 9px;
+    COLOR: #000000;
+    FONT-FAMILY: Verdana, Arial, Helvetica, sans-serif
+}
+TH
+{
+    FONT-WEIGHT: bold;
+    FONT-SIZE: 11px;
+    COLOR: #ffffff;
+    FONT-FAMILY: Arial, Helvetica, sans-serif;
+    BACKGROUND-COLOR: #31659c;
+    TEXT-ALIGN: left
+}
+TH.clsTitle
+{
+    FONT-WEIGHT: bold;
+    FONT-SIZE: 11px;
+    COLOR: #ffffff;
+    FONT-FAMILY: Arial, Helvetica, sans-serif;
+    BACKGROUND-COLOR: #31659c;
+    TEXT-ALIGN: center
+}
+TD.clsSilver
+{
+    BACKGROUND-COLOR: #eeeeee
+}
+TD.clsSilver1
+{
+    BACKGROUND-COLOR: #f1f1f1
+}
+TD.clsSilver2
+{
+    BACKGROUND-COLOR: #dcdcdc
+}
+TD.blue
+{
+    FONT-WEIGHT: bold;
+    FONT-SIZE: 8pt;
+    COLOR: #003399;
+    FONT-FAMILY: Arial, Helvetica
+}
+TD.lightblue
+{
+    FONT-WEIGHT: normal;
+    FONT-SIZE: 11px;
+    COLOR: #000000;
+    FONT-FAMILY: Arial, Helvetica, sans-serif
+}
+TD.titulo
+{
+    FONT-WEIGHT: bold;
+    FONT-SIZE: 10pt;
+    COLOR: #31659c;
+    FONT-FAMILY: Verdana;
+    heigth: 5px
+}
+INPUT.text
+{
+    BORDER-RIGHT: #0f1f5f 1px solid;
+    BORDER-TOP: #0f1f5f 1px solid;
+    FONT-WEIGHT: normal;
+    FONT-SIZE: 11px;
+    BORDER-LEFT: #0f1f5f 1px solid;
+    COLOR: #000000;
+    BORDER-BOTTOM: #0f1f5f 1px solid;
+    FONT-FAMILY: Verdana, Arial, Helvetica, sans-serif;
+    BACKGROUND-COLOR: #ffffff;
+    TEXT-DECORATION: none
+}
+INPUT.button
+{
+    BORDER-RIGHT: #0f1f5f 1px solid;
+    BORDER-TOP: #0f1f5f 1px solid;
+    FONT-WEIGHT: normal;
+    FONT-SIZE: 9px;
+    BORDER-LEFT: #0f1f5f 1px solid;
+    WIDTH: 100px;
+    COLOR: #000000;
+    BORDER-BOTTOM: #0f1f5f 1px solid;
+    FONT-FAMILY: Verdana, Arial, Helvetica, sans-serif;
+    BACKGROUND-COLOR: #f1f1f1;
+    TEXT-DECORATION: none
+}
+TEXTAREA
+{
+    BORDER-RIGHT: #0f1f5f 1px solid;
+    BORDER-TOP: #0f1f5f 1px solid;
+    SCROLLBAR-FACE-COLOR: #f1f1f1;
+    FONT-WEIGHT: normal;
+    FONT-SIZE: 11px;
+    BORDER-LEFT: #0f1f5f 1px solid;
+    SCROLLBAR-SHADOW-COLOR: #003388;
+    COLOR: #000000;
+    SCROLLBAR-3DLIGHT-COLOR: #003388;
+    SCROLLBAR-ARROW-COLOR: #003388;
+    BORDER-BOTTOM: #0f1f5f 1px solid;
+    FONT-FAMILY: Verdana, Arial, Helvetica, sans-serif;
+    SCROLLBAR-DARKSHADOW-COLOR: #ffffff;
+    SCROLLBAR-BASE-COLOR: #ffffff;
+    BACKGROUND-COLOR: #ffffff;
+    TEXT-DECORATION: none
+}
+SELECT
+{
+    BORDER-RIGHT: #0f1f5f 1px solid;
+    BORDER-TOP: #0f1f5f 1px solid;
+    FONT-SIZE: 9px;
+    BORDER-LEFT: #0f1f5f 1px solid;
+    COLOR: #000000;
+    BORDER-BOTTOM: #0f1f5f 1px solid;
+    FONT-FAMILY: verdana, arial;
+    BACKGROUND-COLOR: #ffffff
+}
+INPUT.disabled
+{
+    FONT-WEIGHT: bold;
+    FONT-SIZE: 8pt;
+    COLOR: darkgray;
+    FONT-FAMILY: Arial, Helvetica
+}
+.clsObrig
+{
+    FONT-WEIGHT: bold;
+    FONT-SIZE: 11px;
+    COLOR: #000000;
+    FONT-FAMILY: Verdana, Arial, Helvetica, sans-serif;
+    TEXT-DECORATION: none
+}
+TR.clsSilver
+{
+    BACKGROUND-COLOR: #eeeeee
+}
+TR.clsSilver1
+{
+    BACKGROUND-COLOR: #f2f2f2
+}
+TR.clsSilver2
+{
+    BACKGROUND-COLOR: #dcdcdc
+}
+.clsMenu
+{
+    FONT-WEIGHT: bold;
+    FONT-SIZE: 8pt;
+    COLOR: #000000;
+    FONT-FAMILY: arial ,verdana, helvetica, sans-serif;
+    TEXT-DECORATION: none
+}
+.clsAzulClaro
+{
+    FONT-WEIGHT: bold;
+    FONT-SIZE: 8pt;
+    BACKGROUND: #aaccee;
+    FONT-FAMILY: Verdana, Geneva, Arial, Helvetica, sans-serif
+}
+.TableLine
+{
+    BORDER-COLLAPSE: collapse;
+    bordercolor: black;
+    mso-padding-alt: 0cm 5.4pt 0cm 5.4pt
+}
+.TA
+{
+    SCROLLBAR-FACE-COLOR: #f1f1f1;
+    SCROLLBAR-HIGHLIGHT-COLOR: #f1f1f1;
+    SCROLLBAR-SHADOW-COLOR: #f1f1f1;
+    SCROLLBAR-3DLIGHT-COLOR: #003388;
+    SCROLLBAR-ARROW-COLOR: #003388;
+    SCROLLBAR-DARKSHADOW-COLOR: #003388;
+    SCROLLBAR-BASE-COLOR: #003388
+}
+.Div_Lista
+{
+    SCROLLBAR-FACE-COLOR: #f1f1f1;
+    SCROLLBAR-HIGHLIGHT-COLOR: #f1f1f1;
+    OVERFLOW: auto;
+    WIDTH: 760px;
+    SCROLLBAR-SHADOW-COLOR: #f1f1f1;
+    SCROLLBAR-3DLIGHT-COLOR: #003388;
+    SCROLLBAR-ARROW-COLOR: #003388;
+    SCROLLBAR-DARKSHADOW-COLOR: #003388;
+    SCROLLBAR-BASE-COLOR: #003388;
+    HEIGHT: 350px
+}
+DIV.scroll
+{
+    BORDER-RIGHT: #666 1px solid;
+    BORDER-TOP: #666 1px solid;
+    OVERFLOW: auto;
+    BORDER-LEFT: #666 1px solid;
+    WIDTH: 775px;
+    BORDER-BOTTOM: #666 1px solid;
+    HEIGHT: 250px;
+    BACKGROUND-COLOR: #ffffff
+}
+.Disabled
+{
+    COLOR: #848284
+}
